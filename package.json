@@ -6,12 +6,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node -e \"require('fs').readdirSync('tests').filter(f=>f.endsWith('.test.ts')||f.endsWith('.test.tsx')).sort().forEach(f=>require('child_process').execSync('tsx --experimental-test-module-mocks tests/'+f,{stdio:'inherit'}))\"",
+    "postinstall": "node -e \"const fs=require('fs');const p='./node_modules/@react-pdf/hyphenate/package.json';if(fs.existsSync(p)){const j=JSON.parse(fs.readFileSync(p,'utf8'));if(j.exports&&j.exports['./*']&&!j.exports['./*'].default){j.exports['.'].default=j.exports['.'].import;j.exports['./*'].default=j.exports['./*'].import;fs.writeFileSync(p,JSON.stringify(j,null,2));}}\""
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "@react-pdf/renderer": "^4.9.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.46.0",
     "next": "16.3.5",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-hook-form": "^7.88.0",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -21,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "typescript": "^5"
   }
 }
