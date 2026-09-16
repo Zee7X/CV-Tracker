@@ -219,10 +219,44 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="bg-[#fffefa]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <span className="font-semibold text-stone-800">CV Tracker</span>
-          <span>© {new Date().getFullYear()} CV Tracker</span>
+      <footer className="border-t border-stone-300 bg-[#f5f3ed]">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+          <div className="flex flex-col gap-10 md:flex-row md:justify-between">
+            <div className="max-w-xs">
+              <span className="flex items-center gap-2 text-base font-bold tracking-tight text-stone-950">
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-700 text-white">
+                  <FileText className="h-4 w-4" aria-hidden="true" />
+                </span>
+                CV Tracker
+              </span>
+              <p className="mt-3 text-sm text-stone-600">
+                Build a focused CV, export a clean PDF, and keep every application in one place.
+              </p>
+            </div>
+
+            <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:gap-16">
+              <div>
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-stone-500">Product</h2>
+                <ul className="mt-3 space-y-2 text-sm">
+                  <li><a href="#how-it-works" className="text-stone-700 hover:text-blue-800">How It Works</a></li>
+                  <li><a href="#features" className="text-stone-700 hover:text-blue-800">Features</a></li>
+                  <li><a href="#templates" className="text-stone-700 hover:text-blue-800">Templates</a></li>
+                </ul>
+              </div>
+              <div>
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-stone-500">Get started</h2>
+                <ul className="mt-3 space-y-2 text-sm">
+                  <li><Link href="/register" className="text-stone-700 hover:text-blue-800">Create account</Link></li>
+                  <li><Link href="/login" className="text-stone-700 hover:text-blue-800">Sign in</Link></li>
+                  <li><Link href="/dashboard" className="text-stone-700 hover:text-blue-800">Dashboard</Link></li>
+                </ul>
+              </div>
+            </nav>
+          </div>
+
+          <div className="mt-10 border-t border-stone-300 pt-6">
+            <p className="text-sm text-stone-500">© {new Date().getFullYear()} CV Tracker</p>
+          </div>
         </div>
       </footer>
     </div>

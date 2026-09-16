@@ -138,7 +138,7 @@ export function ApplicationList({ initialApplications }: ApplicationListProps) {
         <button
           type="button"
           onClick={() => setSelectedStatus('all')}
-          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:py-1 ${
             selectedStatus === 'all'
               ? 'bg-slate-900 text-white shadow-sm'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
@@ -147,7 +147,7 @@ export function ApplicationList({ initialApplications }: ApplicationListProps) {
         >
           <span>All</span>
           <span
-            className={`rounded-full px-1.5 py-0.2 text-[10px] ${
+            className={`rounded-full px-1.5 py-0.5 text-[10px] ${
               selectedStatus === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-700'
             }`}
           >
@@ -164,7 +164,7 @@ export function ApplicationList({ initialApplications }: ApplicationListProps) {
               key={status.value}
               type="button"
               onClick={() => setSelectedStatus(status.value)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:py-1 ${
                 isSelected
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
@@ -173,7 +173,7 @@ export function ApplicationList({ initialApplications }: ApplicationListProps) {
             >
               <span>{status.label}</span>
               <span
-                className={`rounded-full px-1.5 py-0.2 text-[10px] ${
+                className={`rounded-full px-1.5 py-0.5 text-[10px] ${
                   isSelected ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-700'
                 }`}
               >

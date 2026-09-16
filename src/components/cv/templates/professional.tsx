@@ -71,19 +71,19 @@ export function ProfessionalTemplate({ cv, className = '' }: TemplateProps) {
           {contactLinks.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-slate-600 border-t border-slate-100 pt-2.5">
               {contactLinks.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 select-none print:hidden" />
+                <div key={idx} className="flex min-w-0 items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 select-none print:hidden shrink-0" />
                   {item.href ? (
                     <a
                       href={item.href}
                       target="_blank"
                       rel="noreferrer"
-                      className="break-all text-slate-700 hover:text-blue-700 hover:underline transition-colors"
+                      className="min-w-0 break-all text-slate-700 hover:text-blue-700 hover:underline transition-colors"
                     >
                       {item.label}
                     </a>
                   ) : (
-                    <span>{item.label}</span>
+                    <span className="min-w-0 break-words">{item.label}</span>
                   )}
                 </div>
               ))}
@@ -133,7 +133,7 @@ export function ProfessionalTemplate({ cv, className = '' }: TemplateProps) {
                       </span>
                     </div>
                     <div className="text-xs font-medium text-slate-600 mt-0.5 flex flex-wrap gap-x-2">
-                      <span className="text-slate-800 font-semibold">{exp.company}</span>
+                      <span className="min-w-0 break-words text-slate-800 font-semibold">{exp.company}</span>
                       {exp.location && <span>• {exp.location}</span>}
                     </div>
                     {exp.description && (
@@ -224,7 +224,7 @@ export function ProfessionalTemplate({ cv, className = '' }: TemplateProps) {
                   >
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline">
                       <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-                        <h3 className="text-xs md:text-sm font-bold text-slate-900">{proj.name}</h3>
+                        <h3 className="min-w-0 text-xs md:text-sm font-bold text-slate-900">{proj.name}</h3>
                         {proj.project_url && (
                           <a
                             href={proj.project_url}

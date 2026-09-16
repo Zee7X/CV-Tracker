@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import type { CVTemplate, CVWithRelations } from '@/types/cv'
 import {
   CVTemplateRenderer,
@@ -18,6 +18,15 @@ import {
   Eye,
   FileCheck,
 } from 'lucide-react'
+
+const A4_PIXEL_WIDTH = 794 // Approx A4 width in px (210mm @ 96dpi)
+const CONTAINER_PADDING = 48
+const DESKTOP_BREAKPOINT = 1024
+
+// Pure so it's unit-testable without a DOM.
+export function computeFitScale(containerWidth: number, a4PixelWidth = A4_PIXEL_WIDTH): number {
+  return Math.min(1.1, Math.max(0.4, Number((containerWidth / a4PixelWidth).toFixed(2))))
+}
 
 export interface LivePreviewProps {
   cv: CVWithRelations
@@ -47,6 +56,7 @@ export function LivePreview({
   const [useSampleData, setUseSampleData] = useState<boolean>(false)
   const [fitMode, setFitMode] = useState<boolean>(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const userZoomedRef = useRef(false)
 
   const activeTemplate = controlledTemplate ?? internalTemplate
 
@@ -73,30 +83,59 @@ export function LivePreview({
 
   // Zoom handlers
   const handleZoomIn = () => {
+    userZoomedRef.current = true
     setFitMode(false)
     setScale((prev) => Math.min(1.5, Number((prev + 0.1).toFixed(2))))
   }
 
   const handleZoomOut = () => {
+    userZoomedRef.current = true
     setFitMode(false)
     setScale((prev) => Math.max(0.4, Number((prev - 0.1).toFixed(2))))
   }
 
   const handleResetZoom = () => {
+    userZoomedRef.current = true
     setFitMode(false)
     setScale(1)
   }
 
   const handleFitToWidth = () => {
     if (!containerRef.current) return
-    const containerWidth = containerRef.current.clientWidth - 48 // Account for padding
-    const a4PixelWidth = 794 // Approx A4 width in px (210mm @ 96dpi)
+    const containerWidth = containerRef.current.clientWidth - CONTAINER_PADDING
     if (containerWidth > 0) {
-      const calculatedScale = Math.min(1.1, Math.max(0.4, Number((containerWidth / a4PixelWidth).toFixed(2))))
-      setScale(calculatedScale)
+      userZoomedRef.current = false // re-enable auto-refit on resize
+      setScale(computeFitScale(containerWidth))
       setFitMode(true)
     }
   }
+
+  // Auto-fit on mount and on resize/orientation change (mobile only), unless
+  // the user explicitly zoomed. Desktop (>=1024px) keeps initialScale.
+  useEffect(() => {
+    const node = containerRef.current
+    if (!node) return
+    let frame = 0
+    const applyFit = () => {
+      if (userZoomedRef.current || !containerRef.current) return
+      if (window.innerWidth >= DESKTOP_BREAKPOINT) return
+      const containerWidth = containerRef.current.clientWidth - CONTAINER_PADDING
+      if (containerWidth > 0) {
+        setScale(computeFitScale(containerWidth))
+        setFitMode(true)
+      }
+    }
+    applyFit()
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(applyFit)
+    })
+    observer.observe(node)
+    return () => {
+      cancelAnimationFrame(frame)
+      observer.disconnect()
+    }
+  }, [])
 
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
@@ -169,7 +208,7 @@ export function LivePreview({
                 type="button"
                 onClick={handleZoomOut}
                 disabled={scale <= 0.4}
-                className="cursor-pointer rounded-md p-1.5 text-slate-600 hover:bg-stone-200 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
+                className="flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-md p-1.5 text-slate-600 hover:bg-stone-200 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
                 title="Zoom Out"
                 aria-label="Zoom Out"
               >
@@ -179,7 +218,7 @@ export function LivePreview({
               <button
                 type="button"
                 onClick={handleResetZoom}
-                className="cursor-pointer rounded-md px-2 py-1 font-mono text-[11px] text-slate-600 hover:bg-stone-200 hover:text-slate-900"
+                className="flex min-h-10 cursor-pointer items-center justify-center rounded-md px-2 py-1 font-mono text-[11px] text-slate-600 hover:bg-stone-200 hover:text-slate-900"
                 title="Reset Zoom to 100%"
                 aria-label="Reset Zoom"
               >
@@ -190,7 +229,7 @@ export function LivePreview({
                 type="button"
                 onClick={handleZoomIn}
                 disabled={scale >= 1.5}
-                className="cursor-pointer rounded-md p-1.5 text-slate-600 hover:bg-stone-200 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
+                className="flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-md p-1.5 text-slate-600 hover:bg-stone-200 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
                 title="Zoom In"
                 aria-label="Zoom In"
               >
@@ -200,7 +239,7 @@ export function LivePreview({
               <button
                 type="button"
                 onClick={handleFitToWidth}
-                className={`cursor-pointer rounded-md p-1.5 transition-colors hover:bg-stone-200 ${
+                className={`flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-stone-200 ${
                   fitMode ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="Fit to Container Width"
@@ -214,7 +253,7 @@ export function LivePreview({
             <button
               type="button"
               onClick={handlePrint}
-              className="cursor-pointer rounded-lg border border-stone-300 bg-white p-1.5 text-slate-600 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-lg border border-stone-300 bg-white p-1.5 text-slate-600 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               title="Print CV or Save as PDF"
               aria-label="Print or Save CV"
             >

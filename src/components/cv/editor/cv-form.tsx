@@ -472,7 +472,7 @@ export function CVForm({ initialData }: CVFormProps) {
         <button
           type="button"
           onClick={() => setMobileTab('edit')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-semibold transition-all ${
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-3 text-xs font-semibold transition-all ${
             mobileTab === 'edit'
               ? 'bg-white text-blue-600 shadow-sm'
               : 'text-slate-600 hover:text-slate-900'
@@ -485,7 +485,7 @@ export function CVForm({ initialData }: CVFormProps) {
         <button
           type="button"
           onClick={() => setMobileTab('preview')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-semibold transition-all ${
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-3 text-xs font-semibold transition-all ${
             mobileTab === 'preview'
               ? 'bg-white text-blue-600 shadow-sm'
               : 'text-slate-600 hover:text-slate-900'
@@ -548,7 +548,7 @@ export function CVForm({ initialData }: CVFormProps) {
           }`}
         >
           {/* Section Navigation Tabs */}
-          <div className="overflow-x-auto pb-1">
+          <div className="overflow-x-auto pb-1 [mask-image:linear-gradient(to_right,black_92%,transparent)]">
             <nav
               aria-label="CV Editor Sections"
               className="flex min-w-max gap-2 border-b border-slate-200 pb-2"
@@ -563,7 +563,7 @@ export function CVForm({ initialData }: CVFormProps) {
                     type="button"
                     onClick={() => setActiveSection(sec.id)}
                     data-has-error={hasError || undefined}
-                    className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                    className={`flex items-center gap-2 rounded-lg border px-3.5 py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:py-2 ${
                       isActive
                         ? 'border-blue-600 bg-blue-600 text-white'
                         : hasError

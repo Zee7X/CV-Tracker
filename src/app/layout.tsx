@@ -13,9 +13,19 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
+const siteName = 'CV Tracker'
+const title = 'CV Tracker — Build your CV and track applications'
+const description = 'Build a focused CV, export a clean PDF, and track every job application.'
+
 export const metadata: Metadata = {
-  title: 'CV Tracker — Build your CV and track applications',
-  description: 'Build a focused CV, export a clean PDF, and track every job application.',
+  // Needed so the file-based opengraph-image.png resolves to an absolute URL for scrapers.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cv-tracker-z.vercel.app'
+  ),
+  title,
+  description,
+  openGraph: { type: 'website', siteName, title, description },
+  twitter: { card: 'summary_large_image', title, description },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

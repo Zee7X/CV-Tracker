@@ -73,7 +73,7 @@ export function AtsTemplate({ cv, className = '' }: TemplateProps) {
                     {item.label}
                   </a>
                 ) : (
-                  <span>{item.label}</span>
+                  <span className="min-w-0 break-words">{item.label}</span>
                 )}
               </React.Fragment>
             ))}
@@ -193,7 +193,7 @@ export function AtsTemplate({ cv, className = '' }: TemplateProps) {
                 <div key={proj.id || idx} className="break-inside-avoid print:break-inside-avoid">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline">
                     <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-                      <h3 className="text-xs md:text-sm font-bold text-neutral-950">{proj.name}</h3>
+                      <h3 className="min-w-0 text-xs md:text-sm font-bold text-neutral-950">{proj.name}</h3>
                       {proj.project_url && (
                         <a
                           href={proj.project_url}
