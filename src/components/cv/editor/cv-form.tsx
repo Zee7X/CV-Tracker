@@ -213,7 +213,7 @@ export function CVForm({ initialData }: CVFormProps) {
         end_date: exp?.end_date || null,
         is_current: Boolean(exp?.is_current),
         description: exp?.description || '',
-        sort_order: exp?.sort_order ?? idx,
+        sort_order: idx,
       })),
       educations: (formValues?.educations ?? []).map((edu, idx) => ({
         id: initialData?.educations?.[idx]?.id || `edu-${idx}`,
@@ -224,7 +224,7 @@ export function CVForm({ initialData }: CVFormProps) {
         start_date: edu?.start_date || null,
         end_date: edu?.end_date || null,
         description: edu?.description || '',
-        sort_order: edu?.sort_order ?? idx,
+        sort_order: idx,
       })),
       projects: (formValues?.projects ?? []).map((proj, idx) => ({
         id: initialData?.projects?.[idx]?.id || `proj-${idx}`,
@@ -234,7 +234,7 @@ export function CVForm({ initialData }: CVFormProps) {
         project_url: proj?.project_url || '',
         start_date: proj?.start_date || null,
         end_date: proj?.end_date || null,
-        sort_order: proj?.sort_order ?? idx,
+        sort_order: idx,
       })),
       certifications: (formValues?.certifications ?? []).map((cert, idx) => ({
         id: initialData?.certifications?.[idx]?.id || `cert-${idx}`,
@@ -243,7 +243,7 @@ export function CVForm({ initialData }: CVFormProps) {
         issuer: cert?.issuer || '',
         issue_date: cert?.issue_date || null,
         credential_url: cert?.credential_url || '',
-        sort_order: cert?.sort_order ?? idx,
+        sort_order: idx,
       })),
       created_at: initialData?.created_at || '2026-01-01T00:00:00.000Z',
       updated_at: initialData?.updated_at || '2026-01-01T00:00:00.000Z',
@@ -548,7 +548,7 @@ export function CVForm({ initialData }: CVFormProps) {
           }`}
         >
           {/* Section Navigation Tabs */}
-          <div className="overflow-x-auto pb-1 [mask-image:linear-gradient(to_right,black_92%,transparent)]">
+          <div className="overflow-x-auto pb-1">
             <nav
               aria-label="CV Editor Sections"
               className="flex min-w-max gap-2 border-b border-slate-200 pb-2"
@@ -644,7 +644,14 @@ export function CVForm({ initialData }: CVFormProps) {
               </Card>
             )}
 
-            {activeSection === 'personal' && <PersonalInfoSection register={register} errors={errors} />}
+            {activeSection === 'personal' && (
+              <PersonalInfoSection
+                register={register}
+                errors={errors}
+                watch={watch}
+                setValue={setValue}
+              />
+            )}
 
             {activeSection === 'summary' && <SummarySection register={register} errors={errors} />}
 
@@ -654,6 +661,7 @@ export function CVForm({ initialData }: CVFormProps) {
                 register={register}
                 errors={errors}
                 watch={watch}
+                setValue={setValue}
               />
             )}
 
@@ -663,6 +671,7 @@ export function CVForm({ initialData }: CVFormProps) {
                 register={register}
                 errors={errors}
                 watch={watch}
+                setValue={setValue}
               />
             )}
 
@@ -674,6 +683,7 @@ export function CVForm({ initialData }: CVFormProps) {
                 register={register}
                 errors={errors}
                 watch={watch}
+                setValue={setValue}
               />
             )}
 
@@ -683,6 +693,7 @@ export function CVForm({ initialData }: CVFormProps) {
                 register={register}
                 errors={errors}
                 watch={watch}
+                setValue={setValue}
               />
             )}
           </div>

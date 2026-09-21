@@ -33,17 +33,32 @@ const COMMON_SKILLS = [
 export function SkillsSection({ watch, setValue, errors }: SkillsSectionProps) {
   const [skillInput, setSkillInput] = useState('')
   const skills = watch('skills') || []
-  const skillError = (errors.skills as { message?: string } | undefined)?.message
-    ?? (Array.isArray(errors.skills)
+  const skillError =
+    (errors.skills as { root?: { message?: string }; message?: string } | undefined)?.root?.message ??
+    (errors.skills as { message?: string } | undefined)?.message ??
+    (Array.isArray(errors.skills)
       ? (errors.skills.find((error) => error?.message) as { message?: string } | undefined)?.message
       : undefined)
 
   const handleAddSkill = (skillToAdd: string) => {
-    const trimmed = skillToAdd.trim()
-    if (!trimmed) return
-    if (!skills.includes(trimmed)) {
-      setValue('skills', [...skills, trimmed], { shouldDirty: true, shouldValidate: true })
+    if (!skillToAdd) return
+    // Split by comma, semicolon or newline to support multiple skills entered together
+    const candidates = skillToAdd
+      .split(/[,;\n]+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+
+    if (candidates.length === 0) return
+
+    const updated = [...skills]
+    for (const item of candidates) {
+      const isDuplicate = updated.some((s) => s.toLowerCase() === item.toLowerCase())
+      if (!isDuplicate) {
+        updated.push(item)
+      }
     }
+
+    setValue('skills', updated, { shouldDirty: true, shouldValidate: true })
     setSkillInput('')
   }
 
@@ -125,7 +140,7 @@ export function SkillsSection({ watch, setValue, errors }: SkillsSectionProps) {
         <div className="pt-2 border-t border-slate-100">
           <p className="mb-2 text-xs font-medium text-slate-500">Popular Suggestions:</p>
           <div className="flex flex-wrap gap-1.5">
-            {COMMON_SKILLS.filter((s) => !skills.includes(s)).map((suggestion) => (
+            {COMMON_SKILLS.filter((s) => !skills.some((existing) => existing.toLowerCase() === s.toLowerCase())).map((suggestion) => (
               <button
                 key={suggestion}
                 type="button"

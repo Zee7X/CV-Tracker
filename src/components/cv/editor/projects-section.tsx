@@ -1,29 +1,48 @@
 import React from 'react'
-import { useFieldArray, type Control, type UseFormRegister, type FieldErrors, type UseFormWatch } from 'react-hook-form'
+import {
+  useFieldArray,
+  type Control,
+  type UseFormRegister,
+  type FieldErrors,
+  type UseFormWatch,
+  type UseFormSetValue,
+} from 'react-hook-form'
 import type { CVInput } from '@/lib/validations/cv'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { FolderOpen, Plus, Trash2, Globe, Calendar } from 'lucide-react'
+import { FolderOpen, Plus, Trash2, Globe, Calendar, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
 
 interface ProjectsSectionProps {
   control: Control<CVInput>
   register: UseFormRegister<CVInput>
   errors: FieldErrors<CVInput>
   watch: UseFormWatch<CVInput>
+  setValue: UseFormSetValue<CVInput>
 }
 
-export function ProjectsSection({ control, register, errors, watch }: ProjectsSectionProps) {
-  const { fields, append, remove } = useFieldArray({
+export function ProjectsSection({ control, register, errors, watch, setValue }: ProjectsSectionProps) {
+  const { fields, append, remove, move } = useFieldArray({
     control,
     name: 'projects',
   })
 
   const projects = watch('projects') || []
 
+  const handleSortNewest = () => {
+    const currentProjects = watch('projects') || []
+    if (currentProjects.length <= 1) return
+    const sorted = [...currentProjects].sort((a, b) => {
+      const dateA = a.end_date || a.start_date || ''
+      const dateB = b.end_date || b.start_date || ''
+      return dateB.localeCompare(dateA)
+    })
+    setValue('projects', sorted, { shouldDirty: true, shouldValidate: true })
+  }
+
   return (
     <Card className="border-stone-300">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle className="flex items-center gap-2 text-lg text-slate-900">
             <FolderOpen className="h-5 w-5 text-blue-600" />
@@ -33,25 +52,40 @@ export function ProjectsSection({ control, register, errors, watch }: ProjectsSe
             Showcase work, academic, volunteer, or personal projects that demonstrate your abilities.
           </CardDescription>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-1 text-blue-600 hover:text-blue-700"
-          onClick={() =>
-            append({
-              name: '',
-              description: '',
-              project_url: '',
-              start_date: '',
-              end_date: '',
-              sort_order: fields.length,
-            })
-          }
-        >
-          <Plus className="h-4 w-4" />
-          Add Project
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {fields.length > 1 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-slate-700 hover:text-blue-600"
+              onClick={handleSortNewest}
+              title="Urutkan proyek dari yang paling baru"
+            >
+              <ArrowUpDown className="h-3.5 w-3.5" />
+              Sort Newest First
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1 text-blue-600 hover:text-blue-700"
+            onClick={() =>
+              append({
+                name: '',
+                description: '',
+                project_url: '',
+                start_date: '',
+                end_date: '',
+                sort_order: fields.length,
+              })
+            }
+          >
+            <Plus className="h-4 w-4" />
+            Add Project
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {fields.length === 0 ? (
@@ -87,22 +121,50 @@ export function ProjectsSection({ control, register, errors, watch }: ProjectsSe
                 key={field.id}
                 className="relative rounded-lg border border-slate-200 bg-slate-50/50 p-4 transition-all hover:border-slate-300"
               >
-                <div className="mb-4 flex items-center justify-between border-b border-slate-200/80 pb-3">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
                   <span className="text-sm font-semibold text-slate-800">
                     Project #{index + 1}
                     {projects[index]?.name && ` — ${projects[index].name}`}
                   </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 text-red-600 hover:bg-red-50 hover:text-red-700"
-                    onClick={() => remove(index)}
-                    aria-label={`Remove project #${index + 1}`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Remove</span>
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={index === 0}
+                      className="h-8 px-2 text-slate-600 hover:bg-slate-200 hover:text-slate-900 disabled:opacity-30"
+                      onClick={() => move(index, index - 1)}
+                      title="Pindahkan ke atas (Move Up)"
+                      aria-label={`Move project #${index + 1} up`}
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                      <span className="hidden sm:inline text-xs">Pindah ke Atas</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={index === fields.length - 1}
+                      className="h-8 px-2 text-slate-600 hover:bg-slate-200 hover:text-slate-900 disabled:opacity-30"
+                      onClick={() => move(index, index + 1)}
+                      title="Pindahkan ke bawah (Move Down)"
+                      aria-label={`Move project #${index + 1} down`}
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                      <span className="hidden sm:inline text-xs">Pindah ke Bawah</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => remove(index)}
+                      aria-label={`Remove project #${index + 1}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="hidden sm:inline text-xs">Remove</span>
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -1,6 +1,6 @@
 import React from 'react'
 import type { CVWithRelations } from '@/types/cv'
-import { formatDateRange, formatDisplayUrl, isEmptyCV } from './sample-data'
+import { formatDateRange, formatDisplayUrl, formatReadableDate, isEmptyCV } from './sample-data'
 
 export interface TemplateProps {
   cv: CVWithRelations
@@ -46,11 +46,11 @@ export function ProfessionalTemplate({ cv, className = '' }: TemplateProps) {
 
   return (
     <article
-      className={`w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white text-slate-900 font-sans leading-normal break-words shadow-sm print:shadow-none print:p-0 ${className}`}
+      className={`w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white text-slate-900 font-sans leading-normal wrap-break-word shadow-sm print:shadow-none print:p-0 ${className}`}
       data-template="professional"
     >
       {/* Top Banner Accent */}
-      <div className="h-2.5 bg-gradient-to-r from-blue-700 via-blue-800 to-slate-900 print:bg-blue-800" />
+      <div className="h-2.5 bg-linear-to-r from-blue-700 via-blue-800 to-slate-900 print:bg-blue-800" />
 
       <div className="p-8 md:p-10 space-y-6">
         {/* Header Section */}
@@ -83,7 +83,7 @@ export function ProfessionalTemplate({ cv, className = '' }: TemplateProps) {
                       {item.label}
                     </a>
                   ) : (
-                    <span className="min-w-0 break-words">{item.label}</span>
+                    <span className="min-w-0 wrap-break-word">{item.label}</span>
                   )}
                 </div>
               ))}
@@ -133,7 +133,7 @@ export function ProfessionalTemplate({ cv, className = '' }: TemplateProps) {
                       </span>
                     </div>
                     <div className="text-xs font-medium text-slate-600 mt-0.5 flex flex-wrap gap-x-2">
-                      <span className="min-w-0 break-words text-slate-800 font-semibold">{exp.company}</span>
+                      <span className="min-w-0 wrap-break-word text-slate-800 font-semibold">{exp.company}</span>
                       {exp.location && <span>• {exp.location}</span>}
                     </div>
                     {exp.description && (
@@ -272,7 +272,7 @@ export function ProfessionalTemplate({ cv, className = '' }: TemplateProps) {
                     <div className="text-xs font-bold text-slate-900">{cert.name}</div>
                     {cert.issuer && <div className="text-xs text-slate-600">{cert.issuer}</div>}
                     <div className="flex justify-between items-center mt-1 text-xs text-slate-500">
-                      {cert.issue_date && <span>Issued: {cert.issue_date}</span>}
+                      {cert.issue_date && <span>Issued: {formatReadableDate(cert.issue_date)}</span>}
                       {cert.credential_url && (
                         <a
                           href={cert.credential_url}

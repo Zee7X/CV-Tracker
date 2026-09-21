@@ -1,6 +1,6 @@
 import React from 'react'
 import type { CVWithRelations } from '@/types/cv'
-import { formatDateRange, formatDisplayUrl, isEmptyCV } from './sample-data'
+import { formatDateRange, formatDisplayUrl, formatReadableDate, isEmptyCV } from './sample-data'
 
 export interface TemplateProps {
   cv: CVWithRelations
@@ -48,7 +48,7 @@ export function ModernTemplate({ cv, className = '' }: TemplateProps) {
 
   return (
     <article
-      className={`w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white text-slate-900 font-sans break-words shadow-sm print:shadow-none flex flex-col md:flex-row ${className}`}
+      className={`w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white text-slate-900 font-sans wrap-break-word shadow-sm print:shadow-none flex flex-col md:flex-row ${className}`}
       data-template="modern"
     >
       {/* Left Sidebar (~35% width) */}
@@ -87,7 +87,7 @@ export function ModernTemplate({ cv, className = '' }: TemplateProps) {
                       {item.value}
                     </a>
                   ) : (
-                    <span className="text-slate-200 break-words">{item.value}</span>
+                    <span className="text-slate-200 wrap-break-word">{item.value}</span>
                   )}
                 </div>
               ))}
@@ -153,7 +153,7 @@ export function ModernTemplate({ cv, className = '' }: TemplateProps) {
                   <div className="font-semibold text-slate-100">{cert.name}</div>
                   {cert.issuer && <div className="text-[11px] text-slate-400">{cert.issuer}</div>}
                   <div className="flex justify-between items-center text-[10px] text-slate-500">
-                    {cert.issue_date && <span>{cert.issue_date}</span>}
+                    {cert.issue_date && <span>{formatReadableDate(cert.issue_date)}</span>}
                     {cert.credential_url && (
                       <a
                         href={cert.credential_url}
@@ -216,7 +216,7 @@ export function ModernTemplate({ cv, className = '' }: TemplateProps) {
               {experiences.map((exp, idx) => (
                 <div key={exp.id || idx} className="relative break-inside-avoid print:break-inside-avoid">
                   {/* Timeline Dot */}
-                  <span className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-blue-500 ring-4 ring-white" />
+                  <span className="absolute -left-5.25 top-1 h-2.5 w-2.5 rounded-full bg-blue-500 ring-4 ring-white" />
                   
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline">
                     <h3 className="min-w-0 flex-1 text-xs md:text-sm font-bold text-slate-900">

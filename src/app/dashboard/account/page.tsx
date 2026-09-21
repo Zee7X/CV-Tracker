@@ -1,14 +1,36 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import DashboardShell from '@/components/layout/dashboard-shell'
+import { AccountSettingsForm } from '@/components/account/account-settings-form'
+
+export const metadata = {
+  title: 'Account Settings - CV Tracker',
+}
 
 export default async function AccountPage() {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/login')
+  }
+
+  // Fetch application profile from public.profiles
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name, avatar_url, created_at')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const initialProfile = {
+    id: user.id,
+    email: user.email ?? '',
+    full_name: profile?.full_name ?? user.user_metadata?.full_name ?? null,
+    avatar_url: profile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
+    created_at: profile?.created_at ?? user.created_at ?? null,
   }
 
   return (
@@ -16,19 +38,10 @@ export default async function AccountPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Account</h1>
-          <p className="text-slate-600">Manage your account settings.</p>
+          <p className="text-slate-600">Manage your profile details and security settings.</p>
         </div>
 
-        {/* Empty State */}
-        <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 text-amber-600">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-8 w-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0c-1 1.248-3 2-5 2m14 0c1.248 0 3-.752 4-2" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-slate-900">Account Settings</h2>
-          <p className="mt-2 text-slate-600">Your account information and preferences.</p>
-        </div>
+        <AccountSettingsForm initialProfile={initialProfile} />
       </div>
     </DashboardShell>
   )

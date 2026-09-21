@@ -1,6 +1,6 @@
 import React from 'react'
 import type { CVWithRelations } from '@/types/cv'
-import { formatDateRange, formatDisplayUrl, isEmptyCV } from './sample-data'
+import { formatDateRange, formatDisplayUrl, formatReadableDate, isEmptyCV } from './sample-data'
 
 export interface TemplateProps {
   cv: CVWithRelations
@@ -45,7 +45,7 @@ export function AtsTemplate({ cv, className = '' }: TemplateProps) {
 
   return (
     <article
-      className={`w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white p-8 md:p-10 text-neutral-900 font-sans leading-normal break-words shadow-sm print:shadow-none print:p-0 ${className}`}
+      className={`w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white p-8 md:p-10 text-neutral-900 font-sans leading-normal wrap-break-word shadow-sm print:shadow-none print:p-0 ${className}`}
       data-template="ats"
     >
       {/* Header */}
@@ -73,7 +73,7 @@ export function AtsTemplate({ cv, className = '' }: TemplateProps) {
                     {item.label}
                   </a>
                 ) : (
-                  <span className="min-w-0 break-words">{item.label}</span>
+                  <span className="min-w-0 wrap-break-word">{item.label}</span>
                 )}
               </React.Fragment>
             ))}
@@ -249,7 +249,7 @@ export function AtsTemplate({ cv, className = '' }: TemplateProps) {
                     )}
                   </div>
                   {cert.issue_date && (
-                    <span className="shrink-0 text-xs text-neutral-700 sm:ml-4">{cert.issue_date}</span>
+                    <span className="shrink-0 text-xs text-neutral-700 sm:ml-4">{formatReadableDate(cert.issue_date)}</span>
                   )}
                 </div>
               ))}

@@ -13,14 +13,17 @@ const PLACEHOLDER_WORDS = new Set([
 
 function looksLikeRealText(value: string): boolean {
   const compact = value.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, '')
-  if (!/\p{L}/u.test(compact) || PLACEHOLDER_WORDS.has(compact)) return false
+  if (!compact || !/\p{L}/u.test(compact) || PLACEHOLDER_WORDS.has(compact)) return false
 
-  // Reject obvious repeated filler such as "sadsadsadsad" without guessing at real prose.
-  for (let start = 0; start < 3; start += 1) {
+  // Reject obvious repeated filler such as "sadsadsadsad" or "asdasdasd" without rejecting short real terms (e.g. PHP, Git, SQL).
+  if (compact.length >= 8) {
     for (let size = 1; size <= 4; size += 1) {
-      const candidate = compact.slice(start)
-      const unit = candidate.slice(0, size)
-      if (candidate.length >= size * 3 && candidate.split(unit).join('').length <= 2) return false
+      const unit = compact.slice(0, size)
+      const repetitions = Math.floor(compact.length / size)
+      if (repetitions >= 3) {
+        const remaining = compact.split(unit).join('')
+        if (remaining.length <= 2) return false
+      }
     }
   }
 
@@ -110,7 +113,17 @@ export const personalInfoSchema = z.object({
   linkedin: socialUrl('LinkedIn URL', 'linkedin.com'),
   github: socialUrl('GitHub URL', 'github.com'),
   portfolio: optionalUrl('Portfolio URL'),
-  photo_url: optionalUrl('Photo URL').nullable(),
+  photo_url: z.string().trim()
+    .refine(
+      (value) => {
+        if (!value) return true
+        if (value.startsWith('data:image/')) return true
+        return isHttpUrl(value)
+      },
+      'Photo must be a valid image URL or image data'
+    )
+    .nullable()
+    .optional(),
 })
 
 export const experienceSchema = z.object({
@@ -130,7 +143,9 @@ export const experienceSchema = z.object({
   if (!data.is_current && !data.end_date) {
     context.addIssue({ code: 'custom', path: ['end_date'], message: 'End date is required unless this is your current role' })
   }
-  validateDateRange(data, context)
+  if (!data.is_current) {
+    validateDateRange(data, context)
+  }
 })
 
 export const educationSchema = z.object({
@@ -168,7 +183,7 @@ export const cvSchema = z.object({
   template: z.enum(['ats', 'professional', 'modern']),
   personal_info: personalInfoSchema,
   summary: longText('Professional summary', 40, 1200).nullable(),
-  skills: z.array(requiredText('Skill', 2, 60))
+  skills: z.array(requiredText('Skill', 1, 60))
     .max(30, 'Add no more than 30 skills')
     .refine(
       (skills) => new Set(skills.map((skill) => skill.toLocaleLowerCase())).size === skills.length,

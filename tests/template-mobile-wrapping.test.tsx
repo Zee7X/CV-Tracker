@@ -23,6 +23,6 @@ for (const [name, Template] of templates) {
 
   test(`${name} template wraps long unbroken strings instead of overflowing`, () => {
     const html = renderToStaticMarkup(<Template cv={SAMPLE_CV} />)
-    assert.match(html, /break-words|break-all/)
+    assert.match(html, /break-words|break-all|wrap-break-word/)
   })
 }

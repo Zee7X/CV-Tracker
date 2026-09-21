@@ -24,7 +24,7 @@ const toExperienceRows = (rows: CVInput['experiences']) =>
     end_date: exp.is_current ? null : sanitize(exp.end_date),
     is_current: Boolean(exp.is_current),
     description: sanitize(exp.description),
-    sort_order: typeof exp.sort_order === 'number' ? exp.sort_order : idx,
+    sort_order: idx,
   }))
 
 const toEducationRows = (rows: CVInput['educations']) =>
@@ -35,7 +35,7 @@ const toEducationRows = (rows: CVInput['educations']) =>
     start_date: sanitize(edu.start_date),
     end_date: sanitize(edu.end_date),
     description: sanitize(edu.description),
-    sort_order: typeof edu.sort_order === 'number' ? edu.sort_order : idx,
+    sort_order: idx,
   }))
 
 const toProjectRows = (rows: CVInput['projects']) =>
@@ -45,7 +45,7 @@ const toProjectRows = (rows: CVInput['projects']) =>
     project_url: sanitize(proj.project_url),
     start_date: sanitize(proj.start_date),
     end_date: sanitize(proj.end_date),
-    sort_order: typeof proj.sort_order === 'number' ? proj.sort_order : idx,
+    sort_order: idx,
   }))
 
 const toCertificationRows = (rows: CVInput['certifications']) =>
@@ -54,7 +54,7 @@ const toCertificationRows = (rows: CVInput['certifications']) =>
     issuer: sanitize(cert.issuer),
     issue_date: sanitize(cert.issue_date),
     credential_url: sanitize(cert.credential_url),
-    sort_order: typeof cert.sort_order === 'number' ? cert.sort_order : idx,
+    sort_order: idx,
   }))
 
 /**

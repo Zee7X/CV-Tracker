@@ -5,6 +5,7 @@ import {
   Text,
   View,
   Link,
+  Image,
   StyleSheet,
   Font,
   type DocumentProps,
@@ -21,6 +22,55 @@ function formatUrlDisplay(url?: string | null): string {
   return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
 }
 
+const MONTHS_ID = [
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
+]
+
+function formatDate(value?: string | null): string {
+  if (!value) return ''
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+
+  // Format YYYY-MM-DD -> e.g. 26 Maret 2000
+  const ymdMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
+  if (ymdMatch) {
+    const year = ymdMatch[1]
+    const mIndex = parseInt(ymdMatch[2], 10) - 1
+    const day = parseInt(ymdMatch[3], 10)
+    if (mIndex >= 0 && mIndex < 12) {
+      return `${day} ${MONTHS_ID[mIndex]} ${year}`
+    }
+  }
+
+  // Format YYYY-MM -> e.g. Maret 2000
+  const ymMatch = /^(\d{4})-(\d{2})$/.exec(trimmed)
+  if (ymMatch) {
+    const year = ymMatch[1]
+    const mIndex = parseInt(ymMatch[2], 10) - 1
+    if (mIndex >= 0 && mIndex < 12) {
+      return `${MONTHS_ID[mIndex]} ${year}`
+    }
+  }
+
+  // Format YYYY
+  if (/^\d{4}$/.test(trimmed)) {
+    return trimmed
+  }
+
+  return trimmed
+}
+
 function formatDateRange(
   start?: string | null,
   end?: string | null,
@@ -30,19 +80,10 @@ function formatDateRange(
   const startLabel = formatDate(start)
   const endLabel = formatDate(end)
   if (isCurrent) {
-    return startLabel ? `${startLabel} – Present` : 'Present'
+    return startLabel ? `${startLabel} – Sekarang` : 'Sekarang'
   }
   if (startLabel && endLabel) return `${startLabel} – ${endLabel}`
   return startLabel || endLabel
-}
-
-function formatDate(value?: string | null): string {
-  if (!value) return ''
-  const match = /^(\d{4})-(\d{2})/.exec(value)
-  if (!match) return value
-  const month = Number(match[2])
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  return month >= 1 && month <= 12 ? `${months[month - 1]} ${match[1]}` : value
 }
 
 // ── 1. ATS Template (Monochrome, Single Column, High ATS Parseability) ────────
@@ -706,6 +747,20 @@ const modernStyles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
   },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  photo: {
+    width: 52,
+    height: 52,
+    borderRadius: 6,
+    marginRight: 12,
+    objectFit: 'cover',
+  },
+  headerDetails: {
+    flex: 1,
+  },
   name: {
     fontSize: 19,
     fontFamily: 'Helvetica-Bold',
@@ -879,23 +934,30 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
       <Page size="A4" style={modernStyles.page} wrap>
         {/* Dark Modern Header Card */}
         <View style={modernStyles.headerCard}>
-          <Text style={modernStyles.name}>{info.full_name || cv.name || 'Candidate Name'}</Text>
-          {info.professional_title ? <Text style={modernStyles.title}>{info.professional_title}</Text> : null}
-          {contactItems.length > 0 && (
-            <View style={modernStyles.contactRow}>
-              {contactItems.map((item, idx) =>
-                item.href ? (
-                  <Link key={idx} src={item.href} style={modernStyles.contactLink}>
-                    {item.label}
-                  </Link>
-                ) : (
-                  <Text key={idx} style={modernStyles.contactItem}>
-                    {item.label}
-                  </Text>
-                )
+          <View style={modernStyles.headerContent}>
+            {info.photo_url ? (
+              <Image src={info.photo_url} style={modernStyles.photo} />
+            ) : null}
+            <View style={modernStyles.headerDetails}>
+              <Text style={modernStyles.name}>{info.full_name || cv.name || 'Candidate Name'}</Text>
+              {info.professional_title ? <Text style={modernStyles.title}>{info.professional_title}</Text> : null}
+              {contactItems.length > 0 && (
+                <View style={modernStyles.contactRow}>
+                  {contactItems.map((item, idx) =>
+                    item.href ? (
+                      <Link key={idx} src={item.href} style={modernStyles.contactLink}>
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <Text key={idx} style={modernStyles.contactItem}>
+                        {item.label}
+                      </Text>
+                    )
+                  )}
+                </View>
               )}
             </View>
-          )}
+          </View>
         </View>
 
         {/* Summary */}
