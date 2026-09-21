@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Briefcase, FileText, LayoutDashboard, LogOut, Menu, User, X } from 'lucide-react'
+import { Briefcase, FileText, LayoutDashboard, LogOut, Mail, Menu, User, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/i18n/language-switcher'
 import { Button } from '@/components/ui/button'
 
@@ -13,6 +13,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'CV', href: '/dashboard/cv', icon: FileText },
+    { name: 'Cover Letters', href: '/dashboard/cover-letters', icon: Mail },
     { name: 'Applications', href: '/dashboard/applications', icon: Briefcase },
     { name: 'Account', href: '/dashboard/account', icon: User },
   ]
@@ -20,7 +21,9 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const navigation = (mobile = false) => (
     <nav className={mobile ? 'flex flex-col gap-1' : 'hidden items-center gap-1 md:flex'}>
       {navItems.map((item) => {
-        const isActive = pathname === item.href
+        const isActive =
+          pathname === item.href ||
+          (item.href !== '/dashboard' && pathname.startsWith(item.href))
         return (
           <Link
             key={item.href}
