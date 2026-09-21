@@ -65,3 +65,4 @@ test('formatCoverLetterPlaintext formats copyable text with company, position, a
   assert.match(plain, /Backend Developer/)
   assert.match(plain, /Nadia Putri/)
 })
+

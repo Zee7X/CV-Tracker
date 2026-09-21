@@ -41,3 +41,4 @@ export interface CoverLetterInput {
   closing: string
   cv_id?: string | null
 }
+

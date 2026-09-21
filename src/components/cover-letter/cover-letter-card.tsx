@@ -190,3 +190,4 @@ export function CoverLetterCard({ letter }: CoverLetterCardProps) {
     </>
   )
 }
+

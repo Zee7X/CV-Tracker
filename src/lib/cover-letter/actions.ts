@@ -203,3 +203,4 @@ export async function duplicateCoverLetter(
   revalidatePath('/dashboard/cover-letters')
   return { success: true, id: (data as any)?.id }
 }
+

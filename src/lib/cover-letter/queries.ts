@@ -58,3 +58,4 @@ export async function getCoverLetterById(id: string): Promise<CoverLetter | null
     return null
   }
 }
+

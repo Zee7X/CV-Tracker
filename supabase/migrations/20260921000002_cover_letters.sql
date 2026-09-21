@@ -48,3 +48,4 @@ create policy "Users can update own cover letters"
 create policy "Users can delete own cover letters"
   on public.cover_letters for delete
   using (auth.uid() = user_id);
+

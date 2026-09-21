@@ -39,3 +39,4 @@ export const coverLetterSchema = z.object({
 })
 
 export type CoverLetterFormValues = z.infer<typeof coverLetterSchema>
+
