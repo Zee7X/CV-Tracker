@@ -241,31 +241,31 @@ export function CoverLetterForm({
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/cover-letters"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             aria-label="Back to Cover Letters"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
+          <div className="min-w-0">
+            <h1 className="truncate text-lg font-bold text-slate-900 sm:text-2xl">
               {isEditing ? `Edit: ${watchedValues.title || 'Untitled'}` : 'New Cover Letter'}
             </h1>
-            <p className="text-xs text-slate-500 sm:text-sm">
+            <p className="line-clamp-1 text-xs text-slate-500 sm:text-sm">
               Craft a tailored job application letter with live preview, auto-fill, and instant export.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:items-center">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleCopy}
-            className="gap-1.5"
+            className="h-9 gap-1.5 text-xs justify-center"
             title="Copy plain text to clipboard"
           >
-            {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4 text-slate-500" />}
+            {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5 text-slate-500" />}
             {copied ? 'Copied!' : 'Copy Text'}
           </Button>
 
@@ -275,22 +275,26 @@ export function CoverLetterForm({
             size="sm"
             onClick={handleDownloadPDF}
             disabled={isExporting}
-            className="gap-1.5"
+            className="h-9 gap-1.5 text-xs justify-center"
             title="Download formatted A4 PDF"
           >
-            {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4 text-slate-500" />}
+            {isExporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5 text-slate-500" />}
             Download PDF
           </Button>
 
-          <Button type="submit" disabled={isBusy} className="gap-2">
+          <Button
+            type="submit"
+            disabled={isBusy}
+            className="col-span-2 sm:col-span-1 h-9 gap-1.5 text-xs justify-center"
+          >
             {isBusy ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <Save className="h-4 w-4" />
+                <Save className="h-3.5 w-3.5" />
                 {isEditing ? 'Save Changes' : 'Create Letter'}
               </>
             )}
@@ -314,12 +318,12 @@ export function CoverLetterForm({
       )}
 
       {/* Mobile Tab Switcher */}
-      <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-100 p-1 lg:hidden">
+      <div className="sticky top-16 z-20 flex items-center justify-between rounded-lg border border-slate-200 bg-slate-100/95 p-1 backdrop-blur-sm lg:hidden shadow-xs">
         <button
           type="button"
           onClick={() => setMobileTab('form')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2.5 text-xs font-semibold ${
-            mobileTab === 'form' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600'
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2.5 text-xs font-semibold transition-all ${
+            mobileTab === 'form' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Edit3 className="h-3.5 w-3.5" />
@@ -328,8 +332,8 @@ export function CoverLetterForm({
         <button
           type="button"
           onClick={() => setMobileTab('preview')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2.5 text-xs font-semibold ${
-            mobileTab === 'preview' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600'
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2.5 text-xs font-semibold transition-all ${
+            mobileTab === 'preview' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Eye className="h-3.5 w-3.5" />
@@ -370,19 +374,43 @@ export function CoverLetterForm({
                         key={tmpl.id}
                         type="button"
                         onClick={() => handleSelectTemplate(tmpl.id)}
-                        className={`flex flex-col items-start rounded-lg border p-3 text-left transition-all ${
+                        className={`group flex flex-col justify-between rounded-xl border p-3.5 text-left transition-all relative ${
                           isSelected
-                            ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500'
-                            : 'border-slate-200 bg-white hover:border-slate-300'
+                            ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-500 shadow-xs'
+                            : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs'
                         }`}
                       >
-                        <div className="flex w-full items-center justify-between">
-                          <span className="text-xs font-bold text-slate-900">{tmpl.name}</span>
-                          <Badge variant="outline" className="text-[10px]">
-                            {tmpl.badge}
-                          </Badge>
+                        <div className="w-full">
+                          <div className="mb-2 flex w-full items-center justify-between gap-2">
+                            <span
+                              className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+                                isSelected
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                              }`}
+                            >
+                              {tmpl.badge}
+                            </span>
+                            <span
+                              className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-xs transition-colors ${
+                                isSelected ? 'text-blue-600' : 'text-slate-300'
+                              }`}
+                            >
+                              {isSelected ? (
+                                <CheckCircle2 className="h-4 w-4 text-blue-600" />
+                              ) : (
+                                <span className="h-1.5 w-1.5 rounded-full bg-slate-300 group-hover:bg-slate-400" />
+                              )}
+                            </span>
+                          </div>
+
+                          <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+                            {tmpl.name}
+                          </h4>
+                          <p className="mt-1.5 text-[11px] leading-relaxed text-slate-500 line-clamp-2">
+                            {tmpl.description}
+                          </p>
                         </div>
-                        <p className="mt-1 text-[11px] text-slate-500 line-clamp-2">{tmpl.description}</p>
                       </button>
                     )
                   })}
@@ -392,17 +420,17 @@ export function CoverLetterForm({
               {/* Auto-Fill from existing CV */}
               {availableCVs.length > 0 && (
                 <div className="rounded-lg border border-blue-200 bg-blue-50/60 p-3">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-blue-600 shrink-0" />
                       <span className="text-xs font-semibold text-blue-950">Auto-Fill from your CV:</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex w-full sm:w-auto items-center gap-2">
                       <select
                         value={selectedCvId}
                         onChange={(e) => setSelectedCvId(e.target.value)}
-                        className="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-800"
+                        className="h-9 flex-1 sm:w-56 rounded-md border border-slate-300 bg-white px-2.5 text-xs text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       >
                         <option value="">Choose a CV profile...</option>
                         {availableCVs.map((cv) => (
@@ -418,7 +446,7 @@ export function CoverLetterForm({
                         variant="default"
                         onClick={handleImportFromCV}
                         disabled={!selectedCvId}
-                        className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
+                        className="h-9 px-3 text-xs bg-blue-600 hover:bg-blue-700 shrink-0"
                       >
                         Import
                       </Button>
@@ -608,7 +636,7 @@ export function CoverLetterForm({
 
         {/* Live Preview Column (5 cols) */}
         <div className={`lg:col-span-5 ${mobileTab === 'form' ? 'hidden lg:block' : 'block'}`}>
-          <div className="sticky top-24 space-y-3">
+          <div className="space-y-3 lg:sticky lg:top-24">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Live Document Preview
@@ -619,7 +647,7 @@ export function CoverLetterForm({
             </div>
 
             {/* Document Paper Mockup */}
-            <div className="rounded-xl border border-stone-300 bg-white p-6 shadow-md md:p-8 text-xs leading-relaxed text-slate-800 space-y-4 max-h-[calc(100vh-160px)] overflow-y-auto">
+            <div className="rounded-xl border border-stone-300 bg-white p-4 sm:p-6 md:p-8 shadow-md text-xs leading-relaxed text-slate-800 space-y-4 max-h-none lg:max-h-[calc(100vh-160px)] overflow-y-visible lg:overflow-y-auto">
               {/* Letter Header */}
               <div className="border-b border-blue-600 pb-3">
                 <h3 className="text-base font-bold text-slate-900">{watchedValues.sender_name || 'Nama Lengkap'}</h3>

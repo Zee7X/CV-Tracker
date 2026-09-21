@@ -402,6 +402,14 @@ const id: Record<string, string> = {
   'Choose a CV profile...': 'Pilih profil CV...',
   'Import': 'Impor',
   'New Cover Letter': 'Surat Lamaran Baru',
+  'Formal Indonesia': 'Formal Indonesia',
+  'Professional English': 'Bahasa Inggris Profesional',
+  'Body Email Ringkas': 'Body Email Ringkas',
+  'Creative Startup': 'Startup Kreatif',
+  'Resmi / BUMN': 'Resmi / BUMN',
+  'International': 'Internasional',
+  'Siap Kirim': 'Siap Kirim',
+  'Modern Tech': 'Teknologi Modern',
 }
 
 type LanguageContextValue = {

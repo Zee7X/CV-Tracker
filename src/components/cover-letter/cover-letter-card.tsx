@@ -57,11 +57,11 @@ export function CoverLetterCard({ letter }: CoverLetterCardProps) {
 
   const templateLabel =
     letter.template === 'formal_id'
-      ? 'Formal (ID)'
+      ? 'Formal ID'
       : letter.template === 'professional_en'
-      ? 'Corporate (EN)'
+      ? 'English'
       : letter.template === 'email_short'
-      ? 'Email Body'
+      ? 'Email'
       : 'Creative'
 
   const formattedDate = new Date(letter.updated_at).toLocaleDateString('id-ID', {

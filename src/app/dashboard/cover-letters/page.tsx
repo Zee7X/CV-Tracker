@@ -37,8 +37,8 @@ export default async function CoverLettersPage() {
               Create and manage customized cover letters and email templates for your job applications.
             </p>
           </div>
-          <Link href="/dashboard/cover-letters/new">
-            <Button className="gap-2">
+          <Link href="/dashboard/cover-letters/new" className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto gap-2">
               <Plus className="h-4 w-4" />
               Create Cover Letter
             </Button>
