@@ -64,7 +64,7 @@ export function ExperienceSection({ control, register, errors, watch, setValue }
               size="sm"
               className="gap-1.5 text-slate-700 hover:text-blue-600"
               onClick={handleSortNewest}
-              title="Urutkan pengalaman dari yang paling baru ke yang lama"
+              title="Sort experiences newest first"
             >
               <ArrowUpDown className="h-3.5 w-3.5" />
               Sort Newest First
@@ -143,11 +143,11 @@ export function ExperienceSection({ control, register, errors, watch, setValue }
                       disabled={index === 0}
                       className="h-8 px-2 text-slate-600 hover:bg-slate-200 hover:text-slate-900 disabled:opacity-30"
                       onClick={() => move(index, index - 1)}
-                      title="Pindahkan ke atas (Move Up)"
+                      title="Move Up"
                       aria-label={`Move experience #${index + 1} up`}
                     >
                       <ArrowUp className="h-4 w-4" />
-                      <span className="hidden sm:inline text-xs">Pindah ke Atas</span>
+                      <span className="hidden sm:inline text-xs">Move Up</span>
                     </Button>
                     <Button
                       type="button"
@@ -156,11 +156,11 @@ export function ExperienceSection({ control, register, errors, watch, setValue }
                       disabled={index === fields.length - 1}
                       className="h-8 px-2 text-slate-600 hover:bg-slate-200 hover:text-slate-900 disabled:opacity-30"
                       onClick={() => move(index, index + 1)}
-                      title="Pindahkan ke bawah (Move Down)"
+                      title="Move Down"
                       aria-label={`Move experience #${index + 1} down`}
                     >
                       <ArrowDown className="h-4 w-4" />
-                      <span className="hidden sm:inline text-xs">Pindah ke Bawah</span>
+                      <span className="hidden sm:inline text-xs">Move Down</span>
                     </Button>
                     <Button
                       type="button"
@@ -305,7 +305,7 @@ export function ExperienceSection({ control, register, errors, watch, setValue }
                           id={`experiences.${index}.end_date`}
                           type="text"
                           disabled
-                          value="Saat ini / Present"
+                          value="Present"
                           className="pl-9 bg-slate-100 text-slate-600 font-medium cursor-not-allowed"
                         />
                       </div>

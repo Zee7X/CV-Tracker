@@ -370,6 +370,10 @@ const id: Record<string, string> = {
   'CV Photo Integration': 'Integrasi Foto CV',
   'Manage your profile details and security settings.':
     'Kelola detail profil dan pengaturan keamanan Anda.',
+  'Sort experiences newest first': 'Urutkan pengalaman dari yang paling baru',
+  'Sort education newest first': 'Urutkan pendidikan dari yang paling baru',
+  'Sort projects newest first': 'Urutkan proyek dari yang paling baru',
+  'Sort certifications newest first': 'Urutkan sertifikasi dari yang paling baru',
 }
 
 type LanguageContextValue = {

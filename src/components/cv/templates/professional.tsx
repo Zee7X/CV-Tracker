@@ -294,3 +294,4 @@ export function ProfessionalTemplate({ cv, className = '' }: TemplateProps) {
     </article>
   )
 }
+

@@ -385,11 +385,10 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
           </CardHeader>
           <CardContent className="space-y-2 text-xs text-blue-800">
             <p>
-              Foto avatar yang Anda simpan di sini dapat disinkronkan secara otomatis ke CV Anda saat menggunakan
-              template <strong>Modern</strong> atau <strong>Kreatif</strong>.
+              Your account avatar can be automatically integrated into your CV when using <strong>Modern</strong> or <strong>Creative</strong> templates.
             </p>
             <p className="text-blue-700">
-              Cukup klik tombol <em>&ldquo;Use Account Photo&rdquo;</em> di tab Informasi Pribadi saat mengedit CV.
+              Simply click <em>&ldquo;Use Account Photo&rdquo;</em> in the Personal Info section when editing your CV.
             </p>
           </CardContent>
         </Card>
