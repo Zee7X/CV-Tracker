@@ -74,7 +74,35 @@ test('formatCoverLetterDate formats dates into readable words for both languages
   assert.equal(formatCoverLetterDate('2026-03-05', 'en'), 'March 5, 2026')
 })
 
-test('generateTemplateContent generates English text when language is en', () => {
+test('getCoverLetterLanguage guarantees strict language per template', async () => {
+  const { getCoverLetterLanguage } = await import('../src/lib/cover-letter/templates')
+  // formal_id must ALWAYS be 'id' even if app UI language is 'en'
+  assert.equal(getCoverLetterLanguage('formal_id', 'en'), 'id')
+  assert.equal(getCoverLetterLanguage('formal_id', 'id'), 'id')
+
+  // professional_en must ALWAYS be 'en' even if app UI language is 'id'
+  assert.equal(getCoverLetterLanguage('professional_en', 'id'), 'en')
+  assert.equal(getCoverLetterLanguage('professional_en', 'en'), 'en')
+
+  // email_short and creative adapt to fallback language
+  assert.equal(getCoverLetterLanguage('email_short', 'id'), 'id')
+  assert.equal(getCoverLetterLanguage('email_short', 'en'), 'en')
+  assert.equal(getCoverLetterLanguage('creative', 'id'), 'id')
+  assert.equal(getCoverLetterLanguage('creative', 'en'), 'en')
+})
+
+test('generateTemplateContent generates English text for professional_en', () => {
+  const content = generateTemplateContent({
+    template: 'professional_en',
+    jobTitle: 'Backend Developer',
+    companyName: 'Tokopedia',
+    senderName: 'Nadia Putri',
+  })
+  assert.match(content.opening, /enthusiasm for the Backend Developer position at Tokopedia/)
+  assert.match(content.closing, /Thank you for your time and consideration/)
+})
+
+test('generateTemplateContent generates Indonesian text for formal_id even if language is en', () => {
   const content = generateTemplateContent({
     template: 'formal_id',
     jobTitle: 'Backend Developer',
@@ -82,8 +110,8 @@ test('generateTemplateContent generates English text when language is en', () =>
     senderName: 'Nadia Putri',
     language: 'en',
   })
-  assert.match(content.opening, /Dear Hiring Manager/)
-  assert.match(content.body, /dedicated, disciplined/)
+  assert.match(content.opening, /Dengan hormat/)
+  assert.match(content.closing, /Demikian surat lamaran pekerjaan ini saya sampaikan/)
 })
 
 test('generateTemplateContent correctly embeds jobTitle, companyName, and source in Indonesian', () => {

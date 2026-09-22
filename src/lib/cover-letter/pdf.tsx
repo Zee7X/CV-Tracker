@@ -10,7 +10,7 @@ import {
 } from '@react-pdf/renderer'
 import type { CoverLetterInput } from '@/types/cover-letter'
 
-import { formatCoverLetterDate } from './templates'
+import { formatCoverLetterDate, getCoverLetterLanguage } from './templates'
 
 Font.registerHyphenationCallback((word) => [word])
 
@@ -113,8 +113,9 @@ export function CoverLetterPDFDocument({
   letter: Partial<CoverLetterInput>
   language?: 'id' | 'en'
 }): React.ReactElement<DocumentProps> {
-  const isEn = letter.template === 'professional_en' || language === 'en'
-  const isFormalId = (letter.template === 'formal_id' || !letter.template) && !isEn
+  const docLang = getCoverLetterLanguage(letter.template, language)
+  const isEn = docLang === 'en'
+  const isFormalId = letter.template === 'formal_id' || (!letter.template && !isEn)
 
   const rawDate = letter.letter_date || new Date().toISOString().split('T')[0]
   const dateStr = formatCoverLetterDate(rawDate, isEn ? 'en' : 'id')

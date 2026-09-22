@@ -118,6 +118,21 @@ export function substituteCoverLetterTokens(
   return result
 }
 
+/**
+ * Determines the document language based on the chosen template and fallback app language.
+ * - 'formal_id': strictly Indonesian ('id')
+ * - 'professional_en': strictly English ('en')
+ * - other templates: adapt to fallbackLang ('en' | 'id')
+ */
+export function getCoverLetterLanguage(
+  template?: CoverLetterTemplate | null,
+  fallbackLang: 'id' | 'en' = 'id'
+): 'id' | 'en' {
+  if (template === 'formal_id') return 'id'
+  if (template === 'professional_en') return 'en'
+  return fallbackLang === 'en' ? 'en' : 'id'
+}
+
 export function generateTemplateContent({
   template,
   jobTitle = '',
@@ -128,7 +143,8 @@ export function generateTemplateContent({
   skillsSummary = '',
   language = 'id',
 }: GenerateParams): { opening: string; body: string; closing: string } {
-  const isEn = template === 'professional_en' || language === 'en'
+  const docLang = getCoverLetterLanguage(template, language)
+  const isEn = docLang === 'en'
   const defaultJobTitle = isEn ? '[Job Title]' : '[Posisi Pekerjaan]'
   const defaultCompanyName = isEn ? '[Company Name]' : '[Nama Perusahaan]'
   const defaultSenderName = isEn ? '[Your Name]' : '[Nama Anda]'
@@ -183,13 +199,6 @@ export function generateTemplateContent({
 
     case 'formal_id':
     default:
-      if (isEn) {
-        return {
-          opening: `Dear ${recipient},\n\nIn response to the opening for the ${actualJobTitle} role at ${actualCompanyName}${srcMentionEn}, I am writing to respectfully submit my application for consideration.`,
-          body: `I am a dedicated, disciplined, and detail-oriented professional with a proven commitment to high standards. ${skillsTextEn}\n\nI adapt quickly to dynamic work environments, collaborate smoothly with diverse teams, and consistently focus on delivering optimal results for organizational success.`,
-          closing: `Thank you for taking the time to review my application. I look forward to the opportunity to discuss my qualifications and potential contributions in an interview. Sincerely.`,
-        }
-      }
       return {
         opening: `Dengan hormat,\n\nSehubungan dengan informasi lowongan pekerjaan yang saya dapatkan${srcMentionId} mengenai posisi ${actualJobTitle} di ${actualCompanyName}, melalui surat ini saya bermaksud mengajukan diri untuk bergabung dengan perusahaan yang Bapak/Ibu pimpin.`,
         body: `Saya merupakan individu yang berdedikasi, teliti, dan memiliki komitmen tinggi dalam bekerja. ${skillsTextId}\n\nSaya terbiasa beradaptasi dengan cepat di lingkungan kerja dinamis, mampu bekerja secara mandiri maupun berkolaborasi dalam tim, serta selalu berupaya memberikan hasil kerja yang optimal demi kemajuan perusahaan.`,
@@ -205,7 +214,8 @@ export function formatCoverLetterPlaintext(
   letter: Partial<CoverLetterInput>,
   language: 'id' | 'en' = 'id'
 ): string {
-  const isEn = letter.template === 'professional_en' || language === 'en'
+  const docLang = getCoverLetterLanguage(letter.template, language)
+  const isEn = docLang === 'en'
   const isEmail = letter.template === 'email_short'
 
   const rawDate = letter.letter_date || new Date().toISOString().split('T')[0]

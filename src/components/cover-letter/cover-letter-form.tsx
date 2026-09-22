@@ -40,6 +40,7 @@ import {
   formatCoverLetterPlaintext,
   formatCoverLetterDate,
   substituteCoverLetterTokens,
+  getCoverLetterLanguage,
 } from '@/lib/cover-letter/templates'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { CoverLetterPDFDocument } from '@/lib/cover-letter/pdf'
@@ -166,7 +167,8 @@ export function CoverLetterForm({
   const watchedRecipientName = watch('recipient_name')
   const watchedSource = watch('source')
   const watchedSenderName = watch('sender_name')
-  const isEn = currentTemplate === 'professional_en' || language === 'en'
+  const docLang = getCoverLetterLanguage(currentTemplate, language)
+  const isEn = docLang === 'en'
 
   // Auto-sync letter content with Job Details & Company info
   useEffect(() => {
@@ -866,7 +868,10 @@ export function CoverLetterForm({
             </div>
 
             {/* Document Paper Mockup */}
-            <div className="rounded-xl border border-stone-300 bg-white p-5 sm:p-7 md:p-9 shadow-md text-xs leading-relaxed text-slate-800 space-y-4 max-h-none lg:max-h-[calc(100vh-160px)] overflow-y-visible lg:overflow-y-auto">
+            <div
+              data-no-translate
+              className="rounded-xl border border-stone-300 bg-white p-5 sm:p-7 md:p-9 shadow-md text-xs leading-relaxed text-slate-800 space-y-4 max-h-none lg:max-h-[calc(100vh-160px)] overflow-y-visible lg:overflow-y-auto"
+            >
               {/* Letter Header */}
               <div className="border-b border-blue-600 pb-2 pt-1">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight tracking-tight">

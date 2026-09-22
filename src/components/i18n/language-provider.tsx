@@ -423,6 +423,17 @@ const id: Record<string, string> = {
   'Dynamic, confident pitch highlighting projects, initiative, and cultural alignment with the company.':
     'Format dinamis dan percaya diri, fokus pada hasil karya, inisiatif, dan keselarasan visi.',
   'Job Application Letter': 'Surat Lamaran Pekerjaan',
+  'Create Letter': 'Buat Surat',
+  'Craft a tailored job application letter with live preview, auto-fill, and instant export.':
+    'Buat surat lamaran kerja yang disesuaikan dengan pratinjau langsung, isi otomatis, dan ekspor instan.',
+  'Download formatted A4 PDF': 'Unduh PDF format A4',
+  'Copy plain text to clipboard': 'Salin teks biasa ke papan klip',
+  'Back to Cover Letters': 'Kembali ke Surat Lamaran',
+  'Reset paragraphs with template defaults': 'Atur ulang paragraf ke template bawaan',
+  'Create and manage customized cover letters and email templates for your job applications.':
+    'Buat dan kelola surat lamaran dan template email yang disesuaikan untuk lamaran kerja Anda.',
+  'Pick a template (Formal Indonesia, Professional English, or Email Body), import your CV details, and create a ready-to-send application letter.':
+    'Pilih template (Formal Indonesia, Bahasa Inggris Profesional, atau Body Email), impor detail CV Anda, dan buat surat lamaran siap kirim.',
 }
 
 type LanguageContextValue = {
