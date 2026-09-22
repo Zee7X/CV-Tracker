@@ -41,12 +41,12 @@ export const COVER_LETTER_TEMPLATES: TemplateDefinition[] = [
 
 interface GenerateParams {
   template: CoverLetterTemplate
-  jobTitle?: string
-  companyName?: string
-  recipientName?: string
-  source?: string
-  senderName?: string
-  skillsSummary?: string
+  jobTitle?: string | null
+  companyName?: string | null
+  recipientName?: string | null
+  source?: string | null
+  senderName?: string | null
+  skillsSummary?: string | null
   language?: 'id' | 'en'
 }
 
@@ -82,20 +82,62 @@ export function formatCoverLetterDate(dateStr?: string | null, language: 'id' | 
   return trimmed
 }
 
+export function substituteCoverLetterTokens(
+  text: string,
+  params: {
+    jobTitle?: string | null
+    companyName?: string | null
+    recipientName?: string | null
+    senderName?: string | null
+    source?: string | null
+  }
+): string {
+  if (!text) return ''
+  let result = text
+  if (params.jobTitle?.trim()) {
+    result = result
+      .replaceAll('[Posisi Pekerjaan]', params.jobTitle.trim())
+      .replaceAll('[Job Title]', params.jobTitle.trim())
+  }
+  if (params.companyName?.trim()) {
+    result = result
+      .replaceAll('[Nama Perusahaan]', params.companyName.trim())
+      .replaceAll('[Company Name]', params.companyName.trim())
+  }
+  if (params.senderName?.trim()) {
+    result = result
+      .replaceAll('[Nama Anda]', params.senderName.trim())
+      .replaceAll('[Your Name]', params.senderName.trim())
+  }
+  if (params.recipientName?.trim()) {
+    result = result
+      .replaceAll('[Nama HRD]', params.recipientName.trim())
+      .replaceAll('[Hiring Manager]', params.recipientName.trim())
+      .replaceAll('[Recipient Name]', params.recipientName.trim())
+  }
+  return result
+}
+
 export function generateTemplateContent({
   template,
-  jobTitle = '[Posisi Pekerjaan]',
-  companyName = '[Nama Perusahaan]',
+  jobTitle = '',
+  companyName = '',
   recipientName = '',
   source = '',
-  senderName = '[Nama Anda]',
+  senderName = '',
   skillsSummary = '',
   language = 'id',
 }: GenerateParams): { opening: string; body: string; closing: string } {
   const isEn = template === 'professional_en' || language === 'en'
-  const recipient = recipientName || (isEn ? 'Hiring Manager' : 'Bapak/Ibu HRD')
-  const srcMentionId = source ? ` melalui ${source}` : ''
-  const srcMentionEn = source ? ` via ${source}` : ''
+  const defaultJobTitle = isEn ? '[Job Title]' : '[Posisi Pekerjaan]'
+  const defaultCompanyName = isEn ? '[Company Name]' : '[Nama Perusahaan]'
+  const defaultSenderName = isEn ? '[Your Name]' : '[Nama Anda]'
+  const actualJobTitle = jobTitle?.trim() || defaultJobTitle
+  const actualCompanyName = companyName?.trim() || defaultCompanyName
+  const recipient = recipientName?.trim() || (isEn ? 'Hiring Manager' : 'Bapak/Ibu HRD')
+  const srcTrimmed = source?.trim()
+  const srcMentionId = srcTrimmed ? ` melalui ${srcTrimmed}` : ''
+  const srcMentionEn = srcTrimmed ? ` via ${srcTrimmed}` : ''
   const skillsTextId = skillsSummary
     ? `Keahlian utama saya mencakup ${skillsSummary}, yang saya terapkan untuk menyelesaikan berbagai target secara efektif.`
     : 'Selama pengalaman kerja dan pembelajaran saya, saya telah membiasakan diri bekerja secara terorganisir, disiplin, dan berorientasi pada pencapaian target tim.'
@@ -106,50 +148,50 @@ export function generateTemplateContent({
   switch (template) {
     case 'professional_en':
       return {
-        opening: `I am writing to express my strong enthusiasm for the ${jobTitle} position at ${companyName}${srcMentionEn}. With my background in delivering results and collaborating across teams, I am confident in my ability to make an immediate, valuable contribution to your organization.`,
-        body: `${skillsTextEn}\n\nAt my previous responsibilities, I consistently focused on streamlining processes, solving challenges proactively, and maintaining high standards of quality. I admire ${companyName}'s growth and values, and I am excited by the opportunity to contribute my skills to your ongoing initiatives.`,
-        closing: `I welcome the opportunity to discuss how my background, skills, and enthusiasm align with the goals of ${companyName}. Thank you for your time and consideration.`,
+        opening: `I am writing to express my strong enthusiasm for the ${actualJobTitle} position at ${actualCompanyName}${srcMentionEn}. With my background in delivering results and collaborating across teams, I am confident in my ability to make an immediate, valuable contribution to your organization.`,
+        body: `${skillsTextEn}\n\nAt my previous responsibilities, I consistently focused on streamlining processes, solving challenges proactively, and maintaining high standards of quality. I admire ${actualCompanyName}'s growth and values, and I am excited by the opportunity to contribute my skills to your ongoing initiatives.`,
+        closing: `I welcome the opportunity to discuss how my background, skills, and enthusiasm align with the goals of ${actualCompanyName}. Thank you for your time and consideration.`,
       }
 
     case 'email_short':
       if (isEn) {
         return {
-          opening: `Dear ${recipient} at ${companyName},\n\nI am writing to submit my application for the ${jobTitle} position at ${companyName}${srcMentionEn}.`,
+          opening: `Dear ${recipient} at ${actualCompanyName},\n\nI am writing to submit my application for the ${actualJobTitle} position at ${actualCompanyName}${srcMentionEn}.`,
           body: `I have a strong interest and relevant experience in this area. ${skillsTextEn}\n\nAttached to this email, please find my Curriculum Vitae (CV) and supporting materials detailing my background and qualifications.`,
-          closing: `I would welcome the opportunity to speak with you regarding how my experience can support ${companyName}. Thank you for your time and consideration.`,
+          closing: `I would welcome the opportunity to speak with you regarding how my experience can support ${actualCompanyName}. Thank you for your time and consideration.`,
         }
       }
       return {
-        opening: `Yth. ${recipient} di ${companyName},\n\nMelalui email ini, saya bermaksud untuk mengajukan lamaran kerja sebagai ${jobTitle} di ${companyName}${srcMentionId}.`,
+        opening: `Yth. ${recipient} di ${actualCompanyName},\n\nMelalui email ini, saya bermaksud untuk mengajukan lamaran kerja sebagai ${actualJobTitle} di ${actualCompanyName}${srcMentionId}.`,
         body: `Saya memiliki ketertarikan besar dan pengalaman yang relevan di bidang ini. ${skillsTextId}\n\nBersama dengan email ini, saya melampirkan berkas Curriculum Vitae (CV) dan dokumen pendukung saya untuk memberikan gambaran lengkap mengenai kualifikasi saya.`,
-        closing: `Besar harapan saya untuk diberikan kesempatan wawancara guna mendiskusikan bagaimana kontribusi saya dapat mendukung kemajuan ${companyName}. Atas perhatian dan kesempatan yang diberikan, saya ucapkan terima kasih.`,
+        closing: `Besar harapan saya untuk diberikan kesempatan wawancara guna mendiskusikan bagaimana kontribusi saya dapat mendukung kemajuan ${actualCompanyName}. Atas perhatian dan kesempatan yang diberikan, saya ucapkan terima kasih.`,
       }
 
     case 'creative':
       if (isEn) {
         return {
-          opening: `Hello ${companyName} Hiring Team,\n\nI have long admired the vision, creativity, and impact created by ${companyName}. When I discovered the opening for ${jobTitle}${srcMentionEn}, I was immediately energized to apply and connect with your team.`,
-          body: `As a proactive and growth-minded professional, I love tackling challenges and creating meaningful solutions. ${skillsTextEn}\n\nI believe the combination of my practical skills, rapid learning curve, and enthusiasm for your mission will allow me to deliver tangible value to projects at ${companyName}.`,
+          opening: `Hello ${actualCompanyName} Hiring Team,\n\nI have long admired the vision, creativity, and impact created by ${actualCompanyName}. When I discovered the opening for ${actualJobTitle}${srcMentionEn}, I was immediately energized to apply and connect with your team.`,
+          body: `As a proactive and growth-minded professional, I love tackling challenges and creating meaningful solutions. ${skillsTextEn}\n\nI believe the combination of my practical skills, rapid learning curve, and enthusiasm for your mission will allow me to deliver tangible value to projects at ${actualCompanyName}.`,
           closing: `I would love the opportunity to share how my energy and experience align with your vision. Thank you for your time, consideration, and this exciting opportunity!`,
         }
       }
       return {
-        opening: `Halo Tim Rekrutmen ${companyName},\n\nSaya selalu mengagumi inovasi dan dampak yang diciptakan oleh ${companyName}. Ketika saya mengetahui adanya lowongan untuk posisi ${jobTitle}${srcMentionId}, saya langsung terdorong untuk bergabung dan berkolaborasi bersama tim Anda.`,
-        body: `Sebagai seorang profesional yang berorientasi pada hasil dan pertumbuhan, saya senang mengeksplorasi solusi kreatif untuk memecahkan masalah. ${skillsTextId}\n\nSaya percaya bahwa kombinasi antara keahlian teknis, kemauan belajar yang tinggi, dan kecocokan nilai kerja akan memungkinkan saya memberikan kontribusi nyata bagi proyek-proyek di ${companyName}.`,
-        closing: `Saya sangat antusias untuk berdiskusi lebih lanjut tentang bagaimana pengalaman dan energi saya dapat mendukung misi ${companyName}. Terima kasih atas waktu dan kesempatan yang diberikan!`,
+        opening: `Halo Tim Rekrutmen ${actualCompanyName},\n\nSaya selalu mengagumi inovasi dan dampak yang diciptakan oleh ${actualCompanyName}. Ketika saya mengetahui adanya lowongan untuk posisi ${actualJobTitle}${srcMentionId}, saya langsung terdorong untuk bergabung dan berkolaborasi bersama tim Anda.`,
+        body: `Sebagai seorang profesional yang berorientasi pada hasil dan pertumbuhan, saya senang mengeksplorasi solusi kreatif untuk memecahkan masalah. ${skillsTextId}\n\nSaya percaya bahwa kombinasi antara keahlian teknis, kemauan belajar yang tinggi, dan kecocokan nilai kerja akan memungkinkan saya memberikan kontribusi nyata bagi proyek-proyek di ${actualCompanyName}.`,
+        closing: `Saya sangat antusias untuk berdiskusi lebih lanjut tentang bagaimana pengalaman dan energi saya dapat mendukung misi ${actualCompanyName}. Terima kasih atas waktu dan kesempatan yang diberikan!`,
       }
 
     case 'formal_id':
     default:
       if (isEn) {
         return {
-          opening: `Dear ${recipient},\n\nIn response to the opening for the ${jobTitle} role at ${companyName}${srcMentionEn}, I am writing to respectfully submit my application for consideration.`,
+          opening: `Dear ${recipient},\n\nIn response to the opening for the ${actualJobTitle} role at ${actualCompanyName}${srcMentionEn}, I am writing to respectfully submit my application for consideration.`,
           body: `I am a dedicated, disciplined, and detail-oriented professional with a proven commitment to high standards. ${skillsTextEn}\n\nI adapt quickly to dynamic work environments, collaborate smoothly with diverse teams, and consistently focus on delivering optimal results for organizational success.`,
           closing: `Thank you for taking the time to review my application. I look forward to the opportunity to discuss my qualifications and potential contributions in an interview. Sincerely.`,
         }
       }
       return {
-        opening: `Dengan hormat,\n\nSehubungan dengan informasi lowongan pekerjaan yang saya dapatkan${srcMentionId} mengenai posisi ${jobTitle} di ${companyName}, melalui surat ini saya bermaksud mengajukan diri untuk bergabung dengan perusahaan yang Bapak/Ibu pimpin.`,
+        opening: `Dengan hormat,\n\nSehubungan dengan informasi lowongan pekerjaan yang saya dapatkan${srcMentionId} mengenai posisi ${actualJobTitle} di ${actualCompanyName}, melalui surat ini saya bermaksud mengajukan diri untuk bergabung dengan perusahaan yang Bapak/Ibu pimpin.`,
         body: `Saya merupakan individu yang berdedikasi, teliti, dan memiliki komitmen tinggi dalam bekerja. ${skillsTextId}\n\nSaya terbiasa beradaptasi dengan cepat di lingkungan kerja dinamis, mampu bekerja secara mandiri maupun berkolaborasi dalam tim, serta selalu berupaya memberikan hasil kerja yang optimal demi kemajuan perusahaan.`,
         closing: `Demikian surat lamaran pekerjaan ini saya sampaikan. Besar harapan saya untuk memperoleh kesempatan mengikuti tahapan seleksi selanjutnya agar saya dapat menjelaskan potensi dan kualifikasi saya secara lebih mendalam. Atas perhatian dan kebijaksanaan Bapak/Ibu, saya mengucapkan terima kasih.`,
       }

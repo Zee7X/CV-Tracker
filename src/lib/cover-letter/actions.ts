@@ -50,11 +50,16 @@ export async function createCoverLetter(
     .single()
 
   if (error) {
-    if (error.code === '42P01') {
+    if (
+      error.code === '42P01' ||
+      error.code === 'PGRST205' ||
+      error.message?.includes('schema cache') ||
+      error.message?.includes('cover_letters')
+    ) {
       return {
         success: false,
         error:
-          'Tabel "cover_letters" belum dibuat di database Supabase. Silakan jalankan script SQL migrasi di Supabase SQL Editor.',
+          'Tabel "public.cover_letters" belum dibuat di database Supabase. Silakan jalankan script SQL migrasi (20260921000002_cover_letters.sql) di Supabase Dashboard > SQL Editor.',
       }
     }
     return { success: false, error: error.message }

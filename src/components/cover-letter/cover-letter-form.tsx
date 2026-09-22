@@ -39,6 +39,7 @@ import {
   generateTemplateContent,
   formatCoverLetterPlaintext,
   formatCoverLetterDate,
+  substituteCoverLetterTokens,
 } from '@/lib/cover-letter/templates'
 import { useLanguage } from '@/components/i18n/language-provider'
 import { CoverLetterPDFDocument } from '@/lib/cover-letter/pdf'
@@ -48,6 +49,55 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+
+const COVER_LETTERS_MIGRATION_SQL = `-- Migration: Create cover_letters table and RLS policies
+create table if not exists public.cover_letters (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  title text not null,
+  template text not null default 'formal_id' check (template in ('formal_id', 'professional_en', 'email_short', 'creative')),
+  job_title text not null,
+  company_name text not null,
+  company_address text,
+  recipient_name text,
+  source text,
+  letter_date text not null,
+  sender_name text not null,
+  sender_email text not null,
+  sender_phone text,
+  sender_location text,
+  opening text not null default '',
+  body text not null default '',
+  closing text not null default '',
+  cv_id uuid references public.cvs(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Indexes
+create index if not exists cover_letters_user_id_idx on public.cover_letters(user_id);
+create index if not exists cover_letters_cv_id_idx on public.cover_letters(cv_id);
+
+-- Enable RLS
+alter table public.cover_letters enable row level security;
+
+-- Policies
+create policy "Users can view own cover letters"
+  on public.cover_letters for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own cover letters"
+  on public.cover_letters for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own cover letters"
+  on public.cover_letters for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "Users can delete own cover letters"
+  on public.cover_letters for delete
+  using (auth.uid() = user_id);`
 
 interface CoverLetterFormProps {
   initialData?: CoverLetter | null
@@ -68,12 +118,16 @@ export function CoverLetterForm({
   const [isPending, startTransition] = useTransition()
   const [isExporting, setIsExporting] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [copiedSQL, setCopiedSQL] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form')
   const [selectedCvId, setSelectedCvId] = useState<string>(initialData?.cv_id || '')
+  const [skillsSummary, setSkillsSummary] = useState('')
 
   const isEditing = Boolean(initialData?.id)
+  const isUserEditedRef = React.useRef(Boolean(isEditing || initialData?.opening))
+  const isTitleEditedRef = React.useRef(Boolean(isEditing || initialData?.title))
 
   const defaultValues: CoverLetterFormValues = {
     title: initialData?.title || (language === 'en' ? 'Job Application Letter' : 'Surat Lamaran Pekerjaan'),
@@ -107,36 +161,89 @@ export function CoverLetterForm({
 
   const watchedValues = watch()
   const currentTemplate = watch('template')
+  const watchedJobTitle = watch('job_title')
+  const watchedCompanyName = watch('company_name')
+  const watchedRecipientName = watch('recipient_name')
+  const watchedSource = watch('source')
+  const watchedSenderName = watch('sender_name')
   const isEn = currentTemplate === 'professional_en' || language === 'en'
 
-  // Auto-generate initial paragraphs if creating fresh
+  // Auto-sync letter content with Job Details & Company info
   useEffect(() => {
-    if (!isEditing && !watchedValues.opening && !watchedValues.body) {
-      const initialTmpl = initialData?.template || (language === 'en' ? 'professional_en' : 'formal_id')
+    if (!isUserEditedRef.current) {
       const generated = generateTemplateContent({
-        template: initialTmpl,
-        jobTitle: watchedValues.job_title || undefined,
-        companyName: watchedValues.company_name || undefined,
-        senderName: watchedValues.sender_name || undefined,
+        template: currentTemplate,
+        jobTitle: watchedJobTitle || undefined,
+        companyName: watchedCompanyName || undefined,
+        recipientName: watchedRecipientName || undefined,
+        source: watchedSource || undefined,
+        senderName: watchedSenderName || undefined,
+        skillsSummary: skillsSummary || undefined,
         language,
       })
-      setValue('template', initialTmpl)
       setValue('opening', generated.opening)
       setValue('body', generated.body)
       setValue('closing', generated.closing)
+    } else {
+      // If user has customized paragraphs, substitute any placeholders that still exist
+      const curOpening = watchedValues.opening || ''
+      const curBody = watchedValues.body || ''
+      const curClosing = watchedValues.closing || ''
+
+      const subParams = {
+        jobTitle: watchedJobTitle,
+        companyName: watchedCompanyName,
+        recipientName: watchedRecipientName,
+        senderName: watchedSenderName,
+        source: watchedSource,
+      }
+
+      const nextOpening = substituteCoverLetterTokens(curOpening, subParams)
+      const nextBody = substituteCoverLetterTokens(curBody, subParams)
+      const nextClosing = substituteCoverLetterTokens(curClosing, subParams)
+
+      if (nextOpening !== curOpening) setValue('opening', nextOpening)
+      if (nextBody !== curBody) setValue('body', nextBody)
+      if (nextClosing !== curClosing) setValue('closing', nextClosing)
     }
-  }, [isEditing, language]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    watchedJobTitle,
+    watchedCompanyName,
+    watchedRecipientName,
+    watchedSource,
+    watchedSenderName,
+    currentTemplate,
+    skillsSummary,
+    language,
+    setValue,
+  ]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-update document title if user hasn't typed a custom title
+  useEffect(() => {
+    if (!isTitleEditedRef.current && !isEditing) {
+      if (watchedJobTitle?.trim() || watchedCompanyName?.trim()) {
+        const role = watchedJobTitle?.trim() || (isEn ? 'Position' : 'Posisi')
+        const company = watchedCompanyName?.trim() ? ` - ${watchedCompanyName.trim()}` : ''
+        const newTitle = isEn ? `Application for ${role}${company}` : `Lamaran ${role}${company}`
+        setValue('title', newTitle)
+      } else {
+        setValue('title', isEn ? 'Job Application Letter' : 'Surat Lamaran Pekerjaan')
+      }
+    }
+  }, [watchedJobTitle, watchedCompanyName, isEn, isEditing, setValue])
 
   // Handle template change
   const handleSelectTemplate = (tmpl: CoverLetterTemplate) => {
     setValue('template', tmpl)
+    isUserEditedRef.current = false
     const generated = generateTemplateContent({
       template: tmpl,
-      jobTitle: watchedValues.job_title || undefined,
-      companyName: watchedValues.company_name || undefined,
-      recipientName: watchedValues.recipient_name || undefined,
-      source: watchedValues.source || undefined,
-      senderName: watchedValues.sender_name || undefined,
+      jobTitle: watchedJobTitle || undefined,
+      companyName: watchedCompanyName || undefined,
+      recipientName: watchedRecipientName || undefined,
+      source: watchedSource || undefined,
+      senderName: watchedSenderName || undefined,
+      skillsSummary: skillsSummary || undefined,
       language,
     })
     setValue('opening', generated.opening)
@@ -146,13 +253,15 @@ export function CoverLetterForm({
 
   // Handle re-generate button
   const handleRegenerate = () => {
+    isUserEditedRef.current = false
     const generated = generateTemplateContent({
       template: currentTemplate,
-      jobTitle: watchedValues.job_title || undefined,
-      companyName: watchedValues.company_name || undefined,
-      recipientName: watchedValues.recipient_name || undefined,
-      source: watchedValues.source || undefined,
-      senderName: watchedValues.sender_name || undefined,
+      jobTitle: watchedJobTitle || undefined,
+      companyName: watchedCompanyName || undefined,
+      recipientName: watchedRecipientName || undefined,
+      source: watchedSource || undefined,
+      senderName: watchedSenderName || undefined,
+      skillsSummary: skillsSummary || undefined,
       language,
     })
     setValue('opening', generated.opening)
@@ -172,15 +281,18 @@ export function CoverLetterForm({
     if (sourceCV.personal_info?.phone) setValue('sender_phone', sourceCV.personal_info.phone)
     if (sourceCV.personal_info?.location) setValue('sender_location', sourceCV.personal_info.location)
 
-    // Build skills summary from top 3 skills
+    // Build skills summary from top 4 skills
     const topSkills = (sourceCV.skills || []).slice(0, 4).join(', ')
+    setSkillsSummary(topSkills)
+
+    isUserEditedRef.current = false
     const generated = generateTemplateContent({
       template: currentTemplate,
-      jobTitle: watchedValues.job_title || undefined,
-      companyName: watchedValues.company_name || undefined,
-      recipientName: watchedValues.recipient_name || undefined,
-      source: watchedValues.source || undefined,
-      senderName: sourceCV.personal_info?.full_name || watchedValues.sender_name || undefined,
+      jobTitle: watchedJobTitle || undefined,
+      companyName: watchedCompanyName || undefined,
+      recipientName: watchedRecipientName || undefined,
+      source: watchedSource || undefined,
+      senderName: sourceCV.personal_info?.full_name || watchedSenderName || undefined,
       skillsSummary: topSkills || undefined,
       language,
     })
@@ -189,9 +301,27 @@ export function CoverLetterForm({
     setValue('closing', generated.closing)
   }
 
+  const getSanitizedLetter = (): CoverLetterFormValues => {
+    const vals = watch()
+    const subParams = {
+      jobTitle: vals.job_title,
+      companyName: vals.company_name,
+      senderName: vals.sender_name,
+      recipientName: vals.recipient_name,
+      source: vals.source,
+    }
+    return {
+      ...vals,
+      opening: substituteCoverLetterTokens(vals.opening || '', subParams),
+      body: substituteCoverLetterTokens(vals.body || '', subParams),
+      closing: substituteCoverLetterTokens(vals.closing || '', subParams),
+    }
+  }
+
   // Copy plaintext to clipboard
   const handleCopy = async () => {
-    const text = formatCoverLetterPlaintext(watchedValues, isEn ? 'en' : 'id')
+    const cleanLetter = getSanitizedLetter()
+    const text = formatCoverLetterPlaintext(cleanLetter, isEn ? 'en' : 'id')
     try {
       await navigator.clipboard.writeText(text)
       setCopied(true)
@@ -205,12 +335,13 @@ export function CoverLetterForm({
   const handleDownloadPDF = async () => {
     setIsExporting(true)
     try {
-      const doc = <CoverLetterPDFDocument letter={watchedValues} language={isEn ? 'en' : 'id'} />
+      const cleanLetter = getSanitizedLetter()
+      const doc = <CoverLetterPDFDocument letter={cleanLetter} language={isEn ? 'en' : 'id'} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
       const filename = isEn
-        ? `${watchedValues.sender_name || 'Cover'}-Letter-${watchedValues.company_name || 'Application'}.pdf`
-        : `${watchedValues.sender_name || 'Surat'}-Lamaran-${watchedValues.company_name || 'Kerja'}.pdf`
+        ? `${cleanLetter.sender_name || 'Cover'}-Letter-${cleanLetter.company_name || 'Application'}.pdf`
+        : `${cleanLetter.sender_name || 'Surat'}-Lamaran-${cleanLetter.company_name || 'Kerja'}.pdf`
       triggerDownload(url, filename)
     } catch (err) {
       console.error('PDF export failed:', err)
@@ -219,20 +350,44 @@ export function CoverLetterForm({
     }
   }
 
+  const handleCopySQLMigration = async () => {
+    try {
+      await navigator.clipboard.writeText(COVER_LETTERS_MIGRATION_SQL)
+      setCopiedSQL(true)
+      setTimeout(() => setCopiedSQL(false), 2500)
+    } catch {
+      // ignore
+    }
+  }
+
   const onSubmit = async (values: CoverLetterFormValues) => {
     setServerError(null)
     setSuccessMessage(null)
 
+    const subParams = {
+      jobTitle: values.job_title,
+      companyName: values.company_name,
+      senderName: values.sender_name,
+      recipientName: values.recipient_name,
+      source: values.source,
+    }
+    const cleanValues: CoverLetterFormValues = {
+      ...values,
+      opening: substituteCoverLetterTokens(values.opening || '', subParams),
+      body: substituteCoverLetterTokens(values.body || '', subParams),
+      closing: substituteCoverLetterTokens(values.closing || '', subParams),
+    }
+
     startTransition(async () => {
       if (isEditing && initialData?.id) {
-        const res = await updateCoverLetter(initialData.id, values)
+        const res = await updateCoverLetter(initialData.id, cleanValues)
         if (!res.success) {
           setServerError(res.error || 'Failed to update cover letter.')
           return
         }
         setSuccessMessage('Cover letter saved successfully!')
       } else {
-        const res = await createCoverLetter(values)
+        const res = await createCoverLetter(cleanValues)
         if (!res.success || !res.id) {
           setServerError(res.error || 'Failed to create cover letter.')
           return
@@ -314,9 +469,47 @@ export function CoverLetterForm({
 
       {/* Notifications */}
       {serverError && (
-        <div role="alert" className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
-          <p>{serverError}</p>
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 space-y-3">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
+            <p className="font-semibold">{serverError}</p>
+          </div>
+          {(serverError.includes('cover_letters') || serverError.includes('schema cache')) && (
+            <div className="mt-2 rounded-md border border-red-300 bg-white p-3 text-xs space-y-2.5 text-slate-700">
+              <p className="font-medium text-slate-900">
+                {language === 'en'
+                  ? 'The database table "cover_letters" has not been created yet in your Supabase project.'
+                  : 'Tabel database "cover_letters" belum dibuat di proyek Supabase Anda.'}
+              </p>
+              <p className="text-slate-600">
+                {language === 'en'
+                  ? 'Click the button below to copy the migration SQL, then paste & run it in Supabase SQL Editor:'
+                  : 'Klik tombol di bawah untuk menyalin skrip SQL migrasi, lalu paste & jalankan di Supabase SQL Editor:'}
+              </p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleCopySQLMigration}
+                  className="gap-1.5 text-xs bg-slate-900 text-white hover:bg-slate-800 hover:text-white"
+                >
+                  {copiedSQL ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copiedSQL
+                    ? (language === 'en' ? 'SQL Copied!' : 'SQL Berhasil Disalin!')
+                    : (language === 'en' ? 'Copy Migration SQL' : 'Salin Skrip SQL Migrasi')}
+                </Button>
+                <a
+                  href="https://supabase.com/dashboard"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline font-medium ml-1"
+                >
+                  {language === 'en' ? 'Open Supabase Dashboard →' : 'Buka Supabase Dashboard →'}
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -368,7 +561,11 @@ export function CoverLetterForm({
                 <Input
                   id="title"
                   placeholder="e.g. Lamaran Backend Developer - PT Tokopedia"
-                  {...register('title')}
+                  {...register('title', {
+                    onChange: () => {
+                      isTitleEditedRef.current = true
+                    },
+                  })}
                 />
                 {errors.title && <p className="text-xs text-red-600">{errors.title.message}</p>}
               </div>
@@ -610,7 +807,11 @@ export function CoverLetterForm({
                   id="opening"
                   rows={3}
                   className="w-full rounded-md border border-slate-300 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-blue-500"
-                  {...register('opening')}
+                  {...register('opening', {
+                    onChange: () => {
+                      isUserEditedRef.current = true
+                    },
+                  })}
                 />
                 {errors.opening && <p className="text-xs text-red-600">{errors.opening.message}</p>}
               </div>
@@ -623,7 +824,11 @@ export function CoverLetterForm({
                   id="body"
                   rows={5}
                   className="w-full rounded-md border border-slate-300 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-blue-500"
-                  {...register('body')}
+                  {...register('body', {
+                    onChange: () => {
+                      isUserEditedRef.current = true
+                    },
+                  })}
                 />
                 {errors.body && <p className="text-xs text-red-600">{errors.body.message}</p>}
               </div>
@@ -636,7 +841,11 @@ export function CoverLetterForm({
                   id="closing"
                   rows={3}
                   className="w-full rounded-md border border-slate-300 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-blue-500"
-                  {...register('closing')}
+                  {...register('closing', {
+                    onChange: () => {
+                      isUserEditedRef.current = true
+                    },
+                  })}
                 />
                 {errors.closing && <p className="text-xs text-red-600">{errors.closing.message}</p>}
               </div>
@@ -694,7 +903,15 @@ export function CoverLetterForm({
               </div>
 
               {/* Opening */}
-              <p className="whitespace-pre-line text-justify text-slate-700">{watchedValues.opening}</p>
+              <p className="whitespace-pre-line text-justify text-slate-700">
+                {substituteCoverLetterTokens(watchedValues.opening || '', {
+                  jobTitle: watchedJobTitle,
+                  companyName: watchedCompanyName,
+                  senderName: watchedSenderName,
+                  recipientName: watchedRecipientName,
+                  source: watchedSource,
+                })}
+              </p>
 
               {/* Data Diri Box for Formal ID */}
               {((currentTemplate === 'formal_id' || !currentTemplate) && !isEn) && (
@@ -708,10 +925,26 @@ export function CoverLetterForm({
               )}
 
               {/* Body */}
-              <p className="whitespace-pre-line text-justify text-slate-700">{watchedValues.body}</p>
+              <p className="whitespace-pre-line text-justify text-slate-700">
+                {substituteCoverLetterTokens(watchedValues.body || '', {
+                  jobTitle: watchedJobTitle,
+                  companyName: watchedCompanyName,
+                  senderName: watchedSenderName,
+                  recipientName: watchedRecipientName,
+                  source: watchedSource,
+                })}
+              </p>
 
               {/* Closing */}
-              <p className="whitespace-pre-line text-justify text-slate-700">{watchedValues.closing}</p>
+              <p className="whitespace-pre-line text-justify text-slate-700">
+                {substituteCoverLetterTokens(watchedValues.closing || '', {
+                  jobTitle: watchedJobTitle,
+                  companyName: watchedCompanyName,
+                  senderName: watchedSenderName,
+                  recipientName: watchedRecipientName,
+                  source: watchedSource,
+                })}
+              </p>
 
               {/* Sign Off */}
               <div className="pt-4 text-[11px]">

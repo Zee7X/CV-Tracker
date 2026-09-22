@@ -86,3 +86,35 @@ test('generateTemplateContent generates English text when language is en', () =>
   assert.match(content.body, /dedicated, disciplined/)
 })
 
+test('generateTemplateContent correctly embeds jobTitle, companyName, and source in Indonesian', () => {
+  const content = generateTemplateContent({
+    template: 'formal_id',
+    jobTitle: 'Fullstack Developer',
+    companyName: 'PT Astra International',
+    source: 'LinkedIn',
+    senderName: 'Rizick Fimelyan Sabillah',
+    language: 'id',
+  })
+  assert.match(content.opening, /Fullstack Developer/)
+  assert.match(content.opening, /PT Astra International/)
+  assert.match(content.opening, /melalui LinkedIn/)
+  assert.equal(content.opening.includes('[Posisi Pekerjaan]'), false)
+  assert.equal(content.opening.includes('[Nama Perusahaan]'), false)
+})
+
+test('substituteCoverLetterTokens replaces placeholder tokens with provided values', async () => {
+  const { substituteCoverLetterTokens } = await import('../src/lib/cover-letter/templates')
+  const rawText = 'Melamar posisi [Posisi Pekerjaan] di [Nama Perusahaan] oleh [Nama Anda] kepada [Nama HRD].'
+  const substituted = substituteCoverLetterTokens(rawText, {
+    jobTitle: 'Fullstack Developer',
+    companyName: 'PT Astra International',
+    senderName: 'Rizick Fimelyan',
+    recipientName: 'Ibu Ratna',
+  })
+  assert.equal(
+    substituted,
+    'Melamar posisi Fullstack Developer di PT Astra International oleh Rizick Fimelyan kepada Ibu Ratna.'
+  )
+})
+
+
