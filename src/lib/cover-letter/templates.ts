@@ -11,9 +11,9 @@ export interface TemplateDefinition {
 export const COVER_LETTER_TEMPLATES: TemplateDefinition[] = [
   {
     id: 'formal_id',
-    name: 'Formal Indonesia',
-    badge: 'Resmi / BUMN',
-    description: 'Format baku resmi standar perusahaan nasional & BUMN dengan tata bahasa sopan dan terstruktur.',
+    name: 'Formal Indonesian',
+    badge: 'Official / BUMN',
+    description: 'Standard formal format with polite structure, perfect for national corporations and institutions.',
     language: 'id',
   },
   {
@@ -25,16 +25,16 @@ export const COVER_LETTER_TEMPLATES: TemplateDefinition[] = [
   },
   {
     id: 'email_short',
-    name: 'Body Email Ringkas',
-    badge: 'Siap Kirim',
-    description: 'Format padat & ringkas yang siap langsung ditempel ke isi email saat melampirkan CV.',
+    name: 'Concise Email Body',
+    badge: 'Email Ready',
+    description: 'Compact & to-the-point format ready to paste directly into your email body when attaching your CV.',
     language: 'id',
   },
   {
     id: 'creative',
     name: 'Creative Startup',
     badge: 'Modern Tech',
-    description: 'Format dinamis dan percaya diri, fokus pada hasil karya, inisiatif, dan keselarasan visi.',
+    description: 'Dynamic, confident pitch highlighting projects, initiative, and cultural alignment with the company.',
     language: 'id',
   },
 ]
@@ -47,6 +47,39 @@ interface GenerateParams {
   source?: string
   senderName?: string
   skillsSummary?: string
+  language?: 'id' | 'en'
+}
+
+const MONTHS_ID = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+]
+
+const MONTHS_EN = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+
+/**
+ * Formats YYYY-MM-DD or date strings into words like "22 September 2026" or "September 22, 2026".
+ */
+export function formatCoverLetterDate(dateStr?: string | null, language: 'id' | 'en' = 'id'): string {
+  if (!dateStr) return ''
+  const trimmed = dateStr.trim()
+  const ymdMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
+  if (!ymdMatch) return trimmed
+
+  const year = ymdMatch[1]
+  const mIndex = parseInt(ymdMatch[2], 10) - 1
+  const day = parseInt(ymdMatch[3], 10)
+
+  if (mIndex >= 0 && mIndex < 12) {
+    if (language === 'en') {
+      return `${MONTHS_EN[mIndex]} ${day}, ${year}`
+    }
+    return `${day} ${MONTHS_ID[mIndex]} ${year}`
+  }
+  return trimmed
 }
 
 export function generateTemplateContent({
@@ -57,8 +90,10 @@ export function generateTemplateContent({
   source = '',
   senderName = '[Nama Anda]',
   skillsSummary = '',
+  language = 'id',
 }: GenerateParams): { opening: string; body: string; closing: string } {
-  const recipient = recipientName || (template === 'professional_en' ? 'Hiring Manager' : 'Bapak/Ibu HRD')
+  const isEn = template === 'professional_en' || language === 'en'
+  const recipient = recipientName || (isEn ? 'Hiring Manager' : 'Bapak/Ibu HRD')
   const srcMentionId = source ? ` melalui ${source}` : ''
   const srcMentionEn = source ? ` via ${source}` : ''
   const skillsTextId = skillsSummary
@@ -77,6 +112,13 @@ export function generateTemplateContent({
       }
 
     case 'email_short':
+      if (isEn) {
+        return {
+          opening: `Dear ${recipient} at ${companyName},\n\nI am writing to submit my application for the ${jobTitle} position at ${companyName}${srcMentionEn}.`,
+          body: `I have a strong interest and relevant experience in this area. ${skillsTextEn}\n\nAttached to this email, please find my Curriculum Vitae (CV) and supporting materials detailing my background and qualifications.`,
+          closing: `I would welcome the opportunity to speak with you regarding how my experience can support ${companyName}. Thank you for your time and consideration.`,
+        }
+      }
       return {
         opening: `Yth. ${recipient} di ${companyName},\n\nMelalui email ini, saya bermaksud untuk mengajukan lamaran kerja sebagai ${jobTitle} di ${companyName}${srcMentionId}.`,
         body: `Saya memiliki ketertarikan besar dan pengalaman yang relevan di bidang ini. ${skillsTextId}\n\nBersama dengan email ini, saya melampirkan berkas Curriculum Vitae (CV) dan dokumen pendukung saya untuk memberikan gambaran lengkap mengenai kualifikasi saya.`,
@@ -84,6 +126,13 @@ export function generateTemplateContent({
       }
 
     case 'creative':
+      if (isEn) {
+        return {
+          opening: `Hello ${companyName} Hiring Team,\n\nI have long admired the vision, creativity, and impact created by ${companyName}. When I discovered the opening for ${jobTitle}${srcMentionEn}, I was immediately energized to apply and connect with your team.`,
+          body: `As a proactive and growth-minded professional, I love tackling challenges and creating meaningful solutions. ${skillsTextEn}\n\nI believe the combination of my practical skills, rapid learning curve, and enthusiasm for your mission will allow me to deliver tangible value to projects at ${companyName}.`,
+          closing: `I would love the opportunity to share how my energy and experience align with your vision. Thank you for your time, consideration, and this exciting opportunity!`,
+        }
+      }
       return {
         opening: `Halo Tim Rekrutmen ${companyName},\n\nSaya selalu mengagumi inovasi dan dampak yang diciptakan oleh ${companyName}. Ketika saya mengetahui adanya lowongan untuk posisi ${jobTitle}${srcMentionId}, saya langsung terdorong untuk bergabung dan berkolaborasi bersama tim Anda.`,
         body: `Sebagai seorang profesional yang berorientasi pada hasil dan pertumbuhan, saya senang mengeksplorasi solusi kreatif untuk memecahkan masalah. ${skillsTextId}\n\nSaya percaya bahwa kombinasi antara keahlian teknis, kemauan belajar yang tinggi, dan kecocokan nilai kerja akan memungkinkan saya memberikan kontribusi nyata bagi proyek-proyek di ${companyName}.`,
@@ -92,6 +141,13 @@ export function generateTemplateContent({
 
     case 'formal_id':
     default:
+      if (isEn) {
+        return {
+          opening: `Dear ${recipient},\n\nIn response to the opening for the ${jobTitle} role at ${companyName}${srcMentionEn}, I am writing to respectfully submit my application for consideration.`,
+          body: `I am a dedicated, disciplined, and detail-oriented professional with a proven commitment to high standards. ${skillsTextEn}\n\nI adapt quickly to dynamic work environments, collaborate smoothly with diverse teams, and consistently focus on delivering optimal results for organizational success.`,
+          closing: `Thank you for taking the time to review my application. I look forward to the opportunity to discuss my qualifications and potential contributions in an interview. Sincerely.`,
+        }
+      }
       return {
         opening: `Dengan hormat,\n\nSehubungan dengan informasi lowongan pekerjaan yang saya dapatkan${srcMentionId} mengenai posisi ${jobTitle} di ${companyName}, melalui surat ini saya bermaksud mengajukan diri untuk bergabung dengan perusahaan yang Bapak/Ibu pimpin.`,
         body: `Saya merupakan individu yang berdedikasi, teliti, dan memiliki komitmen tinggi dalam bekerja. ${skillsTextId}\n\nSaya terbiasa beradaptasi dengan cepat di lingkungan kerja dinamis, mampu bekerja secara mandiri maupun berkolaborasi dalam tim, serta selalu berupaya memberikan hasil kerja yang optimal demi kemajuan perusahaan.`,
@@ -103,11 +159,15 @@ export function generateTemplateContent({
 /**
  * Formats a complete cover letter into clean, copyable plain text for email or document paste.
  */
-export function formatCoverLetterPlaintext(letter: Partial<CoverLetterInput>): string {
-  const isEn = letter.template === 'professional_en'
+export function formatCoverLetterPlaintext(
+  letter: Partial<CoverLetterInput>,
+  language: 'id' | 'en' = 'id'
+): string {
+  const isEn = letter.template === 'professional_en' || language === 'en'
   const isEmail = letter.template === 'email_short'
 
-  const date = letter.letter_date || new Date().toISOString().split('T')[0]
+  const rawDate = letter.letter_date || new Date().toISOString().split('T')[0]
+  const formattedDate = formatCoverLetterDate(rawDate, isEn ? 'en' : 'id')
   const senderName = letter.sender_name || ''
   const senderEmail = letter.sender_email || ''
   const senderPhone = letter.sender_phone ? ` | ${letter.sender_phone}` : ''
@@ -118,7 +178,9 @@ export function formatCoverLetterPlaintext(letter: Partial<CoverLetterInput>): s
   const address = letter.company_address ? `\n${letter.company_address}` : ''
 
   if (isEmail) {
-    return `Subject: Lamaran Pekerjaan - ${position} - ${senderName}
+    const subjectPrefix = isEn ? 'Subject: Job Application' : 'Subject: Lamaran Pekerjaan'
+    const signOff = isEn ? 'Sincerely,' : 'Hormat saya,'
+    return `${subjectPrefix} - ${position} - ${senderName}
 
 ${letter.opening || ''}
 
@@ -126,7 +188,7 @@ ${letter.body || ''}
 
 ${letter.closing || ''}
 
-Hormat saya,
+${signOff}
 ${senderName}
 ${senderEmail}${senderPhone}${senderLoc}`
   }
@@ -135,7 +197,7 @@ ${senderEmail}${senderPhone}${senderLoc}`
     return `${senderName}
 ${senderEmail}${senderPhone}${senderLoc}
 
-Date: ${date}
+Date: ${formattedDate}
 
 To:
 ${recipient}
@@ -156,7 +218,7 @@ ${senderName}`
 
   // Formal Indonesian
   const city = letter.sender_location ? `${letter.sender_location.split(',')[0].trim()}, ` : ''
-  return `${city}${date}
+  return `${city}${formattedDate}
 
 Hal: Lamaran Pekerjaan — ${position}
 Lampiran: Berkas CV dan Dokumen Pendukung

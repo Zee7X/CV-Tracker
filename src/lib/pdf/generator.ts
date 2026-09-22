@@ -7,9 +7,10 @@ import type { CVWithRelations, CVTemplate } from '@/types/cv'
  */
 export async function generatePDF(
   cv: CVWithRelations,
-  templateOverride?: CVTemplate | string
+  templateOverride?: CVTemplate | string,
+  language: 'id' | 'en' = 'id'
 ): Promise<Blob> {
-  const doc = createPDFDocument(cv, templateOverride)
+  const doc = createPDFDocument(cv, templateOverride, language)
   const instance = pdf(doc as React.ReactElement<DocumentProps>)
   const blob = await instance.toBlob()
   return blob
@@ -20,9 +21,10 @@ export async function generatePDF(
  */
 export async function generatePDFBuffer(
   cv: CVWithRelations,
-  templateOverride?: CVTemplate | string
+  templateOverride?: CVTemplate | string,
+  language: 'id' | 'en' = 'id'
 ): Promise<Buffer> {
-  const blob = await generatePDF(cv, templateOverride)
+  const blob = await generatePDF(cv, templateOverride, language)
   const arrayBuffer = await blob.arrayBuffer()
   return Buffer.from(arrayBuffer)
 }

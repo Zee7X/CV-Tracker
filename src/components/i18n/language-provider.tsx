@@ -403,13 +403,26 @@ const id: Record<string, string> = {
   'Import': 'Impor',
   'New Cover Letter': 'Surat Lamaran Baru',
   'Formal Indonesia': 'Formal Indonesia',
+  'Formal Indonesian': 'Formal Indonesia',
   'Professional English': 'Bahasa Inggris Profesional',
   'Body Email Ringkas': 'Body Email Ringkas',
+  'Concise Email Body': 'Body Email Ringkas',
   'Creative Startup': 'Startup Kreatif',
   'Resmi / BUMN': 'Resmi / BUMN',
+  'Official / BUMN': 'Resmi / BUMN',
   'International': 'Internasional',
   'Siap Kirim': 'Siap Kirim',
+  'Email Ready': 'Siap Kirim',
   'Modern Tech': 'Teknologi Modern',
+  'Standard formal format with polite structure, perfect for national corporations and institutions.':
+    'Format baku resmi standar perusahaan nasional & BUMN dengan tata bahasa sopan dan terstruktur.',
+  'Structured corporate format with strong impact paragraphs for multinational & remote companies.':
+    'Format korporat terstruktur untuk perusahaan multinasional, remote, dan global.',
+  'Compact & to-the-point format ready to paste directly into your email body when attaching your CV.':
+    'Format padat & ringkas yang siap langsung ditempel ke isi email saat melampirkan CV.',
+  'Dynamic, confident pitch highlighting projects, initiative, and cultural alignment with the company.':
+    'Format dinamis dan percaya diri, fokus pada hasil karya, inisiatif, dan keselarasan visi.',
+  'Job Application Letter': 'Surat Lamaran Pekerjaan',
 }
 
 type LanguageContextValue = {

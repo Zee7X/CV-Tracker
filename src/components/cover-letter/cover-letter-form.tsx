@@ -38,7 +38,9 @@ import {
   COVER_LETTER_TEMPLATES,
   generateTemplateContent,
   formatCoverLetterPlaintext,
+  formatCoverLetterDate,
 } from '@/lib/cover-letter/templates'
+import { useLanguage } from '@/components/i18n/language-provider'
 import { CoverLetterPDFDocument } from '@/lib/cover-letter/pdf'
 import { triggerDownload } from '@/lib/pdf/generator'
 import { createCoverLetter, updateCoverLetter } from '@/lib/cover-letter/actions'
@@ -62,6 +64,7 @@ export function CoverLetterForm({
   userProfile,
 }: CoverLetterFormProps) {
   const router = useRouter()
+  const { language } = useLanguage()
   const [isPending, startTransition] = useTransition()
   const [isExporting, setIsExporting] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -73,8 +76,8 @@ export function CoverLetterForm({
   const isEditing = Boolean(initialData?.id)
 
   const defaultValues: CoverLetterFormValues = {
-    title: initialData?.title || 'Surat Lamaran Pekerjaan',
-    template: initialData?.template || 'formal_id',
+    title: initialData?.title || (language === 'en' ? 'Job Application Letter' : 'Surat Lamaran Pekerjaan'),
+    template: initialData?.template || (language === 'en' ? 'professional_en' : 'formal_id'),
     job_title: initialData?.job_title || '',
     company_name: initialData?.company_name || '',
     company_address: initialData?.company_address || '',
@@ -104,21 +107,25 @@ export function CoverLetterForm({
 
   const watchedValues = watch()
   const currentTemplate = watch('template')
+  const isEn = currentTemplate === 'professional_en' || language === 'en'
 
   // Auto-generate initial paragraphs if creating fresh
   useEffect(() => {
     if (!isEditing && !watchedValues.opening && !watchedValues.body) {
+      const initialTmpl = initialData?.template || (language === 'en' ? 'professional_en' : 'formal_id')
       const generated = generateTemplateContent({
-        template: currentTemplate,
+        template: initialTmpl,
         jobTitle: watchedValues.job_title || undefined,
         companyName: watchedValues.company_name || undefined,
         senderName: watchedValues.sender_name || undefined,
+        language,
       })
+      setValue('template', initialTmpl)
       setValue('opening', generated.opening)
       setValue('body', generated.body)
       setValue('closing', generated.closing)
     }
-  }, [isEditing]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isEditing, language]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle template change
   const handleSelectTemplate = (tmpl: CoverLetterTemplate) => {
@@ -130,6 +137,7 @@ export function CoverLetterForm({
       recipientName: watchedValues.recipient_name || undefined,
       source: watchedValues.source || undefined,
       senderName: watchedValues.sender_name || undefined,
+      language,
     })
     setValue('opening', generated.opening)
     setValue('body', generated.body)
@@ -145,36 +153,36 @@ export function CoverLetterForm({
       recipientName: watchedValues.recipient_name || undefined,
       source: watchedValues.source || undefined,
       senderName: watchedValues.sender_name || undefined,
+      language,
     })
     setValue('opening', generated.opening)
     setValue('body', generated.body)
     setValue('closing', generated.closing)
   }
 
-  // Import data from selected CV
+  // Handle import from existing CV
   const handleImportFromCV = () => {
     if (!selectedCvId) return
-    const cv = availableCVs.find((c) => c.id === selectedCvId)
-    if (!cv) return
+    const sourceCV = availableCVs.find((c) => c.id === selectedCvId)
+    if (!sourceCV) return
 
-    const info = cv.personal_info || {}
-    if (info.full_name) setValue('sender_name', info.full_name)
-    if (info.email) setValue('sender_email', info.email)
-    if (info.phone) setValue('sender_phone', info.phone)
-    if (info.location) setValue('sender_location', info.location)
+    setValue('cv_id', sourceCV.id)
+    if (sourceCV.personal_info?.full_name) setValue('sender_name', sourceCV.personal_info.full_name)
+    if (sourceCV.personal_info?.email) setValue('sender_email', sourceCV.personal_info.email)
+    if (sourceCV.personal_info?.phone) setValue('sender_phone', sourceCV.personal_info.phone)
+    if (sourceCV.personal_info?.location) setValue('sender_location', sourceCV.personal_info.location)
 
-    setValue('cv_id', cv.id)
-
-    // Re-generate text with top skills from CV
-    const topSkills = (cv.skills || []).slice(0, 5).join(', ')
+    // Build skills summary from top 3 skills
+    const topSkills = (sourceCV.skills || []).slice(0, 4).join(', ')
     const generated = generateTemplateContent({
       template: currentTemplate,
       jobTitle: watchedValues.job_title || undefined,
       companyName: watchedValues.company_name || undefined,
       recipientName: watchedValues.recipient_name || undefined,
       source: watchedValues.source || undefined,
-      senderName: info.full_name || watchedValues.sender_name || undefined,
-      skillsSummary: topSkills,
+      senderName: sourceCV.personal_info?.full_name || watchedValues.sender_name || undefined,
+      skillsSummary: topSkills || undefined,
+      language,
     })
     setValue('opening', generated.opening)
     setValue('body', generated.body)
@@ -183,7 +191,7 @@ export function CoverLetterForm({
 
   // Copy plaintext to clipboard
   const handleCopy = async () => {
-    const text = formatCoverLetterPlaintext(watchedValues)
+    const text = formatCoverLetterPlaintext(watchedValues, isEn ? 'en' : 'id')
     try {
       await navigator.clipboard.writeText(text)
       setCopied(true)
@@ -197,10 +205,12 @@ export function CoverLetterForm({
   const handleDownloadPDF = async () => {
     setIsExporting(true)
     try {
-      const doc = <CoverLetterPDFDocument letter={watchedValues} />
+      const doc = <CoverLetterPDFDocument letter={watchedValues} language={isEn ? 'en' : 'id'} />
       const blob = await pdf(doc).toBlob()
       const url = URL.createObjectURL(blob)
-      const filename = `${watchedValues.sender_name || 'Surat'}-Lamaran-${watchedValues.company_name || 'Kerja'}.pdf`
+      const filename = isEn
+        ? `${watchedValues.sender_name || 'Cover'}-Letter-${watchedValues.company_name || 'Application'}.pdf`
+        : `${watchedValues.sender_name || 'Surat'}-Lamaran-${watchedValues.company_name || 'Kerja'}.pdf`
       triggerDownload(url, filename)
     } catch (err) {
       console.error('PDF export failed:', err)
@@ -650,7 +660,7 @@ export function CoverLetterForm({
             <div className="rounded-xl border border-stone-300 bg-white p-4 sm:p-6 md:p-8 shadow-md text-xs leading-relaxed text-slate-800 space-y-4 max-h-none lg:max-h-[calc(100vh-160px)] overflow-y-visible lg:overflow-y-auto">
               {/* Letter Header */}
               <div className="border-b border-blue-600 pb-3">
-                <h3 className="text-base font-bold text-slate-900">{watchedValues.sender_name || 'Nama Lengkap'}</h3>
+                <h3 className="text-base font-bold text-slate-900">{watchedValues.sender_name || (isEn ? 'Your Full Name' : 'Nama Lengkap')}</h3>
                 <p className="text-[11px] text-slate-500">
                   {[watchedValues.sender_email, watchedValues.sender_phone, watchedValues.sender_location]
                     .filter(Boolean)
@@ -662,23 +672,23 @@ export function CoverLetterForm({
               <div className="space-y-2 text-[11px]">
                 <p className="text-slate-600">
                   {watchedValues.sender_location ? `${watchedValues.sender_location.split(',')[0].trim()}, ` : ''}
-                  {watchedValues.letter_date || new Date().toISOString().split('T')[0]}
+                  {formatCoverLetterDate(watchedValues.letter_date, isEn ? 'en' : 'id') || new Date().toISOString().split('T')[0]}
                 </p>
                 <div>
                   <p className="text-slate-500">
-                    {currentTemplate === 'professional_en' ? 'To:' : 'Kepada Yth.'}
+                    {isEn ? 'To:' : 'Kepada Yth.'}
                   </p>
                   <p className="font-bold text-slate-900">
-                    {watchedValues.recipient_name || (currentTemplate === 'professional_en' ? 'Hiring Team' : 'Bapak/Ibu HRD')}
+                    {watchedValues.recipient_name || (isEn ? 'Hiring Team' : 'Bapak/Ibu HRD')}
                   </p>
-                  <p className="font-semibold text-blue-700">{watchedValues.company_name || 'Nama Perusahaan'}</p>
+                  <p className="font-semibold text-blue-700">{watchedValues.company_name || (isEn ? 'Company Name' : 'Nama Perusahaan')}</p>
                   {watchedValues.company_address && <p className="text-slate-600">{watchedValues.company_address}</p>}
                 </div>
               </div>
 
               {/* Subject */}
               <div className="border-b border-slate-200 pb-1 font-bold text-slate-900">
-                {currentTemplate === 'professional_en'
+                {isEn
                   ? `Subject: Application for ${watchedValues.job_title || 'Position'}`
                   : `Hal: Permohonan Lamaran Kerja — ${watchedValues.job_title || 'Posisi'}`}
               </div>
@@ -687,7 +697,7 @@ export function CoverLetterForm({
               <p className="whitespace-pre-line text-justify text-slate-700">{watchedValues.opening}</p>
 
               {/* Data Diri Box for Formal ID */}
-              {(currentTemplate === 'formal_id' || !currentTemplate) && (
+              {((currentTemplate === 'formal_id' || !currentTemplate) && !isEn) && (
                 <div className="rounded-md border-l-2 border-blue-600 bg-slate-50 p-2.5 text-[11px] space-y-0.5">
                   <p className="font-semibold text-slate-800">Data Diri Singkat:</p>
                   <p>Nama: {watchedValues.sender_name || '-'}</p>
@@ -706,9 +716,9 @@ export function CoverLetterForm({
               {/* Sign Off */}
               <div className="pt-4 text-[11px]">
                 <p className="text-slate-600">
-                  {currentTemplate === 'professional_en' ? 'Sincerely,' : 'Hormat saya,'}
+                  {isEn ? 'Sincerely,' : 'Hormat saya,'}
                 </p>
-                <p className="mt-8 font-bold text-slate-900">{watchedValues.sender_name || 'Nama Pelamar'}</p>
+                <p className="mt-8 font-bold text-slate-900">{watchedValues.sender_name || (isEn ? 'Applicant Name' : 'Nama Pelamar')}</p>
               </div>
             </div>
           </div>

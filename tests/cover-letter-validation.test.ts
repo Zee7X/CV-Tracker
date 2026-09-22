@@ -66,3 +66,23 @@ test('formatCoverLetterPlaintext formats copyable text with company, position, a
   assert.match(plain, /Nadia Putri/)
 })
 
+test('formatCoverLetterDate formats dates into readable words for both languages', async () => {
+  const { formatCoverLetterDate } = await import('../src/lib/cover-letter/templates')
+  assert.equal(formatCoverLetterDate('2026-09-22', 'id'), '22 September 2026')
+  assert.equal(formatCoverLetterDate('2026-09-22', 'en'), 'September 22, 2026')
+  assert.equal(formatCoverLetterDate('2026-03-05', 'id'), '5 Maret 2026')
+  assert.equal(formatCoverLetterDate('2026-03-05', 'en'), 'March 5, 2026')
+})
+
+test('generateTemplateContent generates English text when language is en', () => {
+  const content = generateTemplateContent({
+    template: 'formal_id',
+    jobTitle: 'Backend Developer',
+    companyName: 'Tokopedia',
+    senderName: 'Nadia Putri',
+    language: 'en',
+  })
+  assert.match(content.opening, /Dear Hiring Manager/)
+  assert.match(content.body, /dedicated, disciplined/)
+})
+

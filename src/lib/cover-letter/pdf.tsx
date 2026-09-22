@@ -10,6 +10,8 @@ import {
 } from '@react-pdf/renderer'
 import type { CoverLetterInput } from '@/types/cover-letter'
 
+import { formatCoverLetterDate } from './templates'
+
 Font.registerHyphenationCallback((word) => [word])
 
 const styles = StyleSheet.create({
@@ -104,13 +106,16 @@ const styles = StyleSheet.create({
 
 export function CoverLetterPDFDocument({
   letter,
+  language = 'id',
 }: {
   letter: Partial<CoverLetterInput>
+  language?: 'id' | 'en'
 }): React.ReactElement<DocumentProps> {
-  const isEn = letter.template === 'professional_en'
-  const isFormalId = letter.template === 'formal_id' || !letter.template
+  const isEn = letter.template === 'professional_en' || language === 'en'
+  const isFormalId = (letter.template === 'formal_id' || !letter.template) && !isEn
 
-  const dateStr = letter.letter_date || new Date().toISOString().split('T')[0]
+  const rawDate = letter.letter_date || new Date().toISOString().split('T')[0]
+  const dateStr = formatCoverLetterDate(rawDate, isEn ? 'en' : 'id')
   const recipient = letter.recipient_name || (isEn ? 'Hiring Team' : 'Bapak/Ibu HRD')
   const contacts = [
     letter.sender_email,
@@ -120,13 +125,13 @@ export function CoverLetterPDFDocument({
 
   return (
     <Document
-      title={`${letter.title || 'Surat Lamaran'} - ${letter.sender_name || 'Pelamar'}`}
+      title={`${letter.title || (isEn ? 'Cover Letter' : 'Surat Lamaran')} - ${letter.sender_name || (isEn ? 'Applicant' : 'Pelamar')}`}
       author={letter.sender_name || 'CV Tracker'}
     >
       <Page size="A4" style={styles.page}>
         {/* Header / Sender Profile */}
         <View style={styles.header}>
-          <Text style={styles.senderName}>{letter.sender_name || 'Nama Lengkap'}</Text>
+          <Text style={styles.senderName}>{letter.sender_name || (isEn ? 'Your Name' : 'Nama Lengkap')}</Text>
           <Text style={styles.senderContact}>{contacts.join('  •  ')}</Text>
         </View>
 
@@ -140,7 +145,7 @@ export function CoverLetterPDFDocument({
         <View style={styles.recipientBlock}>
           <Text>{isEn ? 'To:' : 'Kepada Yth.'}</Text>
           <Text style={styles.recipientTitle}>{recipient}</Text>
-          <Text style={styles.companyName}>{letter.company_name || 'Nama Perusahaan'}</Text>
+          <Text style={styles.companyName}>{letter.company_name || (isEn ? 'Company Name' : 'Nama Perusahaan')}</Text>
           {letter.company_address ? <Text>{letter.company_address}</Text> : null}
         </View>
 

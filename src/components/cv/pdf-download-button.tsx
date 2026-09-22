@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cvSchema } from '@/lib/validations/cv'
+import { useLanguage } from '@/components/i18n/language-provider'
 import type { CVWithRelations, CVTemplate } from '@/types/cv'
 
 interface PDFDownloadButtonProps {
@@ -21,6 +22,7 @@ export default function PDFDownloadButton({
   size = 'default',
   className = '',
 }: PDFDownloadButtonProps) {
+  const { language } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<{ message: string; detail?: string } | null>(null)
 
@@ -43,7 +45,7 @@ export default function PDFDownloadButton({
       const { generatePDF, getPDFFileName, createDownloadLink, triggerDownload } =
         await import('@/lib/pdf/generator')
 
-      const blob = await generatePDF(cv, template)
+      const blob = await generatePDF(cv, template, language)
       const filename = getPDFFileName(cv)
       const url = createDownloadLink(blob)
       triggerDownload(url, filename)

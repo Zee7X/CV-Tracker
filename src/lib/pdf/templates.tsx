@@ -37,29 +37,76 @@ const MONTHS_ID = [
   'Desember',
 ]
 
-function formatDate(value?: string | null): string {
+const MONTHS_EN = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+
+export const PDF_LABELS = {
+  id: {
+    summary: 'Ringkasan Profesional',
+    executiveSummary: 'Ringkasan Eksekutif',
+    experience: 'Pengalaman Kerja',
+    education: 'Pendidikan',
+    skills: 'Keahlian',
+    keySkills: 'Keahlian Utama',
+    projects: 'Proyek',
+    certifications: 'Sertifikasi',
+    contact: 'Kontak',
+    aboutMe: 'Tentang Saya',
+    present: 'Sekarang',
+    pageOf: (p: number, t: number) => `Halaman ${p} dari ${t}`,
+  },
+  en: {
+    summary: 'Professional Summary',
+    executiveSummary: 'Executive Summary',
+    experience: 'Experience',
+    education: 'Education',
+    skills: 'Skills',
+    keySkills: 'Key Skills',
+    projects: 'Projects',
+    certifications: 'Certifications',
+    contact: 'Contact',
+    aboutMe: 'About Me',
+    present: 'Present',
+    pageOf: (p: number, t: number) => `Page ${p} of ${t}`,
+  },
+} as const
+
+function formatDate(value?: string | null, language: 'id' | 'en' = 'id'): string {
   if (!value) return ''
   const trimmed = value.trim()
   if (!trimmed) return ''
+  const months = language === 'en' ? MONTHS_EN : MONTHS_ID
 
-  // Format YYYY-MM-DD -> e.g. 26 Maret 2000
+  // Format YYYY-MM-DD -> e.g. 26 Maret 2000 or 26 March 2000
   const ymdMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
   if (ymdMatch) {
     const year = ymdMatch[1]
     const mIndex = parseInt(ymdMatch[2], 10) - 1
     const day = parseInt(ymdMatch[3], 10)
     if (mIndex >= 0 && mIndex < 12) {
-      return `${day} ${MONTHS_ID[mIndex]} ${year}`
+      return `${day} ${months[mIndex]} ${year}`
     }
   }
 
-  // Format YYYY-MM -> e.g. Maret 2000
+  // Format YYYY-MM -> e.g. Maret 2000 or March 2000
   const ymMatch = /^(\d{4})-(\d{2})$/.exec(trimmed)
   if (ymMatch) {
     const year = ymMatch[1]
     const mIndex = parseInt(ymMatch[2], 10) - 1
     if (mIndex >= 0 && mIndex < 12) {
-      return `${MONTHS_ID[mIndex]} ${year}`
+      return `${months[mIndex]} ${year}`
     }
   }
 
@@ -74,13 +121,15 @@ function formatDate(value?: string | null): string {
 function formatDateRange(
   start?: string | null,
   end?: string | null,
-  isCurrent?: boolean
+  isCurrent?: boolean,
+  language: 'id' | 'en' = 'id'
 ): string {
   if (!start && !end) return ''
-  const startLabel = formatDate(start)
-  const endLabel = formatDate(end)
+  const startLabel = formatDate(start, language)
+  const endLabel = formatDate(end, language)
+  const presentLabel = language === 'en' ? 'Present' : 'Sekarang'
   if (isCurrent) {
-    return startLabel ? `${startLabel} – Sekarang` : 'Sekarang'
+    return startLabel ? `${startLabel} – ${presentLabel}` : presentLabel
   }
   if (startLabel && endLabel) return `${startLabel} – ${endLabel}`
   return startLabel || endLabel
@@ -230,13 +279,20 @@ const atsStyles = StyleSheet.create({
   },
 })
 
-export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
+export function AtsPDFDocument({
+  cv,
+  language = 'id',
+}: {
+  cv: CVWithRelations
+  language?: 'id' | 'en'
+}) {
   const info = cv.personal_info || {}
   const experiences = [...(cv.experiences || [])].sort((a, b) => a.sort_order - b.sort_order)
   const educations = [...(cv.educations || [])].sort((a, b) => a.sort_order - b.sort_order)
   const projects = [...(cv.projects || [])].sort((a, b) => a.sort_order - b.sort_order)
   const certifications = [...(cv.certifications || [])].sort((a, b) => a.sort_order - b.sort_order)
   const skills = (cv.skills || []).filter(Boolean)
+  const labels = PDF_LABELS[language] || PDF_LABELS.id
 
   const contactItems: { label: string; href?: string; prefix?: string }[] = []
   if (info.phone) contactItems.push({ label: info.phone, href: `tel:${info.phone}` })
@@ -275,7 +331,7 @@ export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Summary */}
         {cv.summary ? (
           <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>Professional Summary</Text>
+            <Text style={atsStyles.sectionTitle}>{labels.summary}</Text>
             <Text style={atsStyles.entryText}>{cv.summary}</Text>
           </View>
         ) : null}
@@ -283,9 +339,9 @@ export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Experience */}
         {experiences.length > 0 && (
           <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>Experience</Text>
+            <Text style={atsStyles.sectionTitle}>{labels.experience}</Text>
             {experiences.map((exp, idx) => {
-              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current)
+              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current, language)
               return (
                 <View key={exp.id || idx} style={atsStyles.entry} wrap={false}>
                   <View style={atsStyles.entryHeader}>
@@ -306,9 +362,9 @@ export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Education */}
         {educations.length > 0 && (
           <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>Education</Text>
+            <Text style={atsStyles.sectionTitle}>{labels.education}</Text>
             {educations.map((edu, idx) => {
-              const dateStr = formatDateRange(edu.start_date, edu.end_date)
+              const dateStr = formatDateRange(edu.start_date, edu.end_date, false, language)
               const degreeField = [edu.degree, edu.field_of_study].filter(Boolean).join(' in ')
               return (
                 <View key={edu.id || idx} style={atsStyles.entry} wrap={false}>
@@ -331,7 +387,7 @@ export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Skills */}
         {skills.length > 0 && (
           <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>Skills</Text>
+            <Text style={atsStyles.sectionTitle}>{labels.skills}</Text>
             <Text style={atsStyles.skillsText}>{skills.join(' • ')}</Text>
           </View>
         )}
@@ -339,9 +395,9 @@ export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Projects */}
         {projects.length > 0 && (
           <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>Projects</Text>
+            <Text style={atsStyles.sectionTitle}>{labels.projects}</Text>
             {projects.map((proj, idx) => {
-              const dateStr = formatDateRange(proj.start_date, proj.end_date)
+              const dateStr = formatDateRange(proj.start_date, proj.end_date, false, language)
               return (
                 <View key={proj.id || idx} style={atsStyles.entry} wrap={false}>
                   <View style={atsStyles.entryHeader}>
@@ -364,7 +420,7 @@ export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Certifications */}
         {certifications.length > 0 && (
           <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>Certifications</Text>
+            <Text style={atsStyles.sectionTitle}>{labels.certifications}</Text>
             {certifications.map((cert, idx) => (
               <View key={cert.id || idx} style={atsStyles.entry} wrap={false}>
                 <View style={atsStyles.entryHeader}>
@@ -375,7 +431,7 @@ export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
                   ) : (
                     <Text style={atsStyles.entryTitle}>{cert.name}</Text>
                   )}
-                  {cert.issue_date ? <Text style={atsStyles.entryDate}>{formatDate(cert.issue_date)}</Text> : null}
+                  {cert.issue_date ? <Text style={atsStyles.entryDate}>{formatDate(cert.issue_date, language)}</Text> : null}
                 </View>
                 {cert.issuer ? (
                   <View style={atsStyles.entrySubheader}>
@@ -390,7 +446,7 @@ export function AtsPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Multi-page footer */}
         <Text
           style={atsStyles.footer}
-          render={({ pageNumber, totalPages }) => (totalPages > 1 ? `Page ${pageNumber} of ${totalPages}` : '')}
+          render={({ pageNumber, totalPages }) => (totalPages > 1 ? labels.pageOf(pageNumber, totalPages) : '')}
           fixed
         />
       </Page>
@@ -552,13 +608,20 @@ const profStyles = StyleSheet.create({
   },
 })
 
-export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
+export function ProfessionalPDFDocument({
+  cv,
+  language = 'id',
+}: {
+  cv: CVWithRelations
+  language?: 'id' | 'en'
+}) {
   const info = cv.personal_info || {}
   const experiences = [...(cv.experiences || [])].sort((a, b) => a.sort_order - b.sort_order)
   const educations = [...(cv.educations || [])].sort((a, b) => a.sort_order - b.sort_order)
   const projects = [...(cv.projects || [])].sort((a, b) => a.sort_order - b.sort_order)
   const certifications = [...(cv.certifications || [])].sort((a, b) => a.sort_order - b.sort_order)
   const skills = (cv.skills || []).filter(Boolean)
+  const labels = PDF_LABELS[language] || PDF_LABELS.id
 
   const contactItems: { label: string; href?: string }[] = []
   if (info.phone) contactItems.push({ label: info.phone, href: `tel:${info.phone}` })
@@ -601,7 +664,7 @@ export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Executive Summary */}
         {cv.summary ? (
           <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>Executive Summary</Text>
+            <Text style={profStyles.sectionTitle}>{labels.executiveSummary}</Text>
             <Text style={profStyles.entryText}>{cv.summary}</Text>
           </View>
         ) : null}
@@ -609,9 +672,9 @@ export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Professional Experience */}
         {experiences.length > 0 && (
           <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>Professional Experience</Text>
+            <Text style={profStyles.sectionTitle}>{labels.experience}</Text>
             {experiences.map((exp, idx) => {
-              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current)
+              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current, language)
               return (
                 <View key={exp.id || idx} style={profStyles.entry} wrap={false}>
                   <View style={profStyles.entryHeader}>
@@ -632,9 +695,9 @@ export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Education & Credentials */}
         {educations.length > 0 && (
           <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>Education</Text>
+            <Text style={profStyles.sectionTitle}>{labels.education}</Text>
             {educations.map((edu, idx) => {
-              const dateStr = formatDateRange(edu.start_date, edu.end_date)
+              const dateStr = formatDateRange(edu.start_date, edu.end_date, false, language)
               const degreeField = [edu.degree, edu.field_of_study].filter(Boolean).join(' in ')
               return (
                 <View key={edu.id || idx} style={profStyles.entry} wrap={false}>
@@ -657,7 +720,7 @@ export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Key Skills */}
         {skills.length > 0 && (
           <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>Key Skills</Text>
+            <Text style={profStyles.sectionTitle}>{labels.keySkills}</Text>
             <View style={profStyles.skillsContainer}>
               {skills.map((skill, idx) => (
                 <View key={idx} style={profStyles.skillPill}>
@@ -671,9 +734,9 @@ export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Featured Projects */}
         {projects.length > 0 && (
           <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>Projects</Text>
+            <Text style={profStyles.sectionTitle}>{labels.projects}</Text>
             {projects.map((proj, idx) => {
-              const dateStr = formatDateRange(proj.start_date, proj.end_date)
+              const dateStr = formatDateRange(proj.start_date, proj.end_date, false, language)
               return (
                 <View key={proj.id || idx} style={profStyles.entry} wrap={false}>
                   <View style={profStyles.entryHeader}>
@@ -696,7 +759,7 @@ export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Certifications */}
         {certifications.length > 0 && (
           <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>Certifications</Text>
+            <Text style={profStyles.sectionTitle}>{labels.certifications}</Text>
             {certifications.map((cert, idx) => (
               <View key={cert.id || idx} style={profStyles.entry} wrap={false}>
                 <View style={profStyles.entryHeader}>
@@ -707,7 +770,7 @@ export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
                   ) : (
                     <Text style={profStyles.entryTitle}>{cert.name}</Text>
                   )}
-                  {cert.issue_date ? <Text style={profStyles.entryDate}>{formatDate(cert.issue_date)}</Text> : null}
+                  {cert.issue_date ? <Text style={profStyles.entryDate}>{formatDate(cert.issue_date, language)}</Text> : null}
                 </View>
                 {cert.issuer ? (
                   <View style={profStyles.entrySubheader}>
@@ -722,7 +785,7 @@ export function ProfessionalPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Multi-page footer */}
         <Text
           style={profStyles.footer}
-          render={({ pageNumber, totalPages }) => (totalPages > 1 ? `Page ${pageNumber} of ${totalPages}` : '')}
+          render={({ pageNumber, totalPages }) => (totalPages > 1 ? labels.pageOf(pageNumber, totalPages) : '')}
           fixed
         />
       </Page>
@@ -910,13 +973,20 @@ const modernStyles = StyleSheet.create({
   },
 })
 
-export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
+export function ModernPDFDocument({
+  cv,
+  language = 'id',
+}: {
+  cv: CVWithRelations
+  language?: 'id' | 'en'
+}) {
   const info = cv.personal_info || {}
   const experiences = [...(cv.experiences || [])].sort((a, b) => a.sort_order - b.sort_order)
   const educations = [...(cv.educations || [])].sort((a, b) => a.sort_order - b.sort_order)
   const projects = [...(cv.projects || [])].sort((a, b) => a.sort_order - b.sort_order)
   const certifications = [...(cv.certifications || [])].sort((a, b) => a.sort_order - b.sort_order)
   const skills = (cv.skills || []).filter(Boolean)
+  const labels = PDF_LABELS[language] || PDF_LABELS.id
 
   const contactItems: { label: string; href?: string }[] = []
   if (info.phone) contactItems.push({ label: info.phone, href: `tel:${info.phone}` })
@@ -965,7 +1035,7 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
           <View style={modernStyles.section}>
             <View style={modernStyles.sectionHeader}>
               <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>Summary</Text>
+              <Text style={modernStyles.sectionTitle}>{labels.summary}</Text>
             </View>
             <Text style={modernStyles.entryText}>{cv.summary}</Text>
           </View>
@@ -976,10 +1046,10 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
           <View style={modernStyles.section}>
             <View style={modernStyles.sectionHeader}>
               <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>Experience</Text>
+              <Text style={modernStyles.sectionTitle}>{labels.experience}</Text>
             </View>
             {experiences.map((exp, idx) => {
-              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current)
+              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current, language)
               return (
                 <View key={exp.id || idx} style={modernStyles.entry} wrap={false}>
                   <View style={modernStyles.entryHeader}>
@@ -1002,10 +1072,10 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
           <View style={modernStyles.section}>
             <View style={modernStyles.sectionHeader}>
               <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>Education</Text>
+              <Text style={modernStyles.sectionTitle}>{labels.education}</Text>
             </View>
             {educations.map((edu, idx) => {
-              const dateStr = formatDateRange(edu.start_date, edu.end_date)
+              const dateStr = formatDateRange(edu.start_date, edu.end_date, false, language)
               const degreeField = [edu.degree, edu.field_of_study].filter(Boolean).join(' in ')
               return (
                 <View key={edu.id || idx} style={modernStyles.entry} wrap={false}>
@@ -1030,7 +1100,7 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
           <View style={modernStyles.section}>
             <View style={modernStyles.sectionHeader}>
               <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>Skills</Text>
+              <Text style={modernStyles.sectionTitle}>{labels.skills}</Text>
             </View>
             <View style={modernStyles.skillsContainer}>
               {skills.map((skill, idx) => (
@@ -1047,10 +1117,10 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
           <View style={modernStyles.section}>
             <View style={modernStyles.sectionHeader}>
               <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>Projects</Text>
+              <Text style={modernStyles.sectionTitle}>{labels.projects}</Text>
             </View>
             {projects.map((proj, idx) => {
-              const dateStr = formatDateRange(proj.start_date, proj.end_date)
+              const dateStr = formatDateRange(proj.start_date, proj.end_date, false, language)
               return (
                 <View key={proj.id || idx} style={modernStyles.entry} wrap={false}>
                   <View style={modernStyles.entryHeader}>
@@ -1075,7 +1145,7 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
           <View style={modernStyles.section}>
             <View style={modernStyles.sectionHeader}>
               <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>Certifications</Text>
+              <Text style={modernStyles.sectionTitle}>{labels.certifications}</Text>
             </View>
             {certifications.map((cert, idx) => (
               <View key={cert.id || idx} style={modernStyles.entry} wrap={false}>
@@ -1087,7 +1157,7 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
                   ) : (
                     <Text style={modernStyles.entryTitle}>{cert.name}</Text>
                   )}
-                  {cert.issue_date ? <Text style={modernStyles.entryDate}>{formatDate(cert.issue_date)}</Text> : null}
+                  {cert.issue_date ? <Text style={modernStyles.entryDate}>{formatDate(cert.issue_date, language)}</Text> : null}
                 </View>
                 {cert.issuer ? (
                   <View style={modernStyles.entrySubheader}>
@@ -1102,7 +1172,7 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
         {/* Multi-page footer */}
         <Text
           style={modernStyles.footer}
-          render={({ pageNumber, totalPages }) => (totalPages > 1 ? `Page ${pageNumber} of ${totalPages}` : '')}
+          render={({ pageNumber, totalPages }) => (totalPages > 1 ? labels.pageOf(pageNumber, totalPages) : '')}
           fixed
         />
       </Page>
@@ -1114,17 +1184,18 @@ export function ModernPDFDocument({ cv }: { cv: CVWithRelations }) {
 
 export function createPDFDocument(
   cv: CVWithRelations,
-  templateOverride?: CVTemplate | string
+  templateOverride?: CVTemplate | string,
+  language: 'id' | 'en' = 'id'
 ): React.ReactElement<DocumentProps> {
   const selectedTemplate = (templateOverride || cv.template || 'ats').toString().toLowerCase()
 
   switch (selectedTemplate) {
     case 'modern':
-      return <ModernPDFDocument cv={cv} />
+      return <ModernPDFDocument cv={cv} language={language} />
     case 'professional':
-      return <ProfessionalPDFDocument cv={cv} />
+      return <ProfessionalPDFDocument cv={cv} language={language} />
     case 'ats':
     default:
-      return <AtsPDFDocument cv={cv} />
+      return <AtsPDFDocument cv={cv} language={language} />
   }
 }
