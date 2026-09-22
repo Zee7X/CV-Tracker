@@ -191,11 +191,11 @@ export function CoverLetterForm({
       const curClosing = watchedValues.closing || ''
 
       const subParams = {
-        jobTitle: watchedJobTitle,
-        companyName: watchedCompanyName,
-        recipientName: watchedRecipientName,
-        senderName: watchedSenderName,
-        source: watchedSource,
+        jobTitle: watchedJobTitle || '',
+        companyName: watchedCompanyName || '',
+        recipientName: watchedRecipientName || '',
+        senderName: watchedSenderName || '',
+        source: watchedSource || '',
       }
 
       const nextOpening = substituteCoverLetterTokens(curOpening, subParams)
@@ -304,11 +304,11 @@ export function CoverLetterForm({
   const getSanitizedLetter = (): CoverLetterFormValues => {
     const vals = watch()
     const subParams = {
-      jobTitle: vals.job_title,
-      companyName: vals.company_name,
-      senderName: vals.sender_name,
-      recipientName: vals.recipient_name,
-      source: vals.source,
+      jobTitle: vals.job_title || '',
+      companyName: vals.company_name || '',
+      senderName: vals.sender_name || '',
+      recipientName: vals.recipient_name || '',
+      source: vals.source || '',
     }
     return {
       ...vals,
@@ -365,11 +365,11 @@ export function CoverLetterForm({
     setSuccessMessage(null)
 
     const subParams = {
-      jobTitle: values.job_title,
-      companyName: values.company_name,
-      senderName: values.sender_name,
-      recipientName: values.recipient_name,
-      source: values.source,
+      jobTitle: values.job_title || '',
+      companyName: values.company_name || '',
+      senderName: values.sender_name || '',
+      recipientName: values.recipient_name || '',
+      source: values.source || '',
     }
     const cleanValues: CoverLetterFormValues = {
       ...values,
@@ -866,11 +866,13 @@ export function CoverLetterForm({
             </div>
 
             {/* Document Paper Mockup */}
-            <div className="rounded-xl border border-stone-300 bg-white p-4 sm:p-6 md:p-8 shadow-md text-xs leading-relaxed text-slate-800 space-y-4 max-h-none lg:max-h-[calc(100vh-160px)] overflow-y-visible lg:overflow-y-auto">
+            <div className="rounded-xl border border-stone-300 bg-white p-5 sm:p-7 md:p-9 shadow-md text-xs leading-relaxed text-slate-800 space-y-4 max-h-none lg:max-h-[calc(100vh-160px)] overflow-y-visible lg:overflow-y-auto">
               {/* Letter Header */}
-              <div className="border-b border-blue-600 pb-3">
-                <h3 className="text-base font-bold text-slate-900">{watchedValues.sender_name || (isEn ? 'Your Full Name' : 'Nama Lengkap')}</h3>
-                <p className="text-[11px] text-slate-500">
+              <div className="border-b border-blue-600 pb-2 pt-1">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight tracking-tight">
+                  {watchedValues.sender_name || (isEn ? 'Your Full Name' : 'Nama Lengkap')}
+                </h3>
+                <p className="mt-1 text-[11px] text-slate-500 leading-normal">
                   {[watchedValues.sender_email, watchedValues.sender_phone, watchedValues.sender_location]
                     .filter(Boolean)
                     .join(' • ')}
@@ -905,11 +907,11 @@ export function CoverLetterForm({
               {/* Opening */}
               <p className="whitespace-pre-line text-justify text-slate-700">
                 {substituteCoverLetterTokens(watchedValues.opening || '', {
-                  jobTitle: watchedJobTitle,
-                  companyName: watchedCompanyName,
-                  senderName: watchedSenderName,
-                  recipientName: watchedRecipientName,
-                  source: watchedSource,
+                  jobTitle: watchedJobTitle || '',
+                  companyName: watchedCompanyName || '',
+                  senderName: watchedSenderName || '',
+                  recipientName: watchedRecipientName || '',
+                  source: watchedSource || '',
                 })}
               </p>
 
@@ -927,22 +929,22 @@ export function CoverLetterForm({
               {/* Body */}
               <p className="whitespace-pre-line text-justify text-slate-700">
                 {substituteCoverLetterTokens(watchedValues.body || '', {
-                  jobTitle: watchedJobTitle,
-                  companyName: watchedCompanyName,
-                  senderName: watchedSenderName,
-                  recipientName: watchedRecipientName,
-                  source: watchedSource,
+                  jobTitle: watchedJobTitle || '',
+                  companyName: watchedCompanyName || '',
+                  senderName: watchedSenderName || '',
+                  recipientName: watchedRecipientName || '',
+                  source: watchedSource || '',
                 })}
               </p>
 
               {/* Closing */}
               <p className="whitespace-pre-line text-justify text-slate-700">
                 {substituteCoverLetterTokens(watchedValues.closing || '', {
-                  jobTitle: watchedJobTitle,
-                  companyName: watchedCompanyName,
-                  senderName: watchedSenderName,
-                  recipientName: watchedRecipientName,
-                  source: watchedSource,
+                  jobTitle: watchedJobTitle || '',
+                  companyName: watchedCompanyName || '',
+                  senderName: watchedSenderName || '',
+                  recipientName: watchedRecipientName || '',
+                  source: watchedSource || '',
                 })}
               </p>
 
