@@ -369,13 +369,13 @@ export function CVForm({ initialData }: CVFormProps) {
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/dashboard/cv"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-700 shadow-[0_1px_1px_rgba(28,25,23,0.04)] hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
             aria-label="Back to all CVs"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </Link>
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-semibold text-stone-950">{isEditing ? cvName : 'New CV'}</h1>
+            <h1 className="truncate text-xl font-semibold tracking-[-0.01em] text-stone-950">{isEditing ? <span data-no-translate>{cvName}</span> : 'New CV'}</h1>
             <p className="text-sm text-stone-600" aria-live="polite">
               {saveStatus}
             </p>
@@ -429,14 +429,14 @@ export function CVForm({ initialData }: CVFormProps) {
               {menuOpen ? (
                 <div
                   role="menu"
-                  className="menu-enter absolute right-0 top-full z-30 mt-1 w-48 rounded-md border border-stone-300 bg-white py-1 shadow-lg"
+                  className="menu-enter absolute right-0 top-full z-30 mt-1.5 w-52 rounded-xl border border-stone-200 bg-white p-1 shadow-[0_12px_32px_-8px_rgba(28,25,23,0.25)]"
                 >
                   <button
                     type="button"
                     role="menuitem"
                     onClick={handleDuplicate}
                     disabled={isBusy}
-                    className="block w-full px-3 py-2 text-left text-sm text-stone-800 outline-none hover:bg-stone-100 focus-visible:bg-stone-100 disabled:opacity-50"
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-stone-800 outline-none hover:bg-stone-100 focus-visible:bg-stone-100 disabled:opacity-50"
                   >
                     Duplicate CV
                   </button>
@@ -448,7 +448,7 @@ export function CVForm({ initialData }: CVFormProps) {
                       setShowDeleteConfirm(true)
                     }}
                     disabled={isBusy}
-                    className="block w-full px-3 py-2 text-left text-sm text-red-700 outline-none hover:bg-red-50 focus-visible:bg-red-50 disabled:opacity-50"
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-700 outline-none hover:bg-red-50 focus-visible:bg-red-50 disabled:opacity-50"
                   >
                     Delete CV
                   </button>
@@ -464,7 +464,7 @@ export function CVForm({ initialData }: CVFormProps) {
           id="cv-form-error-summary"
           role="alert"
           tabIndex={-1}
-          className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 focus:outline-none"
+          className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 focus:outline-none"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p className="flex-1">{serverError}</p>
@@ -475,7 +475,7 @@ export function CVForm({ initialData }: CVFormProps) {
       ) : null}
 
       {/* Mobile: switch between form and preview */}
-      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-md border border-stone-300 bg-stone-100 p-1 lg:hidden">
+      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-lg border border-stone-200 bg-stone-100 p-1 lg:hidden">
         {(['edit', 'preview'] as const).map((tab) => (
           <button
             key={tab}
@@ -483,7 +483,7 @@ export function CVForm({ initialData }: CVFormProps) {
             role="tab"
             aria-selected={mobileTab === tab}
             onClick={() => setMobileTab(tab)}
-            className={`rounded py-2 text-sm font-semibold ${
+            className={`rounded-md py-2 text-sm font-semibold transition-colors ${
               mobileTab === tab ? 'bg-white text-stone-950 shadow-sm' : 'text-stone-600'
             }`}
           >
@@ -639,13 +639,13 @@ export function CVForm({ initialData }: CVFormProps) {
         {/* Preview */}
         {showPreview || mobileTab === 'preview' ? (
           <div
-            className={`min-w-0 ${mobileTab === 'edit' ? 'hidden lg:block' : ''} ${showPreview ? '' : 'lg:hidden'} lg:sticky lg:top-20 lg:self-start`}
+            className={`min-w-0 ${mobileTab === 'edit' ? 'hidden lg:block' : ''} ${showPreview ? '' : 'lg:hidden'} lg:sticky lg:top-8 lg:self-start`}
           >
             <LivePreview
               cv={previewCV}
               template={selectedTemplate}
               onTemplateChange={setTemplate}
-              containerClassName="lg:h-[calc(100vh-7rem)]"
+              containerClassName="lg:h-[calc(100vh-4rem)]"
             />
           </div>
         ) : null}

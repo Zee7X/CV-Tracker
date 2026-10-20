@@ -6,10 +6,13 @@ import { PageHeader } from '@/components/layout/page-header'
 import { ApplicationList } from '@/components/applications/application-list'
 import { ButtonLink } from '@/components/ui/button-link'
 import { Plus } from 'lucide-react'
+import { APPLICATION_STATUSES, type ApplicationStatus } from '@/types/application'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ApplicationsPage() {
+export default async function ApplicationsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  const { status } = await searchParams
+  const initialStatus = APPLICATION_STATUSES.some((item) => item.value === status) ? (status as ApplicationStatus) : 'all'
   const supabase = await createClient()
   const {
     data: { user },
@@ -33,7 +36,7 @@ export default async function ApplicationsPage() {
             ) : undefined
           }
         />
-        <ApplicationList initialApplications={applications} />
+        <ApplicationList key={initialStatus} initialApplications={applications} initialStatus={initialStatus} />
       </div>
     </>
   )

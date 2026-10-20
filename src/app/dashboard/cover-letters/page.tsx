@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -5,7 +6,7 @@ import { getUserCoverLetters } from '@/lib/cover-letter/queries'
 import { EmptyState, PageHeader } from '@/components/layout/page-header'
 import { CoverLetterCard } from '@/components/cover-letter/cover-letter-card'
 import { ButtonLink } from '@/components/ui/button-link'
-import { Plus } from 'lucide-react'
+import { Mail, Plus } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,6 +41,7 @@ export default async function CoverLettersPage() {
 
         {letters.length === 0 ? (
           <EmptyState
+            icon={<Mail className="h-6 w-6" aria-hidden="true" />}
             title="No cover letters yet"
             description="Pick a format (formal Indonesian, professional English, or a short email body), import your details from a CV, then edit the text for the job."
             action={
@@ -50,12 +52,24 @@ export default async function CoverLettersPage() {
             }
           />
         ) : (
-          <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {letters.map((letter) => (
               <li key={letter.id}>
                 <CoverLetterCard letter={letter} />
               </li>
             ))}
+            <li>
+              <Link
+                href="/dashboard/cover-letters/new"
+                className="flex h-full min-h-[180px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-stone-300 px-6 py-8 text-center transition-colors hover:border-blue-400 hover:bg-blue-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-blue-700 ring-1 ring-stone-200">
+                  <Plus className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <span className="text-sm font-semibold text-stone-900">New cover letter</span>
+                <span className="max-w-[220px] text-xs leading-5 text-stone-500">Pick a format, then fill it from one of your CVs.</span>
+              </Link>
+            </li>
           </ul>
         )}
       </div>

@@ -68,7 +68,7 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
       .join('') || '?'
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="min-w-0 space-y-6">
       <EditorSection title="Profile" description="Your name is used as the default sender on new cover letters.">
         {profileState?.success ? <Notice kind="success">{profileState.success}</Notice> : null}
         {profileState?.error ? <Notice kind="error">{profileState.error}</Notice> : null}
@@ -77,7 +77,7 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
           <input type="hidden" name="avatar_url" value={avatarUrl} />
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md border border-stone-300 bg-stone-100 text-xl font-semibold text-stone-500">
+            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-stone-200 bg-stone-100 text-xl font-semibold text-stone-500">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarUrl} alt="" className="h-full w-full object-cover" />

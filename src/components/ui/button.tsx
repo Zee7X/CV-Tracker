@@ -3,16 +3,16 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
         default:
-          'border border-blue-600 bg-blue-600 text-white hover:border-blue-700 hover:bg-blue-700 active:bg-blue-800',
+          'border border-blue-700 bg-blue-700 text-white shadow-[0_1px_2px_rgba(29,78,216,0.25)] hover:border-blue-800 hover:bg-blue-800 active:bg-blue-900',
         secondary:
           'bg-stone-200 text-stone-950 hover:bg-stone-300',
         outline:
-          'border border-stone-300 bg-white text-stone-900 hover:border-stone-500 hover:bg-stone-50',
+          'border border-stone-300 bg-white text-stone-900 shadow-[0_1px_1px_rgba(28,25,23,0.04)] hover:border-stone-400 hover:bg-stone-50',
         ghost:
           'text-stone-700 hover:bg-stone-200/70 hover:text-stone-950',
         link: 'h-auto p-0 text-blue-800 underline-offset-4 hover:underline',

@@ -33,7 +33,7 @@ export default async function ApplicationDetailPage({ params }: ApplicationDetai
 
   return (
     <>
-      <div className="max-w-3xl">
+      <div>
         <ApplicationForm initialData={application} userCVs={cvs} />
       </div>
     </>

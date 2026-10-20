@@ -84,7 +84,7 @@ const LANGUAGE_OPTIONS: { id: LetterLanguage; label: string }[] = [
 ]
 
 const selectClass =
-  'h-10 w-full rounded-md border border-stone-300 bg-[#fffefa] px-3 text-sm text-stone-950 focus-visible:border-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800/20'
+  'h-10 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-950 transition-colors hover:border-stone-400 focus-visible:border-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800/20'
 
 function localToday() {
   const now = new Date()
@@ -381,7 +381,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
       </div>
 
       {serverError ? (
-        <div role="alert" className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           <p className="font-medium">{serverError}</p>
           {missingTable ? (
             <div className="mt-3 space-y-2 text-stone-700">
@@ -406,7 +406,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
         </div>
       ) : null}
 
-      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-md border border-stone-300 bg-white p-1 lg:hidden">
+      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-lg border border-stone-200 bg-stone-100 p-1 lg:hidden">
         {(['form', 'preview'] as const).map((tab) => (
           <button
             key={tab}
@@ -414,7 +414,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
             role="tab"
             aria-selected={mobileTab === tab}
             onClick={() => setMobileTab(tab)}
-            className={`rounded py-2 text-sm font-medium ${mobileTab === tab ? 'bg-stone-900 text-white' : 'text-stone-600 hover:text-stone-950'}`}
+            className={`rounded-md py-2 text-sm font-semibold transition-colors ${mobileTab === tab ? 'bg-white text-stone-950 shadow-sm' : 'text-stone-600 hover:text-stone-950'}`}
           >
             {tab === 'form' ? 'Edit' : 'Preview'}
           </button>
@@ -432,8 +432,8 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
                   return (
                     <label
                       key={tmpl.id}
-                      className={`cursor-pointer rounded-md border px-3.5 py-3 text-left transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-800 ${
-                        selected ? 'border-blue-800 bg-blue-50/50' : 'border-stone-300 bg-white hover:border-stone-500'
+                      className={`cursor-pointer rounded-lg border px-3.5 py-3 text-left transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-700 ${
+                        selected ? 'border-blue-700 bg-blue-50/60 ring-1 ring-blue-700' : 'border-stone-200 bg-white hover:border-stone-400'
                       }`}
                     >
                       <input
@@ -568,12 +568,12 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
         </div>
 
         <div className={mobileTab === 'form' ? 'hidden lg:block' : ''}>
-          <div className="space-y-2 lg:sticky lg:top-20">
+          <div className="space-y-2 lg:sticky lg:top-8">
             <p className="text-sm font-medium text-stone-700">Preview</p>
             <div
               data-no-translate
               lang={docLang}
-              className="space-y-4 rounded-sm border border-stone-300 bg-white p-6 font-serif text-[12.5px] leading-relaxed text-stone-900 sm:p-8 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto"
+              className="space-y-4 rounded-md bg-white p-6 shadow-[0_8px_24px_-12px_rgba(28,25,23,0.25)] ring-1 ring-stone-200 font-serif text-[12.5px] leading-relaxed text-stone-900 sm:p-8 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto"
             >
               <div className="border-b border-stone-800 pb-2">
                 <p className="text-lg font-bold leading-tight">{values.sender_name || (isEn ? 'Your name' : 'Nama lengkap')}</p>

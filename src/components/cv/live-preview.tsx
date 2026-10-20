@@ -79,13 +79,13 @@ export function LivePreview({
 
   return (
     <section
-      className={`flex flex-col overflow-hidden rounded-lg border border-stone-300 bg-stone-200/60 ${containerClassName}`}
+      className={`flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-[#ebe9e3] ${containerClassName}`}
       aria-label="CV preview"
       data-testid="cv-live-preview"
     >
       {showControls ? (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-300 bg-[#fffefa] px-3 py-2">
-          <div role="radiogroup" aria-label="Template" className="flex rounded-md border border-stone-300 bg-stone-100 p-0.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 bg-white px-3 py-2">
+          <div role="radiogroup" aria-label="Template" className="flex rounded-lg border border-stone-200 bg-stone-100 p-0.5">
             {TEMPLATES_METADATA.map((tmpl) => {
               const selected = activeTemplate === tmpl.id
               return (
@@ -119,7 +119,7 @@ export function LivePreview({
                 Show sample
               </label>
             ) : null}
-            <div className="flex items-center rounded-md border border-stone-300 bg-white">
+            <div className="flex items-center rounded-lg border border-stone-200 bg-white">
               <button
                 type="button"
                 onClick={() => zoom(-0.1)}

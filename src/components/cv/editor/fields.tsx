@@ -15,8 +15,8 @@ export function EditorSection({
   children: React.ReactNode
 }) {
   return (
-    <section className="rounded-lg border border-stone-300 bg-white">
-      <header className="flex flex-col gap-3 border-b border-stone-200 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+    <section className="rounded-xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
+      <header className="flex flex-col gap-3 border-b border-stone-100 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h2 className="text-base font-semibold text-stone-950">{title}</h2>
           {description ? <p className="mt-1 max-w-prose text-sm text-stone-600">{description}</p> : null}
@@ -100,7 +100,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
     return (
       <textarea
         ref={ref}
-        className={`block w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm leading-relaxed text-stone-950 placeholder:text-stone-400 focus-visible:border-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800/25 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+        className={`block w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm leading-relaxed text-stone-950 placeholder:text-stone-400 focus-visible:border-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800/25 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
         {...props}
       />
     )

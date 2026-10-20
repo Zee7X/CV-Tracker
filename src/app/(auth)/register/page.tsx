@@ -14,10 +14,10 @@ export default function RegisterPage() {
   const done = state && 'success' in state
 
   return (
-    <div className="rounded-lg border border-stone-300 bg-[#fffefa] p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-stone-950">Create an account</h1>
-        <p className="mt-1 text-sm text-stone-600">Free. You can write your first CV right after signing up.</p>
+    <div>
+      <div className="mb-8">
+        <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-stone-950">Create an account</h1>
+        <p className="mt-2 text-sm leading-6 text-stone-600">Free. You can write your first CV right after signing up.</p>
       </div>
 
       {done ? (
@@ -77,7 +77,7 @@ export default function RegisterPage() {
 
       <p className="mt-6 text-sm text-stone-600">
         Already have an account?{' '}
-        <Link href="/login" className="font-medium text-blue-800 underline-offset-4 hover:underline">
+        <Link href="/login" className="font-medium text-blue-700 underline-offset-4 hover:underline">
           Sign in
         </Link>
       </p>

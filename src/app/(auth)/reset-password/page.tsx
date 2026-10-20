@@ -11,10 +11,10 @@ export default function ResetPasswordPage() {
   const [state, action, pending] = useActionState(resetPasswordAction, undefined)
 
   return (
-    <div className="rounded-lg border border-stone-300 bg-[#fffefa] p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-stone-950">Set a new password</h1>
-        <p className="mt-1 text-sm text-stone-600">
+    <div>
+      <div className="mb-8">
+        <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-stone-950">Set a new password</h1>
+        <p className="mt-2 text-sm leading-6 text-stone-600">
           Use at least 8 characters.
         </p>
       </div>

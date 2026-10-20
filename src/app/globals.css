@@ -18,8 +18,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-* {
-  border-color: var(--line);
+@layer base {
+  * {
+    border-color: var(--line);
+  }
 }
 
 html {
@@ -36,14 +38,18 @@ body {
   color: var(--ink);
 }
 
-h1,
-h2,
-h3 {
-  text-wrap: balance;
-}
+/* In the base layer so utilities such as `truncate` still win: `text-wrap` is a
+   shorthand that also resets white-space. */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 
-p {
-  text-wrap: pretty;
+  p {
+    text-wrap: pretty;
+  }
 }
 
 /*

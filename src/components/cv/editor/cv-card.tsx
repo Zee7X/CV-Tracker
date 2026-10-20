@@ -5,12 +5,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { CV } from '@/types/cv'
 import { duplicateCV, deleteCV } from '@/lib/cv/actions'
-import { DOCUMENT_LANGUAGES, resolveDocumentLanguage } from '@/lib/cv/document'
+import { resolveDocumentLanguage } from '@/lib/cv/document'
 import { TEMPLATE_NAMES } from '@/lib/format'
 import { LocalDate } from '@/components/i18n/local-date'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { Loader2 } from 'lucide-react'
+import { CVThumbnail } from '@/components/cv/cv-thumbnail'
+import { Copy, Loader2, Pencil, Trash2 } from 'lucide-react'
 
 interface CVCardProps {
   cv: CV
@@ -44,34 +45,39 @@ export function CVCard({ cv }: CVCardProps) {
   }
 
   const info = cv.personal_info
-  const language = DOCUMENT_LANGUAGES.find((l) => l.id === resolveDocumentLanguage(info?.document_language))?.label
 
   return (
     <>
-      <article className="flex h-full flex-col rounded-lg border border-stone-300 bg-white transition-colors hover:border-stone-500">
+      <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.04)] transition-[border-color,box-shadow] hover:border-stone-300 hover:shadow-[0_4px_16px_-6px_rgba(28,25,23,0.12)]">
         <Link
           href={`/dashboard/cv/${cv.id}`}
-          className="block flex-1 rounded-t-lg px-5 pb-4 pt-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-800"
+          className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-700"
         >
-          <h2 className="line-clamp-2 text-base font-semibold text-stone-950" data-no-translate>
-            {cv.name}
-          </h2>
-          <p className="mt-1 text-xs text-stone-500">
-            <span data-no-translate>{TEMPLATE_NAMES[cv.template] ?? cv.template}</span>
-            <span aria-hidden="true"> · </span>
-            <span data-no-translate>{language}</span>
-            <span aria-hidden="true"> · </span>
-            <span>Edited</span> <LocalDate value={cv.updated_at} />
-          </p>
-
-          <div className="mt-4 text-sm">
-            <p className="font-medium text-stone-900">{info?.full_name || 'No name yet'}</p>
-            {info?.professional_title ? <p className="text-stone-600">{info.professional_title}</p> : null}
+          <div className="flex justify-center border-b border-stone-100 bg-[#f1efe9] px-6 pt-6">
+            <CVThumbnail cv={cv} className="w-[46%] translate-y-1 rounded-b-none transition-transform duration-200 group-hover:-translate-y-0.5" />
           </div>
-
-          {cv.skills && cv.skills.length > 0 ? (
-            <p className="mt-3 line-clamp-2 text-xs text-stone-500">{cv.skills.join(', ')}</p>
-          ) : null}
+          <div className="flex flex-1 flex-col px-5 py-4">
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="line-clamp-2 text-[15px] font-semibold leading-snug text-stone-950" data-no-translate>
+                {cv.name}
+              </h2>
+              <span className="shrink-0 rounded-md bg-stone-100 px-1.5 py-0.5 text-[11px] font-semibold uppercase text-stone-600" data-no-translate>
+                {resolveDocumentLanguage(info?.document_language)}
+              </span>
+            </div>
+            <p className="mt-1 truncate text-sm text-stone-600">
+              {info?.full_name ? (
+                <span data-no-translate>{[info.full_name, info.professional_title].filter(Boolean).join(' · ')}</span>
+              ) : (
+                <span>No name yet</span>
+              )}
+            </p>
+            <p className="mt-auto pt-3 text-xs text-stone-500">
+              <span data-no-translate>{TEMPLATE_NAMES[cv.template] ?? cv.template}</span>
+              <span aria-hidden="true"> · </span>
+              <span>Edited</span> <LocalDate value={cv.updated_at} />
+            </p>
+          </div>
         </Link>
 
         {errorMsg ? (
@@ -80,35 +86,40 @@ export function CVCard({ cv }: CVCardProps) {
           </p>
         ) : null}
 
-        <div className="flex items-center gap-1 border-t border-stone-200 px-3 py-2">
+        <div className="flex items-center gap-1 border-t border-stone-100 px-3 py-2">
           <Link
             href={`/dashboard/cv/${cv.id}`}
-            className="rounded-md px-2.5 py-1.5 text-xs font-semibold text-blue-800 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800"
+            className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           >
+            <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
             Edit
           </Link>
           <Button
             type="button"
             variant="ghost"
             size="sm"
+            className="h-8"
             onClick={() => run('duplicate', () => duplicateCV(cv.id), 'Could not duplicate the CV.')}
             disabled={isPending}
             aria-label={`Duplicate ${cv.name}`}
           >
-            {pendingAction === 'duplicate' ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : null}
+            {pendingAction === 'duplicate' ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+            )}
             Duplicate
           </Button>
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="sm"
-            className="ml-auto text-red-700 hover:bg-red-50 hover:text-red-800"
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 disabled:opacity-50"
             onClick={() => setShowDeleteConfirm(true)}
             disabled={isPending}
             aria-label={`Delete ${cv.name}`}
+            title="Delete"
           >
-            Delete
-          </Button>
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
+          </button>
         </div>
       </article>
 

@@ -20,7 +20,7 @@ export default async function NewApplicationPage() {
 
   return (
     <>
-      <div className="max-w-3xl">
+      <div>
         <ApplicationForm userCVs={cvs} />
       </div>
     </>

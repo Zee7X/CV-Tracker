@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Logo, LogoMark } from '@/components/brand/logo'
 import { LanguageSwitcher } from '@/components/i18n/language-switcher'
 import { ButtonLink } from '@/components/ui/button-link'
 import { AtsTemplate, SAMPLE_CV } from '@/components/cv/templates'
@@ -27,11 +28,9 @@ const templates = [
 export default function LandingPage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f5f3ed] text-stone-950">
-      <header className="border-b border-stone-300">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
-          <Link href="/" className="mr-auto text-base font-semibold">
-            CV Tracker
-          </Link>
+      <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#f5f3ed]/90 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
+          <Logo className="mr-auto" />
           <LanguageSwitcher compact />
           <ButtonLink href="/login" variant="ghost" size="sm">
             Sign in
@@ -64,7 +63,7 @@ export default function LandingPage() {
             </div>
 
             <figure className="hidden lg:block">
-              <div className="h-[540px] w-[420px] overflow-hidden rounded-sm border border-stone-300 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+              <div className="h-[540px] w-[420px] overflow-hidden rounded-md bg-white shadow-[0_24px_48px_-20px_rgba(28,25,23,0.35)] ring-1 ring-stone-200">
                 <div className="w-[794px] origin-top-left scale-[0.529]" aria-hidden="true" data-no-translate>
                   <AtsTemplate cv={SAMPLE_CV} language="en" />
                 </div>
@@ -139,7 +138,10 @@ export default function LandingPage() {
 
       <footer className="border-t border-stone-300">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 text-sm text-stone-500 sm:flex-row sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} CV Tracker</p>
+          <p className="flex items-center gap-2">
+            <LogoMark className="h-5 w-5" />
+            <span>© {new Date().getFullYear()} CV Tracker</span>
+          </p>
           <nav aria-label="Footer" className="flex gap-5">
             <Link href="/login" className="hover:text-stone-950">Sign in</Link>
             <Link href="/register" className="hover:text-stone-950">Create account</Link>

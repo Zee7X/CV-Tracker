@@ -44,7 +44,7 @@ export function TextBone({
   )
 }
 
-const fieldBox = 'block w-full rounded-md border border-stone-300 bg-[#fffefa]'
+const fieldBox = 'block w-full rounded-lg border border-stone-300 bg-white'
 
 /** An input or select whose value is still loading: same box, a bone for the value. */
 export function InputBone({ className, empty = false }: { className?: string; empty?: boolean }) {
