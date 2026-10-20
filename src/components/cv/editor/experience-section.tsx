@@ -51,7 +51,7 @@ export function ExperienceSection({ control, register, errors, watch, setValue }
       action={fields.length > 0 ? addButton : undefined}
     >
       {fields.length === 0 ? (
-        <div className="rounded-md border border-dashed border-stone-300 px-4 py-8 text-center">
+        <div className="rounded-md border border-dashed border-stone-900/10 px-4 py-8 text-center">
           <p className="text-sm text-stone-700">No work experience yet.</p>
           <p className="mt-1 text-xs text-stone-500">Add your current or most recent job first.</p>
           <div className="mt-4">{addButton}</div>
@@ -104,14 +104,14 @@ export function ExperienceSection({ control, register, errors, watch, setValue }
                     End month
                   </label>
                   {isCurrent ? (
-                    <Input id={id('end_date')} type="text" disabled value="Present" className="bg-stone-100 text-stone-600" />
+                    <Input id={id('end_date')} type="text" disabled value="Present" className="bg-stone-900/[0.05] text-stone-600" />
                   ) : (
                     <Input id={id('end_date')} type="month" placeholder="YYYY-MM" {...register(`experiences.${index}.end_date`)} />
                   )}
                   <label className="flex w-fit cursor-pointer items-center gap-2 pt-1 text-sm text-stone-700">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 rounded border-stone-400 accent-blue-800"
+                      className="h-4 w-4 rounded border-stone-400 accent-brand-800"
                       {...register(`experiences.${index}.is_current`, {
                         onChange: (event) => {
                           if (event.target.checked) {

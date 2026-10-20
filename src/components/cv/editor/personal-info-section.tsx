@@ -117,9 +117,9 @@ export function PersonalInfoSection({ register, errors, watch, setValue, templat
         </Field>
       </div>
 
-      <div className="border-t border-stone-200 pt-4">
+      <div className="border-t border-white/70 pt-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-          <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md border border-stone-300 bg-stone-100">
+          <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md border border-stone-900/10 bg-stone-900/[0.05]">
             {photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={photoUrl} alt="CV photo" className="h-full w-full object-cover" />
@@ -184,7 +184,7 @@ export function PersonalInfoSection({ register, errors, watch, setValue, templat
               <button
                 type="button"
                 onClick={() => setShowUrlInput(!showUrlInput)}
-                className="text-xs font-medium text-blue-800 underline-offset-4 hover:underline"
+                className="text-xs font-medium text-brand-800 underline-offset-4 hover:underline"
                 aria-expanded={showUrlInput}
               >
                 {showUrlInput ? 'Hide image URL' : 'Use an image URL'}

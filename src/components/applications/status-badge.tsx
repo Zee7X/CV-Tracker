@@ -11,7 +11,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   const statusConfig = APPLICATION_STATUSES.find((s) => s.value === status) || {
     value: status,
     label: status.charAt(0).toUpperCase() + status.slice(1),
-    color: 'bg-stone-100 text-stone-700 border-stone-300',
+    color: 'bg-stone-900/[0.05] text-stone-700 border-stone-900/10',
   }
 
   return (

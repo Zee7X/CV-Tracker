@@ -43,7 +43,7 @@ export function AuthAlert({ kind, message }: AlertProps) {
         'rounded-md px-4 py-3 text-sm',
         kind === 'error'
           ? 'bg-red-50 text-red-700 border border-red-200'
-          : 'border border-blue-200 bg-blue-50 text-blue-800'
+          : 'border border-brand-200 bg-brand-50 text-brand-800'
       )}
     >
       {message}

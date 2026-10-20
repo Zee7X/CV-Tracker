@@ -79,13 +79,13 @@ export function SkillsSection({ watch, setValue, errors }: SkillsSectionProps) {
           {skills.map((skill, index) => (
             <li
               key={`${skill}-${index}`}
-              className="inline-flex items-center gap-1 rounded-md border border-stone-300 bg-stone-50 py-1 pl-2.5 pr-1 text-sm text-stone-900"
+              className="inline-flex items-center gap-1 rounded-md border border-stone-900/10 bg-white/50 py-1 pl-2.5 pr-1 text-sm text-stone-900"
             >
               {skill}
               <button
                 type="button"
                 onClick={() => removeSkill(index)}
-                className="flex h-6 w-6 items-center justify-center rounded text-stone-500 hover:bg-stone-200 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800"
+                className="flex h-6 w-6 items-center justify-center rounded text-stone-500 hover:bg-stone-200 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
                 aria-label={`Remove ${skill}`}
               >
                 <X className="h-3.5 w-3.5" aria-hidden="true" />

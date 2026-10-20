@@ -49,7 +49,7 @@ export function EducationSection({ control, register, errors, watch }: SectionPr
       action={fields.length > 0 ? addButton : undefined}
     >
       {fields.length === 0 ? (
-        <div className="rounded-md border border-dashed border-stone-300 px-4 py-8 text-center">
+        <div className="rounded-md border border-dashed border-stone-900/10 px-4 py-8 text-center">
           <p className="text-sm text-stone-700">No education added yet.</p>
           <p className="mt-1 text-xs text-stone-500">Add your highest or most recent qualification.</p>
           <div className="mt-4">{addButton}</div>

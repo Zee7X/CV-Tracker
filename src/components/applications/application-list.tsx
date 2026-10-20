@@ -62,8 +62,8 @@ export function ApplicationList({ initialApplications, initialStatus = 'all' }: 
   ]
 
   return (
-    <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
-      <div className="flex flex-col gap-3 border-b border-stone-100 px-4 pt-4 sm:px-5">
+    <div className="overflow-hidden rounded-3xl glass">
+      <div className="flex flex-col gap-3 border-b border-stone-900/[0.06] px-4 pt-4 sm:px-5">
         <div className="relative w-full max-w-md">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" aria-hidden="true" />
           <Input
@@ -88,15 +88,15 @@ export function ApplicationList({ initialApplications, initialStatus = 'all' }: 
                   role="tab"
                   aria-selected={selected}
                   onClick={() => setSelectedStatus(filter.value)}
-                  className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-700 ${
+                  className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700 ${
                     selected
-                      ? 'border-blue-700 text-stone-950'
-                      : 'border-transparent text-stone-500 hover:border-stone-300 hover:text-stone-900'
+                      ? 'border-brand-700 text-stone-900'
+                      : 'border-transparent text-stone-500 hover:border-stone-900/10 hover:text-stone-900'
                   }`}
                 >
                   {filter.label}
                   <span
-                    className={`rounded-md px-1.5 py-px text-xs tabular-nums ${selected ? 'bg-blue-50 text-blue-700' : 'bg-stone-100 text-stone-500'}`}
+                    className={`rounded-md px-1.5 py-px text-xs tabular-nums ${selected ? 'bg-brand-50 text-brand-700' : 'bg-stone-900/[0.05] text-stone-500'}`}
                   >
                     {count}
                   </span>
@@ -107,7 +107,7 @@ export function ApplicationList({ initialApplications, initialStatus = 'all' }: 
         </div>
       </div>
 
-      <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,200px)_120px_232px] gap-4 border-b border-stone-100 bg-stone-50/70 px-5 py-2.5 text-xs font-medium text-stone-500 lg:grid">
+      <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,200px)_120px_232px] gap-4 border-b border-stone-900/[0.06] bg-white/50/70 px-5 py-2.5 text-xs font-medium text-stone-500 lg:grid">
         <span>Position and company</span>
         <span>CV sent</span>
         <span>Date applied</span>
@@ -133,7 +133,7 @@ export function ApplicationList({ initialApplications, initialStatus = 'all' }: 
           </Button>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-100">
+        <ul className="divide-y divide-stone-900/[0.06]">
           {filteredApplications.map((app) => (
             <li key={app.id}>
               <ApplicationCard application={app} />

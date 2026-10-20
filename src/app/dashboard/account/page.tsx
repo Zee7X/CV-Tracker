@@ -56,22 +56,22 @@ export default async function AccountPage() {
         <AccountSettingsForm initialProfile={initialProfile} />
 
         <aside className="space-y-4 xl:sticky xl:top-8">
-          <Panel title="In your account" bodyClassName="divide-y divide-stone-100">
+          <Panel title="In your account" bodyClassName="divide-y divide-stone-900/[0.06]">
             {usage.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="flex items-center justify-between px-5 py-3 text-sm transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-700"
+                className="flex items-center justify-between px-5 py-3 text-sm transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
               >
                 <span className="text-stone-700">{item.label}</span>
-                <span className="font-semibold tabular-nums text-stone-950" data-no-translate>
+                <span className="font-semibold tabular-nums text-stone-900" data-no-translate>
                   {item.value}
                 </span>
               </Link>
             ))}
           </Panel>
           <Panel title="Signed in as" bodyClassName="space-y-1 px-5 py-4 text-sm">
-            <p className="truncate font-medium text-stone-950" data-no-translate>
+            <p className="truncate font-medium text-stone-900" data-no-translate>
               {initialProfile.email}
             </p>
             {initialProfile.created_at ? (

@@ -15,10 +15,10 @@ export function EditorSection({
   children: React.ReactNode
 }) {
   return (
-    <section className="rounded-xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
-      <header className="flex flex-col gap-3 border-b border-stone-100 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+    <section className="rounded-3xl glass">
+      <header className="flex flex-col gap-3 border-b border-stone-900/[0.06] px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h2 className="text-base font-semibold text-stone-950">{title}</h2>
+          <h2 className="text-base font-semibold text-stone-900">{title}</h2>
           {description ? <p className="mt-1 max-w-prose text-sm text-stone-600">{description}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
@@ -38,8 +38,8 @@ export function EntryCard({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-md border border-stone-200 bg-stone-50/60">
-      <div className="flex items-center justify-between gap-2 border-b border-stone-200 py-1.5 pl-4 pr-1.5">
+    <div className="rounded-md border border-white/70 bg-white/50/60">
+      <div className="flex items-center justify-between gap-2 border-b border-white/70 py-1.5 pl-4 pr-1.5">
         <h3 className="min-w-0 truncate text-sm font-semibold text-stone-900">{heading}</h3>
         {actions ? <div className="flex shrink-0 items-center gap-1">{actions}</div> : null}
       </div>
@@ -100,7 +100,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
     return (
       <textarea
         ref={ref}
-        className={`block w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm leading-relaxed text-stone-950 placeholder:text-stone-400 focus-visible:border-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800/25 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+        className={`block w-full rounded-xl border border-stone-900/10 bg-white/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-white/85 focus-visible:border-brand-400 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 py-2 text-sm leading-relaxed text-stone-900 placeholder:text-stone-400 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
         {...props}
       />
     )

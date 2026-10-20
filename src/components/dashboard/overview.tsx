@@ -15,7 +15,7 @@ import { CVThumbnail } from '@/components/cv/cv-thumbnail'
 
 type Summary = ReturnType<typeof summarize>
 
-const linkClass = 'text-xs font-semibold text-blue-700 underline-offset-4 hover:underline'
+const linkClass = 'text-xs font-semibold text-brand-700 underline-offset-4 hover:underline'
 
 /* Stat strip: real counts only, each with the sentence that explains it. */
 export function StatStrip({ summary }: { summary: Summary }) {
@@ -66,15 +66,15 @@ export function StatStrip({ summary }: { summary: Summary }) {
           <Link
             key={item.label}
             href={item.href}
-            className="group rounded-xl border border-stone-200 bg-white p-4 shadow-[0_1px_2px_rgba(28,25,23,0.04)] transition-colors hover:border-stone-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 sm:p-5"
+            className="group rounded-3xl glass p-4 shadow-[0_1px_2px_rgba(28,25,23,0.04)] transition-colors hover:border-stone-900/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 sm:p-5"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-stone-600">{item.label}</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-100 text-stone-500 transition-colors group-hover:bg-blue-50 group-hover:text-blue-700">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900/[0.05] text-stone-500 transition-colors group-hover:bg-brand-50 group-hover:text-brand-700">
                 <Icon className="h-4 w-4" aria-hidden="true" />
               </span>
             </div>
-            <p className="mt-2 text-[28px] font-semibold leading-9 tabular-nums tracking-[-0.02em] text-stone-950" data-no-translate>
+            <p className="mt-2 text-[28px] font-semibold leading-9 tabular-nums tracking-[-0.02em] text-stone-900" data-no-translate>
               {item.value}
             </p>
             <p className="mt-0.5 text-xs leading-5 text-stone-500">{item.note}</p>
@@ -88,7 +88,7 @@ export function StatStrip({ summary }: { summary: Summary }) {
 const BAR_COLORS: Record<string, string> = {
   applied: 'bg-stone-400',
   screening: 'bg-amber-400',
-  interview: 'bg-blue-600',
+  interview: 'bg-brand-600',
   offering: 'bg-emerald-500',
   accepted: 'bg-emerald-700',
   rejected: 'bg-stone-200',
@@ -109,12 +109,12 @@ export function Pipeline({ summary }: { summary: Summary }) {
     >
       {summary.total === 0 ? (
         <div className="space-y-3">
-          <div className="h-3 rounded-full bg-stone-100" />
+          <div className="h-3 rounded-full bg-stone-900/[0.05]" />
           <p className="text-sm text-stone-500">Stages appear here once you log your first application.</p>
         </div>
       ) : (
         <>
-          <div className="flex h-3 overflow-hidden rounded-full bg-stone-100" aria-hidden="true">
+          <div className="flex h-3 overflow-hidden rounded-full bg-stone-900/[0.05]" aria-hidden="true">
             {APPLICATION_STATUSES.map((status) => {
               const count = summary.byStatus[status.value] ?? 0
               if (!count) return null
@@ -134,11 +134,11 @@ export function Pipeline({ summary }: { summary: Summary }) {
                 <li key={status.value}>
                   <Link
                     href={`/dashboard/applications?status=${status.value}`}
-                    className="flex items-center gap-2.5 rounded-lg border border-stone-200 px-3 py-2.5 transition-colors hover:border-stone-300 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+                    className="flex items-center gap-2.5 rounded-lg border border-white/70 px-3 py-2.5 transition-colors hover:border-stone-900/10 hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
                   >
                     <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${BAR_COLORS[status.value]}`} aria-hidden="true" />
                     <span className="flex-1 text-sm text-stone-700">{status.label}</span>
-                    <span className="text-sm font-semibold tabular-nums text-stone-950" data-no-translate>
+                    <span className="text-sm font-semibold tabular-nums text-stone-900" data-no-translate>
                       {count}
                     </span>
                   </Link>
@@ -172,16 +172,16 @@ export function FollowUps({ items }: { items: Summary['followUps'] }) {
           <p className="text-sm leading-6 text-stone-600">Nothing to chase right now. Older applications that are still waiting show up here.</p>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-100">
+        <ul className="divide-y divide-stone-900/[0.06]">
           {shown.map(({ app, days }) => (
             <li key={app.id}>
               <Link
                 href={`/dashboard/applications/${app.id}`}
-                className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-700"
+                className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
               >
                 <Monogram name={app.company_name} size="sm" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-stone-950" data-no-translate>
+                  <span className="block truncate text-sm font-medium text-stone-900" data-no-translate>
                     {app.company_name}
                   </span>
                   <span className="block truncate text-xs text-stone-500" data-no-translate>
@@ -199,7 +199,7 @@ export function FollowUps({ items }: { items: Summary['followUps'] }) {
         </ul>
       )}
       {items.length > shown.length ? (
-        <div className="border-t border-stone-100 px-5 py-3 text-xs text-stone-500">
+        <div className="border-t border-stone-900/[0.06] px-5 py-3 text-xs text-stone-500">
           <span data-no-translate>+{items.length - shown.length}</span> <span>more in the applications list</span>
         </div>
       ) : null}
@@ -231,16 +231,16 @@ export function RecentApplicationsPanel({ applications }: { applications: JobApp
           </ButtonLink>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-100">
+        <ul className="divide-y divide-stone-900/[0.06]">
           {rows.map((app) => (
             <li key={app.id}>
               <Link
                 href={`/dashboard/applications/${app.id}`}
-                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-5 py-3.5 transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-700 sm:grid-cols-[auto_minmax(0,1fr)_200px_96px_92px]"
+                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-5 py-3.5 transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700 sm:grid-cols-[auto_minmax(0,1fr)_200px_96px_92px]"
               >
                 <Monogram name={app.company_name} />
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-medium text-stone-950" data-no-translate>
+                  <span className="block truncate text-sm font-medium text-stone-900" data-no-translate>
                     {app.position}
                   </span>
                   <span className="block truncate text-xs text-stone-500" data-no-translate>
@@ -294,16 +294,16 @@ export function CVShelf({ cvs, letterCount }: { cvs: CV[]; letterCount: number }
           </ButtonLink>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-100">
+        <ul className="divide-y divide-stone-900/[0.06]">
           {shown.map((cv) => (
             <li key={cv.id}>
               <Link
                 href={`/dashboard/cv/${cv.id}`}
-                className="flex items-center gap-3.5 px-5 py-3 transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-700"
+                className="flex items-center gap-3.5 px-5 py-3 transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
               >
                 <CVThumbnail cv={cv} className="w-11" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-stone-950" data-no-translate>
+                  <span className="block truncate text-sm font-medium text-stone-900" data-no-translate>
                     {cv.name}
                   </span>
                   <span className="block truncate text-xs text-stone-500">
@@ -320,13 +320,13 @@ export function CVShelf({ cvs, letterCount }: { cvs: CV[]; letterCount: number }
       )}
       <Link
         href="/dashboard/cover-letters"
-        className="flex items-center gap-3 border-t border-stone-100 px-5 py-3.5 text-sm transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-700"
+        className="flex items-center gap-3 border-t border-stone-900/[0.06] px-5 py-3.5 text-sm transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900/[0.05] text-stone-500">
           <Mail className="h-4 w-4" aria-hidden="true" />
         </span>
         <span className="flex-1 font-medium text-stone-800">Cover letters</span>
-        <span className="text-sm font-semibold tabular-nums text-stone-950" data-no-translate>
+        <span className="text-sm font-semibold tabular-nums text-stone-900" data-no-translate>
           {letterCount}
         </span>
       </Link>
@@ -369,19 +369,19 @@ export function GettingStarted({ hasCV, hasApplication, hasLetter }: { hasCV: bo
           <span data-no-translate>{doneCount}/3</span> <span>steps done</span>
         </>
       }
-      bodyClassName="grid gap-px overflow-hidden rounded-b-xl bg-stone-100 md:grid-cols-3"
+      bodyClassName="grid gap-px overflow-hidden rounded-b-xl bg-stone-900/[0.05] md:grid-cols-3"
     >
       {steps.map((step, index) => (
         <div key={step.title} className="flex flex-col bg-white p-5">
           <span
             className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-              step.done ? 'bg-emerald-600 text-white' : 'bg-stone-100 text-stone-600'
+              step.done ? 'bg-emerald-600 text-white' : 'bg-stone-900/[0.05] text-stone-600'
             }`}
             aria-hidden="true"
           >
             {step.done ? <Check className="h-4 w-4" /> : index + 1}
           </span>
-          <h3 className={`mt-3 text-sm font-semibold ${step.done ? 'text-stone-500 line-through decoration-stone-300' : 'text-stone-950'}`}>
+          <h3 className={`mt-3 text-sm font-semibold ${step.done ? 'text-stone-500 line-through decoration-stone-300' : 'text-stone-900'}`}>
             {step.title}
           </h3>
           <p className="mt-1 flex-1 text-sm leading-6 text-stone-600">{step.copy}</p>

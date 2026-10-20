@@ -1,41 +1,103 @@
 @import "tailwindcss";
 
+/*
+ * Visual language: soft warm aurora behind frosted glass panels, coral accent,
+ * Poppins for headings and UI. CV documents (templates, PDF) stay plain white:
+ * they are what recruiters read, so none of this reaches them.
+ */
 :root {
-  --paper: #f5f3ed;
-  --surface: #fffefa;
-  --ink: #17211d;
-  --muted-ink: #59635f;
-  --line: #d8d7cf;
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
-  --highlight: #dbeafe;
+  --paper: #f6efeb;
+  --ink: #1f1a24;
+  --line: rgb(31 26 36 / 0.1);
+  --highlight: #ffe0d2;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
   --color-background: var(--paper);
   --color-foreground: var(--ink);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-poppins), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Coral accent. 600 and darker pass 4.5:1 on white for text and buttons. */
+  --color-brand-50: #fff5f0;
+  --color-brand-100: #ffe8dd;
+  --color-brand-200: #ffcfba;
+  --color-brand-300: #ffab8c;
+  --color-brand-400: #fb845f;
+  --color-brand-500: #f2663c;
+  --color-brand-600: #cc4219;
+  --color-brand-700: #ad3714;
+  --color-brand-800: #8c2f17;
+  --color-brand-900: #732916;
+  --color-brand-950: #3f1208;
 }
 
 @layer base {
   * {
     border-color: var(--line);
   }
-}
 
-html {
-  background: var(--paper);
-}
+  html {
+    background: var(--paper);
+  }
 
-body {
-  background: var(--paper);
-  color: var(--ink);
+  body {
+    color: var(--ink);
+    background-color: var(--paper);
+    /* The aurora: three blurred light sources fixed behind every page. */
+    background-image:
+      radial-gradient(60rem 40rem at -10% -10%, rgb(255 178 145 / 0.85), transparent 60%),
+      radial-gradient(50rem 40rem at 110% 0%, rgb(255 196 226 / 0.85), transparent 60%),
+      radial-gradient(55rem 45rem at 100% 110%, rgb(200 176 255 / 0.8), transparent 60%),
+      radial-gradient(40rem 30rem at 0% 100%, rgb(255 210 180 / 0.75), transparent 60%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
 }
 
 ::selection {
   background: var(--highlight);
   color: var(--ink);
+}
+
+@layer components {
+  /* Frosted panel: the base surface for cards, panels, dialogs and menus. */
+  .glass {
+    background: rgb(255 255 255 / 0.62);
+    border: 1px solid rgb(255 255 255 / 0.75);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.9) inset,
+      0 10px 30px -12px rgb(120 60 80 / 0.18),
+      0 2px 6px -2px rgb(120 60 80 / 0.08);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  }
+
+  /* Lighter glass for sidebars and top bars, which sit over large areas. */
+  .glass-soft {
+    background: rgb(255 255 255 / 0.4);
+    border-color: rgb(255 255 255 / 0.6);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  }
+
+  /* Glowing orb: the brand mark and the avatar fallback. */
+  .orb {
+    background: radial-gradient(circle at 32% 28%, #ffd9c4 0%, #ff9a73 32%, #f0603a 62%, #b8326b 100%);
+    box-shadow:
+      0 6px 18px -4px rgb(240 96 58 / 0.55),
+      inset 0 -2px 6px rgb(120 20 60 / 0.25);
+  }
 }
 
 /* In the base layer so utilities such as `truncate` still win: `text-wrap` is a
@@ -108,7 +170,7 @@ body {
 }
 
 .skeleton-bone {
-  background: linear-gradient(90deg, #e7e5e0 0%, #efeee9 40%, #e7e5e0 80%);
+  background: linear-gradient(90deg, rgb(120 90 100 / 0.1) 0%, rgb(120 90 100 / 0.05) 40%, rgb(120 90 100 / 0.1) 80%);
   background-size: 300% 100%;
   animation: skeleton-sweep 1.4s ease-in-out infinite;
 }
@@ -155,7 +217,8 @@ body {
 }
 
 .app-dialog[open]::backdrop {
-  background-color: rgb(12 10 9 / 0.45);
+  background-color: rgb(60 30 50 / 0.25);
+  backdrop-filter: blur(6px);
 }
 
 @starting-style {
@@ -211,6 +274,6 @@ html[data-i18n-pending] body {
 
   .skeleton-bone {
     animation: none;
-    background: #e7e5e0;
+    background: rgb(120 90 100 / 0.1);
   }
 }

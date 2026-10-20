@@ -41,7 +41,7 @@ export function CertificationsSection({ control, register, errors, watch }: Sect
       action={fields.length > 0 ? addButton : undefined}
     >
       {fields.length === 0 ? (
-        <div className="rounded-md border border-dashed border-stone-300 px-4 py-8 text-center">
+        <div className="rounded-md border border-dashed border-stone-900/10 px-4 py-8 text-center">
           <p className="text-sm text-stone-700">No certifications yet.</p>
           <p className="mt-1 text-xs text-stone-500">Optional. Skip this section if you have none.</p>
           <div className="mt-4">{addButton}</div>

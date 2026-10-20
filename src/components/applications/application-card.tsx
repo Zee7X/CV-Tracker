@@ -14,7 +14,7 @@ import { ChevronDown, CalendarDays, ExternalLink, FileText, Loader2, Pencil, Tra
 const STAGE_DOT: Record<ApplicationStatus, string> = {
   applied: 'bg-stone-400',
   screening: 'bg-amber-400',
-  interview: 'bg-blue-600',
+  interview: 'bg-brand-600',
   offering: 'bg-emerald-500',
   accepted: 'bg-emerald-700',
   rejected: 'bg-stone-300',
@@ -65,13 +65,13 @@ export function ApplicationCard({ application, onDeleteSuccess }: ApplicationCar
 
   return (
     <>
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-3 px-4 py-4 transition-colors hover:bg-stone-50/60 sm:px-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,200px)_120px_232px] lg:items-center lg:gap-4">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-3 px-4 py-4 transition-colors hover:bg-white/50/60 sm:px-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,200px)_120px_232px] lg:items-center lg:gap-4">
         <div className="col-span-2 flex min-w-0 items-start gap-3 lg:col-span-1 lg:items-center">
           <Monogram name={application.company_name} />
           <div className="min-w-0 flex-1">
             <Link
               href={`/dashboard/applications/${application.id}`}
-              className="block truncate rounded text-sm font-semibold text-stone-950 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+              className="block truncate rounded text-sm font-semibold text-stone-900 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
             >
               <span data-no-translate>{application.position}</span>
             </Link>
@@ -84,7 +84,7 @@ export function ApplicationCard({ application, onDeleteSuccess }: ApplicationCar
                   href={application.job_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-blue-700 underline-offset-4 hover:underline"
+                  className="inline-flex shrink-0 items-center gap-0.5 text-xs font-medium text-brand-700 underline-offset-4 hover:underline"
                 >
                   Job posting
                   <ExternalLink className="h-3 w-3" aria-hidden="true" />
@@ -111,7 +111,7 @@ export function ApplicationCard({ application, onDeleteSuccess }: ApplicationCar
             {application.cv ? (
               <Link
                 href={`/dashboard/cv/${application.cv.id}`}
-                className="truncate text-stone-700 underline-offset-4 hover:text-stone-950 hover:underline"
+                className="truncate text-stone-700 underline-offset-4 hover:text-stone-900 hover:underline"
                 data-no-translate
               >
                 {application.cv.name}
@@ -140,7 +140,7 @@ export function ApplicationCard({ application, onDeleteSuccess }: ApplicationCar
               value={application.status}
               onChange={(event) => handleStatusChange(event.target.value as ApplicationStatus)}
               disabled={isPending}
-              className="h-9 w-full appearance-none rounded-lg border border-stone-200 bg-white pl-7 pr-8 text-sm font-medium text-stone-800 transition-colors hover:border-stone-300 focus-visible:border-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700/20 disabled:opacity-50 lg:w-[136px]"
+              className="h-9 w-full appearance-none rounded-xl border border-white/70 bg-white/60 pl-7 pr-8 text-sm font-medium text-stone-800 transition-colors hover:border-stone-900/10 focus-visible:border-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700/20 disabled:opacity-50 lg:w-[136px]"
             >
               {APPLICATION_STATUSES.map((status) => (
                 <option key={status.value} value={status.value}>
@@ -156,7 +156,7 @@ export function ApplicationCard({ application, onDeleteSuccess }: ApplicationCar
           </span>
           <Link
             href={`/dashboard/applications/${application.id}`}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-900/[0.05] hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
             aria-label={`Edit ${application.position} at ${application.company_name}`}
             title="Edit"
           >
@@ -164,7 +164,7 @@ export function ApplicationCard({ application, onDeleteSuccess }: ApplicationCar
           </Link>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-500 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-500 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 disabled:opacity-50"
             onClick={() => setShowDeleteConfirm(true)}
             disabled={isPending}
             aria-label={`Delete ${application.position} at ${application.company_name}`}

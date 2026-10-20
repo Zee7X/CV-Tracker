@@ -13,7 +13,7 @@ function PendingIndicator({ variant }: { variant: 'bar' | 'spinner' }) {
   return (
     <span
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-x-3 -bottom-px h-0.5 origin-left rounded-full bg-blue-700 transition-[transform,opacity] duration-500 ease-out ${
+      className={`pointer-events-none absolute inset-x-3 -bottom-px h-0.5 origin-left rounded-full bg-brand-700 transition-[transform,opacity] duration-500 ease-out ${
         pending ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0'
       }`}
     />

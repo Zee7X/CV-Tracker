@@ -77,7 +77,7 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
           <input type="hidden" name="avatar_url" value={avatarUrl} />
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-stone-200 bg-stone-100 text-xl font-semibold text-stone-500">
+            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/70 bg-stone-900/[0.05] text-xl font-semibold text-stone-500">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -132,7 +132,7 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
                   type="button"
                   onClick={() => setShowUrlInput((open) => !open)}
                   aria-expanded={showUrlInput}
-                  className="rounded px-1 text-xs font-medium text-blue-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800"
+                  className="rounded px-1 text-xs font-medium text-brand-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
                 >
                   {showUrlInput ? 'Hide link field' : 'Use an image link instead'}
                 </button>
@@ -167,12 +167,12 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
                 type="email"
                 value={initialProfile.email}
                 readOnly
-                className="cursor-not-allowed bg-stone-100 text-stone-600"
+                className="cursor-not-allowed bg-stone-900/[0.05] text-stone-600"
               />
             </Field>
           </div>
 
-          <div className="flex items-center justify-between gap-4 border-t border-stone-200 pt-4">
+          <div className="flex items-center justify-between gap-4 border-t border-white/70 pt-4">
             <p className="text-xs text-stone-500">
               {initialProfile.created_at ? (
                 <>
@@ -201,7 +201,7 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
               <PasswordInput id="confirm_password" name="confirm_password" autoComplete="new-password" required minLength={8} />
             </Field>
           </div>
-          <div className="flex justify-end border-t border-stone-200 pt-4">
+          <div className="flex justify-end border-t border-white/70 pt-4">
             <Button type="submit" variant="outline" disabled={passwordPending}>
               {passwordPending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
               {passwordPending ? 'Updating' : 'Change password'}

@@ -40,7 +40,7 @@ function Avatar({ user }: { user: ShellUser }) {
   return (
     <span
       aria-hidden="true"
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold text-white"
+      className="orb flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
       data-no-translate
     >
       {initialsOf(user.name || user.email)}
@@ -61,16 +61,22 @@ function SidebarNav({ pathname, counts }: { pathname: string; counts: ShellCount
             href={item.href}
             pendingVariant="spinner"
             aria-current={active ? 'page' : undefined}
-            className={`group flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 ${
-              active ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-950'
+            className={`font-display group flex h-11 items-center gap-3 rounded-full px-4 text-sm transition-[background-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 ${
+              active
+                ? 'bg-white/90 font-semibold text-stone-900 shadow-[0_6px_18px_-8px_rgba(120,60,80,0.35)]'
+                : 'font-medium text-stone-600 hover:bg-white/50 hover:text-stone-900'
             }`}
           >
-            <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-white' : 'text-stone-400 group-hover:text-stone-600'}`} aria-hidden="true" />
+            <Icon
+              className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-brand-500' : 'text-stone-500 group-hover:text-stone-700'}`}
+              strokeWidth={active ? 2.2 : 1.8}
+              aria-hidden="true"
+            />
             <span className="flex-1">{item.name}</span>
             {value !== null && value !== undefined ? (
               <span
-                className={`min-w-6 rounded-md px-1.5 py-0.5 text-center text-xs tabular-nums ${
-                  active ? 'bg-white/15 text-white' : 'bg-stone-100 text-stone-500 group-hover:bg-stone-200'
+                className={`min-w-6 rounded-full px-2 py-0.5 text-center text-xs tabular-nums ${
+                  active ? 'bg-brand-50 text-brand-700' : 'bg-white/50 text-stone-500'
                 }`}
               >
                 {value}
@@ -91,13 +97,13 @@ function UserBlock({ user, pathname }: { user: ShellUser | null; pathname: strin
         href="/dashboard/account"
         aria-current={accountActive ? 'page' : undefined}
         pendingVariant="spinner"
-        className={`flex min-w-0 flex-1 items-center gap-3 rounded-lg px-2 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 ${
-          accountActive ? 'bg-stone-100' : 'hover:bg-stone-100'
+        className={`flex min-w-0 flex-1 items-center gap-3 rounded-full py-1.5 pl-1.5 pr-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 ${
+          accountActive ? 'bg-white/90 shadow-[0_6px_18px_-8px_rgba(120,60,80,0.35)]' : 'hover:bg-white/50'
         }`}
       >
         {user ? <Avatar user={user} /> : null}
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium text-stone-950" data-no-translate>
+          <span className="block truncate text-sm font-medium text-stone-900" data-no-translate>
             {user?.name || 'Account'}
           </span>
           <span className="block truncate text-xs text-stone-500" data-no-translate>
@@ -110,7 +116,7 @@ function UserBlock({ user, pathname }: { user: ShellUser | null; pathname: strin
           type="submit"
           aria-label="Sign out"
           title="Sign out"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-white/70 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
         >
           <LogOut className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -137,7 +143,7 @@ export default function DashboardShell({
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f5f1] text-stone-950">
+    <div className="min-h-screen text-stone-900">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:shadow"
@@ -146,21 +152,21 @@ export default function DashboardShell({
       </a>
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-stone-200 bg-white lg:flex print:hidden">
-        <div className="flex h-16 items-center px-5">
+      <aside className="glass-soft fixed inset-y-3 left-3 z-40 hidden w-64 flex-col rounded-[28px] border lg:flex print:hidden">
+        <div className="flex h-20 items-center px-6">
           <Logo href="/dashboard" />
         </div>
-        <div className="px-3 pb-4">
+        <div className="px-4 pb-5">
           <ButtonLink href="/dashboard/applications/new" className="w-full">
             <Plus className="h-4 w-4" aria-hidden="true" />
             Add application
           </ButtonLink>
         </div>
-        <div className="flex-1 overflow-y-auto px-3">
-          <p className="px-3 pb-2 text-xs font-medium text-stone-400">Workspace</p>
+        <div className="flex-1 overflow-y-auto px-4">
+          <p className="px-3 pb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-stone-500">Workspace</p>
           <SidebarNav pathname={pathname} counts={counts} />
         </div>
-        <div className="space-y-3 border-t border-stone-200 p-3">
+        <div className="space-y-3 border-t border-stone-900/[0.06] p-4">
           <div className="flex items-center justify-between px-2">
             <span className="text-xs font-medium text-stone-500">Language</span>
             <LanguageSwitcher compact />
@@ -170,13 +176,13 @@ export default function DashboardShell({
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/95 backdrop-blur lg:hidden print:hidden">
+      <header className="glass-soft sticky top-0 z-40 border-b lg:hidden print:hidden">
         <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
           <Logo href="/dashboard" className="mr-auto" />
           <LanguageSwitcher compact />
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-stone-700 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-stone-700 hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
             onClick={() => setIsMobileMenuOpen((open) => !open)}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-nav"
@@ -186,10 +192,10 @@ export default function DashboardShell({
           </button>
         </div>
         <div id="mobile-nav" data-open={isMobileMenuOpen} inert={!isMobileMenuOpen} className="collapse-panel">
-          <div className={isMobileMenuOpen ? 'border-t border-stone-200' : ''}>
+          <div className={isMobileMenuOpen ? 'border-t border-stone-900/[0.06]' : ''}>
             <div className="space-y-3 px-3 py-3 sm:px-5">
               <SidebarNav pathname={pathname} counts={counts} />
-              <div className="border-t border-stone-200 pt-3">
+              <div className="border-t border-stone-900/[0.06] pt-3">
                 <UserBlock user={user} pathname={pathname} />
               </div>
             </div>
@@ -197,7 +203,7 @@ export default function DashboardShell({
         </div>
       </header>
 
-      <main id="main" className="lg:pl-64">
+      <main id="main" className="lg:pl-[17.5rem]">
         {/* Keyed on the path so each page mounts fresh and settles in (see .route-content); the sidebar stays put. */}
         <div key={pathname} className="route-content mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
           {children}

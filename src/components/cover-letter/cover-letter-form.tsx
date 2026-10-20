@@ -84,7 +84,7 @@ const LANGUAGE_OPTIONS: { id: LetterLanguage; label: string }[] = [
 ]
 
 const selectClass =
-  'h-10 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-950 transition-colors hover:border-stone-400 focus-visible:border-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800/20'
+  'h-10 w-full rounded-xl border border-stone-900/10 bg-white/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-white/85 focus-visible:border-brand-400 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 text-sm text-stone-900'
 
 function localToday() {
   const now = new Date()
@@ -343,16 +343,16 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-      <div className="flex flex-col gap-4 border-b border-stone-300 pb-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 border-b border-stone-900/10 pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <Link
             href="/dashboard/cover-letters"
-            className="inline-flex items-center gap-1 rounded text-sm font-medium text-stone-600 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800"
+            className="inline-flex items-center gap-1 rounded text-sm font-medium text-stone-600 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Cover letters
           </Link>
-          <h1 className="mt-1 truncate text-2xl font-semibold text-stone-950">
+          <h1 className="mt-1 truncate text-2xl font-semibold text-stone-900">
             {isEditing ? values.title || 'Untitled letter' : 'New cover letter'}
           </h1>
         </div>
@@ -396,7 +396,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
                   href="https://supabase.com/dashboard"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm font-medium text-blue-800 underline-offset-4 hover:underline"
+                  className="text-sm font-medium text-brand-800 underline-offset-4 hover:underline"
                 >
                   Open Supabase dashboard<span className="sr-only"> (opens in a new tab)</span>
                 </a>
@@ -406,7 +406,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
         </div>
       ) : null}
 
-      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-lg border border-stone-200 bg-stone-100 p-1 lg:hidden">
+      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-full border border-white/70 bg-white/40 p-1 backdrop-blur-md lg:hidden">
         {(['form', 'preview'] as const).map((tab) => (
           <button
             key={tab}
@@ -414,7 +414,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
             role="tab"
             aria-selected={mobileTab === tab}
             onClick={() => setMobileTab(tab)}
-            className={`rounded-md py-2 text-sm font-semibold transition-colors ${mobileTab === tab ? 'bg-white text-stone-950 shadow-sm' : 'text-stone-600 hover:text-stone-950'}`}
+            className={`rounded-full py-2 text-sm font-semibold transition-colors ${mobileTab === tab ? 'bg-white/90 text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'}`}
           >
             {tab === 'form' ? 'Edit' : 'Preview'}
           </button>
@@ -432,8 +432,8 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
                   return (
                     <label
                       key={tmpl.id}
-                      className={`cursor-pointer rounded-lg border px-3.5 py-3 text-left transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-700 ${
-                        selected ? 'border-blue-700 bg-blue-50/60 ring-1 ring-blue-700' : 'border-stone-200 bg-white hover:border-stone-400'
+                      className={`cursor-pointer rounded-lg border px-3.5 py-3 text-left transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-700 ${
+                        selected ? 'border-brand-700 bg-brand-50/60 ring-1 ring-brand-700' : 'border-white/70 bg-white hover:border-stone-400'
                       }`}
                     >
                       <input
@@ -445,7 +445,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
                         className="sr-only"
                       />
                       <span className="flex items-baseline justify-between gap-2">
-                        <span className="text-sm font-semibold text-stone-950">{tmpl.name}</span>
+                        <span className="text-sm font-semibold text-stone-900">{tmpl.name}</span>
                         <span className="text-xs text-stone-500">{tmpl.badge}</span>
                       </span>
                       <span className="mt-1 block text-xs leading-5 text-stone-600">{tmpl.description}</span>
@@ -466,7 +466,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
                   value={docLang}
                   disabled={languageLocked}
                   onChange={(event) => handleSelectLanguage(event.target.value as LetterLanguage)}
-                  className={`${selectClass} disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-500`}
+                  className={`${selectClass} disabled:cursor-not-allowed disabled:bg-stone-900/[0.05] disabled:text-stone-500`}
                 >
                   {LANGUAGE_OPTIONS.map((option) => (
                     <option key={option.id} value={option.id}>
@@ -488,7 +488,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
             </div>
 
             {availableCVs.length > 0 ? (
-              <div className="flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:items-start">
+              <div className="flex flex-col gap-2 border-t border-white/70 pt-4 sm:flex-row sm:items-start">
                 <Field id="import_cv" label="Fill your details from a CV" className="flex-1" hint="Copies name, email, phone, city and your top skills.">
                   <select id="import_cv" value={selectedCvId} onChange={(e) => setSelectedCvId(e.target.value)} className={selectClass}>
                     <option value="">Choose a CV</option>

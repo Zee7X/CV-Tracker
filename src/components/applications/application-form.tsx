@@ -24,7 +24,7 @@ interface ApplicationFormProps {
 }
 
 const selectClass =
-  'flex h-10 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-950 shadow-[0_1px_1px_rgba(28,25,23,0.03)] transition-colors hover:border-stone-400 focus-visible:border-blue-700 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-blue-700/15 disabled:opacity-50'
+  'flex h-10 w-full rounded-xl border border-stone-900/10 bg-white/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-white/85 focus-visible:border-brand-400 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 py-2 text-sm text-stone-900 disabled:opacity-50'
 
 // The usual path of an application; Rejected can happen at any step and is shown apart.
 const STAGES = APPLICATION_STATUSES.filter((status) => status.value !== 'rejected')
@@ -87,14 +87,14 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
     <div className="space-y-5">
       <Link
         href="/dashboard/applications"
-        className="inline-flex items-center gap-1 rounded text-sm font-medium text-stone-600 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800"
+        className="inline-flex items-center gap-1 rounded text-sm font-medium text-stone-600 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         Applications
       </Link>
 
       <div>
-        <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.02em] text-stone-950">
+        <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.02em] text-stone-900">
           {isEditing ? (
             <>
               <span data-no-translate>{initialData?.position}</span>
@@ -111,7 +111,7 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="rounded-xl border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="rounded-3xl glass">
         {serverError ? (
           <p role="alert" className="mx-5 mt-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
             {serverError}
@@ -149,7 +149,7 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
           </Field>
         </fieldset>
 
-        <fieldset className="grid grid-cols-1 gap-4 border-t border-stone-100 px-5 py-5 sm:grid-cols-3">
+        <fieldset className="grid grid-cols-1 gap-4 border-t border-stone-900/[0.06] px-5 py-5 sm:grid-cols-3">
           <legend className="sr-only">Progress</legend>
           <Field id="applied_date" label="Date applied" required error={errors.applied_date?.message}>
             <Input id="applied_date" type="date" aria-invalid={Boolean(errors.applied_date)} {...register('applied_date')} />
@@ -181,7 +181,7 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
           </Field>
         </fieldset>
 
-        <div className="border-t border-stone-100 px-5 py-5">
+        <div className="border-t border-stone-900/[0.06] px-5 py-5">
           <Field
             id="notes"
             label="Notes"
@@ -193,7 +193,7 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
           </Field>
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-stone-100 px-5 py-4">
+        <div className="flex items-center justify-end gap-2 border-t border-stone-900/[0.06] px-5 py-4">
           <ButtonLink href="/dashboard/applications" variant="outline" aria-disabled={isLoading}>
             Cancel
           </ButtonLink>
@@ -205,10 +205,10 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
       </form>
 
       <aside className="space-y-4 xl:sticky xl:top-8">
-        <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
-          <h2 className="text-sm font-semibold text-stone-950">Progress</h2>
+        <section className="rounded-3xl glass p-5 shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
+          <h2 className="text-sm font-semibold text-stone-900">Progress</h2>
           {watchedStatus === 'rejected' ? (
-            <p className="mt-3 rounded-lg bg-stone-100 px-3 py-2.5 text-sm text-stone-600">
+            <p className="mt-3 rounded-lg bg-stone-900/[0.05] px-3 py-2.5 text-sm text-stone-600">
               Marked as rejected. Keep it here so you remember which CV you sent.
             </p>
           ) : (
@@ -221,18 +221,18 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
                     {index < STAGES.length - 1 ? (
                       <span
                         aria-hidden="true"
-                        className={`absolute left-[9px] top-5 h-[calc(100%-12px)] w-0.5 ${stageIndex > index ? 'bg-blue-600' : 'bg-stone-200'}`}
+                        className={`absolute left-[9px] top-5 h-[calc(100%-12px)] w-0.5 ${stageIndex > index ? 'bg-brand-600' : 'bg-stone-200'}`}
                       />
                     ) : null}
                     <span
                       aria-hidden="true"
                       className={`relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                        current ? 'border-blue-600 bg-white' : reached ? 'border-blue-600 bg-blue-600' : 'border-stone-200 bg-white'
+                        current ? 'border-brand-600 bg-white' : reached ? 'border-brand-600 bg-brand-600' : 'border-white/70 bg-white'
                       }`}
                     >
-                      {current ? <span className="h-2 w-2 rounded-full bg-blue-600" /> : reached ? <Check className="h-3 w-3 text-white" /> : null}
+                      {current ? <span className="h-2 w-2 rounded-full bg-brand-600" /> : reached ? <Check className="h-3 w-3 text-white" /> : null}
                     </span>
-                    <span className={`text-sm ${current ? 'font-semibold text-stone-950' : reached ? 'text-stone-700' : 'text-stone-400'}`}>
+                    <span className={`text-sm ${current ? 'font-semibold text-stone-900' : reached ? 'text-stone-700' : 'text-stone-400'}`}>
                       {stage.label}
                       {current ? <span className="sr-only"> (current stage)</span> : null}
                     </span>
@@ -243,16 +243,16 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
           )}
         </section>
 
-        <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
-          <h2 className="text-sm font-semibold text-stone-950">CV sent</h2>
+        <section className="rounded-3xl glass p-5 shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
+          <h2 className="text-sm font-semibold text-stone-900">CV sent</h2>
           {linkedCV ? (
             <Link
               href={`/dashboard/cv/${linkedCV.id}`}
-              className="mt-3 flex items-center gap-3 rounded-lg border border-stone-200 p-3 transition-colors hover:border-stone-300 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+              className="mt-3 flex items-center gap-3 rounded-lg border border-white/70 p-3 transition-colors hover:border-stone-900/10 hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
             >
               <CVThumbnail cv={linkedCV} className="w-12" />
               <span className="min-w-0">
-                <span className="block truncate text-sm font-medium text-stone-950" data-no-translate>
+                <span className="block truncate text-sm font-medium text-stone-900" data-no-translate>
                   {linkedCV.name}
                 </span>
                 <span className="block text-xs text-stone-500" data-no-translate>
@@ -272,7 +272,7 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
             href={watchedUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-5 py-4 text-sm font-medium text-blue-700 shadow-[0_1px_2px_rgba(28,25,23,0.04)] transition-colors hover:border-stone-300 hover:bg-stone-50"
+            className="flex items-center justify-between gap-3 rounded-3xl glass px-5 py-4 text-sm font-medium text-brand-700 shadow-[0_1px_2px_rgba(28,25,23,0.04)] transition-colors hover:border-stone-900/10 hover:bg-white/50"
           >
             Open the job posting
             <ExternalLink className="h-4 w-4" aria-hidden="true" />

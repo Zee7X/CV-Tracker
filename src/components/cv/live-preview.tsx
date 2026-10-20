@@ -79,13 +79,13 @@ export function LivePreview({
 
   return (
     <section
-      className={`flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-[#ebe9e3] ${containerClassName}`}
+      className={`flex flex-col overflow-hidden rounded-3xl glass/35 ${containerClassName}`}
       aria-label="CV preview"
       data-testid="cv-live-preview"
     >
       {showControls ? (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 bg-white px-3 py-2">
-          <div role="radiogroup" aria-label="Template" className="flex rounded-lg border border-stone-200 bg-stone-100 p-0.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/60 bg-white/50 px-3 py-2 backdrop-blur-md">
+          <div role="radiogroup" aria-label="Template" className="flex rounded-lg border border-white/70 bg-stone-900/[0.05] p-0.5">
             {TEMPLATES_METADATA.map((tmpl) => {
               const selected = activeTemplate === tmpl.id
               return (
@@ -96,8 +96,8 @@ export function LivePreview({
                   aria-checked={selected}
                   title={tmpl.description}
                   onClick={() => selectTemplate(tmpl.id)}
-                  className={`rounded px-2.5 py-1 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800 ${
-                    selected ? 'bg-white text-stone-950 shadow-sm' : 'text-stone-600 hover:text-stone-950'
+                  className={`rounded px-2.5 py-1 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800 ${
+                    selected ? 'bg-white/90 text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
                   }`}
                   data-no-translate
                 >
@@ -114,18 +114,18 @@ export function LivePreview({
                   type="checkbox"
                   checked={useSampleData}
                   onChange={(event) => setUseSampleData(event.target.checked)}
-                  className="h-3.5 w-3.5 rounded border-stone-400 accent-blue-700"
+                  className="h-3.5 w-3.5 rounded border-stone-400 accent-brand-700"
                 />
                 Show sample
               </label>
             ) : null}
-            <div className="flex items-center rounded-lg border border-stone-200 bg-white">
+            <div className="flex items-center rounded-xl border border-white/70 bg-white/60">
               <button
                 type="button"
                 onClick={() => zoom(-0.1)}
                 disabled={scale <= MIN_SCALE}
                 aria-label="Zoom Out"
-                className="flex h-8 w-8 items-center justify-center text-stone-600 hover:text-stone-950 disabled:opacity-30"
+                className="flex h-8 w-8 items-center justify-center text-stone-600 hover:text-stone-900 disabled:opacity-30"
               >
                 <Minus className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
@@ -134,8 +134,8 @@ export function LivePreview({
                 onClick={() => setManualScale(null)}
                 aria-label="Fit to Width"
                 title="Fit to width"
-                className={`h-8 min-w-12 border-x border-stone-300 px-1.5 text-xs tabular-nums ${
-                  manualScale === null ? 'font-semibold text-stone-950' : 'text-stone-600 hover:text-stone-950'
+                className={`h-8 min-w-12 border-x border-stone-900/10 px-1.5 text-xs tabular-nums ${
+                  manualScale === null ? 'font-semibold text-stone-900' : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
                 {Math.round(scale * 100)}%
@@ -145,7 +145,7 @@ export function LivePreview({
                 onClick={() => zoom(0.1)}
                 disabled={scale >= MAX_SCALE}
                 aria-label="Zoom In"
-                className="flex h-8 w-8 items-center justify-center text-stone-600 hover:text-stone-950 disabled:opacity-30"
+                className="flex h-8 w-8 items-center justify-center text-stone-600 hover:text-stone-900 disabled:opacity-30"
               >
                 <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               </button>

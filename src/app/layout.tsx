@@ -1,16 +1,18 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter, Poppins } from 'next/font/google'
 import { LanguageProvider } from '@/components/i18n/language-provider'
 import './globals.css'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
 })
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+// Headings, navigation and buttons, like the rounded geometric type in the reference design.
+const poppins = Poppins({
+  variable: '--font-poppins',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
 })
 
 const siteName = 'CV Tracker'
@@ -39,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       // Lets Next turn smooth scrolling off during route changes so a new page starts at the top instantly.
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
+      className={`${inter.variable} ${poppins.variable} h-full scroll-smooth antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: LANGUAGE_BOOT_SCRIPT }} />

@@ -42,7 +42,7 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, subject, childr
     <dialog
       ref={ref}
       aria-labelledby={titleId}
-      className="app-dialog w-[calc(100%-2rem)] max-w-md rounded-xl border border-stone-200 bg-white p-0 text-stone-950 shadow-xl"
+      className="app-dialog glass w-[calc(100%-2rem)] max-w-md rounded-[28px] bg-white/80 p-0 text-stone-900"
       onCancel={(event) => {
         event.preventDefault()
         if (!pending) onClose()

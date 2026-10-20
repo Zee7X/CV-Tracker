@@ -27,9 +27,9 @@ const templates = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#f5f3ed] text-stone-950">
-      <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#f5f3ed]/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
+    <div className="min-h-screen overflow-x-hidden text-stone-900">
+      <header className="sticky top-3 z-40 px-3 sm:px-5">
+        <div className="glass mx-auto flex h-16 max-w-6xl items-center gap-3 rounded-full px-4 sm:px-6">
           <Logo className="mr-auto" />
           <LanguageSwitcher compact />
           <ButtonLink href="/login" variant="ghost" size="sm">
@@ -42,10 +42,10 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="border-b border-stone-300">
+        <section>
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
             <div>
-              <h1 className="max-w-2xl text-4xl font-semibold leading-[1.08] tracking-[-0.03em] sm:text-5xl">
+              <h1 className="font-display max-w-2xl text-4xl font-semibold leading-[1.08] tracking-[-0.035em] text-stone-900 sm:text-[56px]">
                 Write your CV, send it, and know which version went where.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-stone-600">
@@ -63,10 +63,12 @@ export default function LandingPage() {
             </div>
 
             <figure className="hidden lg:block">
-              <div className="h-[540px] w-[420px] overflow-hidden rounded-md bg-white shadow-[0_24px_48px_-20px_rgba(28,25,23,0.35)] ring-1 ring-stone-200">
+              <div className="glass rounded-[28px] p-3">
+              <div className="h-[540px] w-[420px] overflow-hidden rounded-[18px] bg-white shadow-[0_24px_48px_-20px_rgba(120,40,80,0.35)]">
                 <div className="w-[794px] origin-top-left scale-[0.529]" aria-hidden="true" data-no-translate>
                   <AtsTemplate cv={SAMPLE_CV} language="en" />
                 </div>
+              </div>
               </div>
               <figcaption className="mt-3 text-sm text-stone-500">
                 The ATS Clean template, rendered with sample data. Your PDF uses the same layout.
@@ -75,15 +77,15 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section aria-labelledby="workflow-title" className="border-b border-stone-300 bg-[#fffefa]">
-          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-[260px_minmax(0,1fr)]">
+        <section aria-labelledby="workflow-title" className="px-3 sm:px-5">
+          <div className="glass mx-auto grid max-w-6xl gap-10 rounded-[32px] px-6 py-14 sm:px-10 md:grid-cols-[260px_minmax(0,1fr)]">
             <h2 id="workflow-title" className="text-2xl font-semibold tracking-[-0.02em]">
               How it fits into a job search
             </h2>
             <ol className="space-y-8">
               {workflow.map((step, index) => (
                 <li key={step.title} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3">
-                  <span className="pt-0.5 text-sm font-semibold tabular-nums text-stone-400">{index + 1}.</span>
+                  <span className="orb flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold tabular-nums text-white">{index + 1}</span>
                   <div>
                     <h3 className="text-lg font-semibold">{step.title}</h3>
                     <p className="mt-1.5 max-w-2xl leading-7 text-stone-600">{step.copy}</p>
@@ -94,7 +96,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section aria-labelledby="templates-title" className="border-b border-stone-300">
+        <section aria-labelledby="templates-title">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
             <h2 id="templates-title" className="text-2xl font-semibold tracking-[-0.02em]">
               Three templates, one set of content
@@ -103,10 +105,10 @@ export default function LandingPage() {
               Changing the template never changes what you wrote. Duplicate a CV when you want a different version for a
               different role.
             </p>
-            <div className="mt-8 overflow-x-auto">
+            <div className="glass mt-8 overflow-x-auto rounded-[28px] px-6 py-2">
               <table className="w-full min-w-[560px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-stone-400 text-stone-500">
+                  <tr className="border-b border-stone-900/10 text-stone-500">
                     <th scope="col" className="py-2 pr-4 font-medium">Template</th>
                     <th scope="col" className="py-2 pr-4 font-medium">Good for</th>
                     <th scope="col" className="py-2 font-medium">Layout</th>
@@ -114,8 +116,8 @@ export default function LandingPage() {
                 </thead>
                 <tbody>
                   {templates.map((template) => (
-                    <tr key={template.name} className="border-b border-stone-300 align-top">
-                      <th scope="row" className="py-4 pr-4 font-semibold text-stone-950" data-no-translate>
+                    <tr key={template.name} className="border-b border-stone-900/10 align-top">
+                      <th scope="row" className="py-4 pr-4 font-semibold text-stone-900" data-no-translate>
                         {template.name}
                       </th>
                       <td className="py-4 pr-4 text-stone-700">{template.use}</td>
@@ -128,23 +130,25 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-14 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p className="text-lg font-medium">Start with your most recent job. The rest can wait.</p>
+        <section className="px-3 pb-14 sm:px-5">
+          <div className="glass mx-auto flex max-w-6xl flex-col gap-4 rounded-full px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <p className="font-display text-lg font-medium">Start with your most recent job. The rest can wait.</p>
           <ButtonLink href="/register" size="lg">
             Create a free account
           </ButtonLink>
+          </div>
         </section>
       </main>
 
-      <footer className="border-t border-stone-300">
+      <footer className="border-t border-stone-900/[0.06]">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 text-sm text-stone-500 sm:flex-row sm:justify-between sm:px-6">
           <p className="flex items-center gap-2">
             <LogoMark className="h-5 w-5" />
             <span>© {new Date().getFullYear()} CV Tracker</span>
           </p>
           <nav aria-label="Footer" className="flex gap-5">
-            <Link href="/login" className="hover:text-stone-950">Sign in</Link>
-            <Link href="/register" className="hover:text-stone-950">Create account</Link>
+            <Link href="/login" className="hover:text-stone-900">Sign in</Link>
+            <Link href="/register" className="hover:text-stone-900">Create account</Link>
           </nav>
         </div>
       </footer>

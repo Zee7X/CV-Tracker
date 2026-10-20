@@ -10,7 +10,7 @@ export const APPLICATION_STATUSES: {
 }[] = [
   { value: 'applied', label: 'Applied', color: 'bg-stone-100 text-stone-800 border-stone-300' },
   { value: 'screening', label: 'Screening', color: 'bg-amber-50 text-amber-900 border-amber-200' },
-  { value: 'interview', label: 'Interview', color: 'bg-blue-50 text-blue-900 border-blue-200' },
+  { value: 'interview', label: 'Interview', color: 'bg-brand-50 text-brand-900 border-brand-200' },
   { value: 'offering', label: 'Offer', color: 'bg-emerald-50 text-emerald-900 border-emerald-200' },
   { value: 'accepted', label: 'Accepted', color: 'bg-emerald-700 text-white border-emerald-700' },
   { value: 'rejected', label: 'Rejected', color: 'bg-white text-stone-500 border-stone-300' },

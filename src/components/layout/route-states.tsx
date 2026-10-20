@@ -18,7 +18,7 @@ export function RouteError({
 
   return (
     <div role="alert" className="rounded-lg border border-red-200 bg-white px-6 py-10">
-      <h1 className="text-lg font-semibold text-stone-950">{what}</h1>
+      <h1 className="text-lg font-semibold text-stone-900">{what}</h1>
       <p className="mt-1 max-w-xl text-sm text-stone-600">
         The server did not respond as expected. Your saved data is not affected. Try again, and if it keeps failing,
         check your connection or sign in again.
