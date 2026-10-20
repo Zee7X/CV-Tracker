@@ -46,6 +46,153 @@ p {
   text-wrap: pretty;
 }
 
+/*
+ * Motion. Short and functional only: content settles in after a route change,
+ * menus and dialogs grow from where they open, skeletons appear only when a
+ * load is slow enough to notice. Everything is cut by prefers-reduced-motion.
+ */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+/*
+ * Whatever mounts inside the dashboard content area settles in: the page after
+ * a route change, and the real content when it replaces a loading skeleton.
+ * `backwards` only holds the start frame, so no transform is left behind on
+ * the page (a lingering transform would break sticky and fixed children).
+ */
+.route-content > *,
+.page-enter {
+  animation: enter-up 220ms var(--ease-out) backwards;
+}
+
+/* Fast loads finish before the skeleton shows, so there is no flash of grey. */
+.route-content > .skeleton-page,
+.skeleton-page {
+  animation: fade-in 200ms ease-out 120ms backwards;
+}
+
+.section-enter {
+  animation: fade-in 160ms ease-out backwards;
+}
+
+.menu-enter {
+  transform-origin: top right;
+  animation: menu-in 140ms var(--ease-out) backwards;
+}
+
+.skeleton-bone {
+  background: linear-gradient(90deg, #e7e5e0 0%, #efeee9 40%, #e7e5e0 80%);
+  background-size: 300% 100%;
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+/* Native <dialog>: fade the backdrop, lift the panel. */
+.app-dialog {
+  margin: auto;
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition:
+    opacity 160ms ease-out,
+    transform 180ms var(--ease-out),
+    overlay 180ms allow-discrete,
+    display 180ms allow-discrete;
+}
+
+.app-dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .app-dialog[open] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.app-dialog::backdrop {
+  background-color: rgb(12 10 9 / 0);
+  transition:
+    background-color 180ms ease-out,
+    overlay 180ms allow-discrete,
+    display 180ms allow-discrete;
+}
+
+.app-dialog[open]::backdrop {
+  background-color: rgb(12 10 9 / 0.45);
+}
+
+@starting-style {
+  .app-dialog[open]::backdrop {
+    background-color: rgb(12 10 9 / 0);
+  }
+}
+
+/* Tab strips scroll sideways on narrow screens without showing a scrollbar. */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile navigation panel slides open instead of popping in. */
+.collapse-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms var(--ease-out);
+}
+
+.collapse-panel[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+
+.collapse-panel > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/*
+ * Indonesian UI: the page is translated in the browser after hydration. Hide it
+ * for that first frame so English text never flashes before the translation.
+ * The inline script in the root layout sets the attribute; LanguageProvider
+ * removes it, and the script removes it anyway after a second as a safety net.
+ */
+html[data-i18n-pending] body {
+  visibility: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -54,5 +201,10 @@ p {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .skeleton-bone {
+    animation: none;
+    background: #e7e5e0;
   }
 }

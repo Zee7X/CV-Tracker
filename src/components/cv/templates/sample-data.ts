@@ -9,6 +9,7 @@ export const SAMPLE_CV: CVWithRelations = {
   name: 'Nadia Putri - Professional CV',
   template: 'modern',
   personal_info: {
+    document_language: 'en',
     full_name: 'Nadia Putri',
     professional_title: 'Project & Operations Coordinator',
     email: 'nadia.putri@example.com',
@@ -46,7 +47,7 @@ export const SAMPLE_CV: CVWithRelations = {
       end_date: null,
       is_current: true,
       description:
-        'Coordinate weekly operations across four branches and prepare performance reports for management. Redesigned the purchase-request workflow, reducing average processing time by 28% while improving documentation accuracy.',
+        '- Coordinate weekly operations across four branches and prepare performance reports for management.\n- Redesigned the purchase-request workflow, cutting average processing time by 28%.\n- Keep documentation accurate for audits and month-end reviews.',
       sort_order: 1,
     },
     {
@@ -59,7 +60,7 @@ export const SAMPLE_CV: CVWithRelations = {
       end_date: '2022-02',
       is_current: false,
       description:
-        'Handled customer cases across email, phone, and in-person channels, maintaining a 95% satisfaction score. Created a shared knowledge guide that shortened onboarding for new team members by two weeks.',
+        '- Handled customer cases across email, phone, and in-person channels with a 95% satisfaction score.\n- Wrote a shared knowledge guide that shortened onboarding for new team members by two weeks.',
       sort_order: 2,
     },
     {
@@ -146,6 +147,7 @@ export const EMPTY_CV: CVWithRelations = {
   name: 'Untitled CV',
   template: 'ats',
   personal_info: {
+    document_language: 'en',
     full_name: '',
     professional_title: '',
     email: '',
@@ -182,85 +184,4 @@ export function isEmptyCV(cv?: Partial<CVWithRelations> | null): boolean {
   const hasCerts = Boolean(cv.certifications && cv.certifications.length > 0)
 
   return !hasName && !hasEmail && !hasSummary && !hasExp && !hasEdu && !hasSkills && !hasProjects && !hasCerts
-}
-
-const MONTHS_ID = [
-  'Januari',
-  'Februari',
-  'Maret',
-  'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
-  'September',
-  'Oktober',
-  'November',
-  'Desember',
-]
-
-/**
- * Formats YYYY-MM-DD, YYYY-MM or YYYY string into readable date (e.g. 26 Maret 2000).
- */
-export function formatReadableDate(dateStr?: string | null): string {
-  if (!dateStr || typeof dateStr !== 'string') return ''
-  const trimmed = dateStr.trim()
-  if (!trimmed) return ''
-
-  // Format YYYY-MM-DD -> e.g. 26 Maret 2000
-  const ymdMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
-  if (ymdMatch) {
-    const year = ymdMatch[1]
-    const mIndex = parseInt(ymdMatch[2], 10) - 1
-    const day = parseInt(ymdMatch[3], 10)
-    if (mIndex >= 0 && mIndex < 12) {
-      return `${day} ${MONTHS_ID[mIndex]} ${year}`
-    }
-  }
-
-  // Format YYYY-MM -> e.g. Maret 2000
-  const ymMatch = /^(\d{4})-(\d{2})$/.exec(trimmed)
-  if (ymMatch) {
-    const year = ymMatch[1]
-    const mIndex = parseInt(ymMatch[2], 10) - 1
-    if (mIndex >= 0 && mIndex < 12) {
-      return `${MONTHS_ID[mIndex]} ${year}`
-    }
-  }
-
-  // Format YYYY
-  if (/^\d{4}$/.test(trimmed)) {
-    return trimmed
-  }
-
-  return trimmed
-}
-
-export const formatMonthYear = formatReadableDate
-
-/**
- * Formats start and end dates with Sekarang fallback.
- */
-export function formatDateRange(
-  startDate?: string | null,
-  endDate?: string | null,
-  isCurrent?: boolean
-): string {
-  const start = formatReadableDate(startDate)
-  if (isCurrent) {
-    return start ? `${start} – Sekarang` : 'Sekarang'
-  }
-  const end = formatReadableDate(endDate)
-  if (start && end) return `${start} – ${end}`
-  if (start) return start
-  if (end) return end
-  return ''
-}
-
-/**
- * Cleans a URL for display (stripping protocol and trailing slash).
- */
-export function formatDisplayUrl(url?: string | null): string {
-  if (!url) return ''
-  return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
 }

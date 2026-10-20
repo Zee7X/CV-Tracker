@@ -5,18 +5,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { CV } from '@/types/cv'
 import { duplicateCV, deleteCV } from '@/lib/cv/actions'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { DOCUMENT_LANGUAGES, resolveDocumentLanguage } from '@/lib/cv/document'
+import { TEMPLATE_NAMES } from '@/lib/format'
+import { LocalDate } from '@/components/i18n/local-date'
 import { Button } from '@/components/ui/button'
-import {
-  FileText,
-  Copy,
-  Trash2,
-  Edit3,
-  Calendar,
-  Loader2,
-  AlertCircle,
-} from 'lucide-react'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Loader2 } from 'lucide-react'
 
 interface CVCardProps {
   cv: CV
@@ -25,27 +19,23 @@ interface CVCardProps {
 export function CVCard({ cv }: CVCardProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [pendingAction, setPendingAction] = useState<'duplicate' | 'delete' | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  const handleDuplicate = () => {
+  const run = (
+    kind: 'duplicate' | 'delete',
+    action: () => Promise<{ success: boolean; error?: string }>,
+    fallback: string
+  ) => {
     setErrorMsg(null)
+    setPendingAction(kind)
     startTransition(async () => {
-      const res = await duplicateCV(cv.id)
+      const res = await action()
+      setPendingAction(null)
       if (!res.success) {
-        setErrorMsg(res.error || 'Failed to duplicate CV')
-        return
-      }
-      router.refresh()
-    })
-  }
-
-  const handleDelete = () => {
-    setErrorMsg(null)
-    startTransition(async () => {
-      const res = await deleteCV(cv.id)
-      if (!res.success) {
-        setErrorMsg(res.error || 'Failed to delete CV')
+        setShowDeleteConfirm(false)
+        setErrorMsg(res.error || fallback)
         return
       }
       setShowDeleteConfirm(false)
@@ -53,153 +43,86 @@ export function CVCard({ cv }: CVCardProps) {
     })
   }
 
-  const templateVariant =
-    cv.template === 'ats' ? 'default' : cv.template === 'modern' ? 'secondary' : 'outline'
-
-  const formattedDate = new Date(cv.updated_at).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
+  const info = cv.personal_info
+  const language = DOCUMENT_LANGUAGES.find((l) => l.id === resolveDocumentLanguage(info?.document_language))?.label
 
   return (
     <>
-      <Card className="flex flex-col justify-between border-stone-300 transition-colors hover:border-stone-500">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                <FileText className="h-5 w-5" />
-              </div>
-              <div>
-                <CardTitle className="line-clamp-1 text-base font-semibold text-slate-900">
-                  {cv.name}
-                </CardTitle>
-                <div className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
-                  <Calendar className="h-3.5 w-3.5" />
-                  <span>Updated {formattedDate}</span>
-                </div>
-              </div>
-            </div>
-            <Badge variant={templateVariant} className="capitalize">
-              {cv.template}
-            </Badge>
-          </div>
-        </CardHeader>
+      <article className="flex h-full flex-col rounded-lg border border-stone-300 bg-white transition-colors hover:border-stone-500">
+        <Link
+          href={`/dashboard/cv/${cv.id}`}
+          className="block flex-1 rounded-t-lg px-5 pb-4 pt-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-800"
+        >
+          <h2 className="line-clamp-2 text-base font-semibold text-stone-950" data-no-translate>
+            {cv.name}
+          </h2>
+          <p className="mt-1 text-xs text-stone-500">
+            <span data-no-translate>{TEMPLATE_NAMES[cv.template] ?? cv.template}</span>
+            <span aria-hidden="true"> · </span>
+            <span data-no-translate>{language}</span>
+            <span aria-hidden="true"> · </span>
+            <span>Edited</span> <LocalDate value={cv.updated_at} />
+          </p>
 
-        <CardContent className="space-y-3 pb-4">
-          {errorMsg && (
-            <div
-              role="alert"
-              className="flex items-center gap-1.5 rounded bg-red-50 p-2 text-xs text-red-700"
-            >
-              <AlertCircle className="h-4 w-4 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
-            <div className="font-medium text-slate-800">
-              {cv.personal_info?.full_name || 'No name provided'}
-            </div>
-            {cv.personal_info?.professional_title && (
-              <div className="text-slate-500">{cv.personal_info.professional_title}</div>
-            )}
-            {cv.personal_info?.email && (
-              <div className="mt-1 text-slate-500">{cv.personal_info.email}</div>
-            )}
+          <div className="mt-4 text-sm">
+            <p className="font-medium text-stone-900">{info?.full_name || 'No name yet'}</p>
+            {info?.professional_title ? <p className="text-stone-600">{info.professional_title}</p> : null}
           </div>
 
-          {cv.skills && cv.skills.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {cv.skills.slice(0, 3).map((skill, i) => (
-                <span
-                  key={i}
-                  className="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600"
-                >
-                  {skill}
-                </span>
-              ))}
-              {cv.skills.length > 3 && (
-                <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500">
-                  +{cv.skills.length - 3}
-                </span>
-              )}
-            </div>
-          )}
-        </CardContent>
+          {cv.skills && cv.skills.length > 0 ? (
+            <p className="mt-3 line-clamp-2 text-xs text-stone-500">{cv.skills.join(', ')}</p>
+          ) : null}
+        </Link>
 
-        <CardFooter className="flex items-center justify-between border-t border-slate-100 pt-3">
+        {errorMsg ? (
+          <p role="alert" className="mx-5 mb-3 rounded-md bg-red-50 px-3 py-2 text-xs text-red-800">
+            {errorMsg}
+          </p>
+        ) : null}
+
+        <div className="flex items-center gap-1 border-t border-stone-200 px-3 py-2">
           <Link
             href={`/dashboard/cv/${cv.id}`}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500"
+            className="rounded-md px-2.5 py-1.5 text-xs font-semibold text-blue-800 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800"
           >
-            <Edit3 className="h-3.5 w-3.5" />
-            Edit CV
+            Edit
           </Link>
-
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-slate-600 hover:text-slate-900"
-              onClick={handleDuplicate}
-              disabled={isPending}
-              aria-label={`Duplicate ${cv.name}`}
-            >
-              {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Copy className="h-3.5 w-3.5" />}
-              <span className="ml-1 text-xs">Copy</span>
-            </Button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 text-red-600 hover:bg-red-50 hover:text-red-700"
-              onClick={() => setShowDeleteConfirm(true)}
-              disabled={isPending}
-              aria-label={`Delete ${cv.name}`}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </CardFooter>
-      </Card>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
-        >
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-slate-900">Delete CV?</h3>
-            <p className="mt-2 text-sm text-slate-600">
-              Are you sure you want to delete <strong>{cv.name}</strong>? This action cannot be undone.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                className="bg-red-600 hover:bg-red-700"
-                onClick={handleDelete}
-                disabled={isPending}
-              >
-                {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Delete CV'}
-              </Button>
-            </div>
-          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => run('duplicate', () => duplicateCV(cv.id), 'Could not duplicate the CV.')}
+            disabled={isPending}
+            aria-label={`Duplicate ${cv.name}`}
+          >
+            {pendingAction === 'duplicate' ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : null}
+            Duplicate
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="ml-auto text-red-700 hover:bg-red-50 hover:text-red-800"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={isPending}
+            aria-label={`Delete ${cv.name}`}
+          >
+            Delete
+          </Button>
         </div>
-      )}
+      </article>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={() => run('delete', () => deleteCV(cv.id), 'Could not delete the CV.')}
+        title="Delete this CV?"
+        subject={cv.name}
+        confirmLabel="Delete CV"
+        pending={pendingAction === 'delete'}
+      >
+        The CV and all its sections are removed. Applications that used it are kept. This cannot be undone.
+      </ConfirmDialog>
     </>
   )
 }

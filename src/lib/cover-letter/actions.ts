@@ -44,7 +44,7 @@ export async function createCoverLetter(
   }
 
   const { data, error } = await supabase
-    .from('cover_letters' as any)
+    .from('cover_letters')
     .insert(payload)
     .select('id')
     .single()
@@ -59,14 +59,14 @@ export async function createCoverLetter(
       return {
         success: false,
         error:
-          'Tabel "public.cover_letters" belum dibuat di database Supabase. Silakan jalankan script SQL migrasi (20260921000002_cover_letters.sql) di Supabase Dashboard > SQL Editor.',
+          'The cover_letters table is missing in Supabase. Run supabase/migrations/20260921000002_cover_letters.sql in the Supabase SQL editor.',
       }
     }
     return { success: false, error: error.message }
   }
 
   revalidatePath('/dashboard/cover-letters')
-  return { success: true, id: (data as any)?.id }
+  return { success: true, id: data?.id }
 }
 
 export async function updateCoverLetter(
@@ -109,7 +109,7 @@ export async function updateCoverLetter(
   }
 
   const { error } = await supabase
-    .from('cover_letters' as any)
+    .from('cover_letters')
     .update(payload)
     .eq('id', id)
     .eq('user_id', user.id)
@@ -137,7 +137,7 @@ export async function deleteCoverLetter(
   }
 
   const { error } = await supabase
-    .from('cover_letters' as any)
+    .from('cover_letters')
     .delete()
     .eq('id', id)
     .eq('user_id', user.id)
@@ -164,7 +164,7 @@ export async function duplicateCoverLetter(
   }
 
   const { data: original, error: fetchError } = await supabase
-    .from('cover_letters' as any)
+    .from('cover_letters')
     .select('*')
     .eq('id', id)
     .eq('user_id', user.id)
@@ -196,7 +196,7 @@ export async function duplicateCoverLetter(
   }
 
   const { data, error: insertError } = await supabase
-    .from('cover_letters' as any)
+    .from('cover_letters')
     .insert(payload)
     .select('id')
     .single()
@@ -206,6 +206,6 @@ export async function duplicateCoverLetter(
   }
 
   revalidatePath('/dashboard/cover-letters')
-  return { success: true, id: (data as any)?.id }
+  return { success: true, id: data?.id }
 }
 

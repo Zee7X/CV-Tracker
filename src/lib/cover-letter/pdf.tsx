@@ -155,8 +155,8 @@ export function CoverLetterPDFDocument({
         {/* Subject */}
         <Text style={styles.subject}>
           {isEn
-            ? `Subject: Application for ${letter.job_title || 'Position'}`
-            : `Perihal: Permohonan Lamaran Kerja — ${letter.job_title || 'Posisi'}`}
+            ? `Subject: Application for ${letter.job_title || 'the position'}`
+            : `Perihal: Lamaran Pekerjaan sebagai ${letter.job_title || 'posisi'}`}
         </Text>
 
         {/* Opening Paragraph */}
@@ -167,11 +167,11 @@ export function CoverLetterPDFDocument({
         {/* Data Diri Box for Formal ID */}
         {isFormalId && (
           <View style={styles.personalSummaryBox}>
-            <Text style={{ fontFamily: 'Helvetica-Bold', marginBottom: 2 }}>Data Diri Singkat:</Text>
+            <Text style={{ fontFamily: 'Helvetica-Bold', marginBottom: 2 }}>Data diri</Text>
             <Text>Nama: {letter.sender_name || '-'}</Text>
             <Text>Email: {letter.sender_email || '-'}</Text>
             {letter.sender_phone ? <Text>Telepon: {letter.sender_phone}</Text> : null}
-            {letter.sender_location ? <Text>Lokasi: {letter.sender_location}</Text> : null}
+            {letter.sender_location ? <Text>Domisili: {letter.sender_location}</Text> : null}
           </View>
         )}
 

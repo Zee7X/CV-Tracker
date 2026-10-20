@@ -15,13 +15,13 @@ export function Field({ label, htmlFor, error, children, className }: FieldProps
     <div className={cn('flex flex-col gap-1.5', className)}>
       <label
         htmlFor={htmlFor}
-        className="text-sm font-medium text-slate-700"
+        className="text-sm font-medium text-stone-800"
       >
         {label}
       </label>
       {children}
       {error && (
-        <p id={`${htmlFor}-error`} role="alert" className="text-xs text-red-600">
+        <p id={`${htmlFor}-error`} role="alert" className="text-xs text-red-700">
           {error}
         </p>
       )}
@@ -40,7 +40,7 @@ export function AuthAlert({ kind, message }: AlertProps) {
     <div
       role="alert"
       className={cn(
-        'rounded-lg px-4 py-3 text-sm',
+        'rounded-md px-4 py-3 text-sm',
         kind === 'error'
           ? 'bg-red-50 text-red-700 border border-red-200'
           : 'border border-blue-200 bg-blue-50 text-blue-800'

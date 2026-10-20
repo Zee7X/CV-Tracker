@@ -15,7 +15,7 @@ export async function getUserCoverLetters(): Promise<CoverLetter[]> {
     if (!user) return []
 
     const { data, error } = await supabase
-      .from('cover_letters' as any)
+      .from('cover_letters')
       .select('*')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false })
@@ -45,7 +45,7 @@ export async function getCoverLetterById(id: string): Promise<CoverLetter | null
     if (!user) return null
 
     const { data, error } = await supabase
-      .from('cover_letters' as any)
+      .from('cover_letters')
       .select('*')
       .eq('id', id)
       .eq('user_id', user.id)

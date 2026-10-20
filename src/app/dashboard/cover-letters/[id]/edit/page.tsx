@@ -3,7 +3,6 @@ import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getCoverLetterById } from '@/lib/cover-letter/queries'
 import { getUserCVs } from '@/lib/cv/queries'
-import DashboardShell from '@/components/layout/dashboard-shell'
 import { CoverLetterForm } from '@/components/cover-letter/cover-letter-form'
 
 export const dynamic = 'force-dynamic'
@@ -50,13 +49,13 @@ export default async function EditCoverLetterPage({ params }: EditCoverLetterPag
   }
 
   return (
-    <DashboardShell>
+    <>
       <CoverLetterForm
         initialData={letter}
         availableCVs={cvs}
         userProfile={userProfile}
       />
-    </DashboardShell>
+    </>
   )
 }
 

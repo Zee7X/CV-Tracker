@@ -3,7 +3,6 @@ import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getApplicationById } from '../queries'
 import { getUserCVs } from '@/lib/cv/queries'
-import DashboardShell from '@/components/layout/dashboard-shell'
 import { ApplicationForm } from '@/components/applications/application-form'
 
 export const dynamic = 'force-dynamic'
@@ -33,10 +32,10 @@ export default async function ApplicationDetailPage({ params }: ApplicationDetai
   }
 
   return (
-    <DashboardShell>
-      <div className="mx-auto max-w-3xl">
+    <>
+      <div className="max-w-3xl">
         <ApplicationForm initialData={application} userCVs={cvs} />
       </div>
-    </DashboardShell>
+    </>
   )
 }

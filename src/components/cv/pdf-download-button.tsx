@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cvSchema } from '@/lib/validations/cv'
-import { useLanguage } from '@/components/i18n/language-provider'
 import type { CVWithRelations, CVTemplate } from '@/types/cv'
 
 interface PDFDownloadButtonProps {
@@ -13,6 +12,8 @@ interface PDFDownloadButtonProps {
   variant?: 'default' | 'outline' | 'secondary' | 'ghost'
   size?: 'default' | 'sm' | 'lg' | 'icon'
   className?: string
+  /** Called instead of showing the inline error, e.g. to jump to the invalid field. */
+  onInvalid?: () => void
 }
 
 export default function PDFDownloadButton({
@@ -21,66 +22,63 @@ export default function PDFDownloadButton({
   variant = 'default',
   size = 'default',
   className = '',
+  onInvalid,
 }: PDFDownloadButtonProps) {
-  const { language } = useLanguage()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<{ message: string; detail?: string } | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleDownload = async () => {
     if (loading) return
-    setLoading(true)
     setError(null)
 
+    const validation = cvSchema.safeParse(cv)
+    if (!validation.success) {
+      if (onInvalid) onInvalid()
+      else setError(validation.error.issues[0]?.message ?? 'Invalid CV data')
+      return
+    }
+
+    setLoading(true)
     try {
-      const validation = cvSchema.safeParse(cv)
-      if (!validation.success) {
-        setError({
-          message: 'Fix the highlighted form fields before downloading your CV.',
-          detail: validation.error.issues[0]?.message ?? 'Invalid CV data',
-        })
-        return
-      }
-
-      // Dynamic import to keep PDF renderer out of initial client bundle
-      const { generatePDF, getPDFFileName, createDownloadLink, triggerDownload } =
-        await import('@/lib/pdf/generator')
-
-      const blob = await generatePDF(cv, template, language)
-      const filename = getPDFFileName(cv)
-      const url = createDownloadLink(blob)
-      triggerDownload(url, filename)
+      // Loaded on demand so the PDF renderer stays out of the initial bundle.
+      // The PDF language comes from the CV itself, never from the app UI language.
+      const { generatePDF, getPDFFileName, createDownloadLink, triggerDownload } = await import('@/lib/pdf/generator')
+      const blob = await generatePDF(cv, template)
+      triggerDownload(createDownloadLink(blob), getPDFFileName(cv))
     } catch (err) {
       console.error('PDF generation error:', err)
-      setError({ message: 'Failed to generate PDF. Please try again.' })
+      setError('Could not create the PDF. Try again.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="inline-flex flex-col items-start">
+    <div className="relative inline-flex">
       <Button
         type="button"
         onClick={handleDownload}
         disabled={loading}
         variant={variant}
         size={size}
-        className={`gap-2 ${className}`}
+        className={className}
         aria-busy={loading}
       >
         {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
         ) : (
-          <Download className="h-4 w-4" />
+          <Download className="h-4 w-4" aria-hidden="true" />
         )}
-        <span>{loading ? 'Generating PDF...' : 'Download PDF'}</span>
+        <span>{loading ? 'Exporting...' : 'Download PDF'}</span>
       </Button>
-      {error && (
-        <div className="mt-2 max-w-xs text-xs font-medium text-red-700" role="alert">
-          <p>{error.message}</p>
-          {error.detail ? <p className="mt-0.5 font-normal">{error.detail}</p> : null}
-        </div>
-      )}
+      {error ? (
+        <p
+          role="alert"
+          className="absolute right-0 top-full z-10 mt-1.5 w-64 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800"
+        >
+          {error}
+        </p>
+      ) : null}
     </div>
   )
 }

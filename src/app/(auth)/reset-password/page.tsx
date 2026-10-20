@@ -12,10 +12,10 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="rounded-lg border border-stone-300 bg-[#fffefa] p-8">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold text-slate-900">Set a new password</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Choose a strong password for your account
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-stone-950">Set a new password</h1>
+        <p className="mt-1 text-sm text-stone-600">
+          Use at least 8 characters.
         </p>
       </div>
 

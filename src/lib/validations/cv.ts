@@ -101,6 +101,7 @@ function validateDateRange(
 }
 
 export const personalInfoSchema = z.object({
+  document_language: z.enum(['en', 'id']).default('en'),
   full_name: requiredText('Full name', 2, 100),
   professional_title: optionalText('Professional title', 2, 100),
   email: z.string().trim().email('Please enter a valid email address').max(254, 'Email address is too long'),

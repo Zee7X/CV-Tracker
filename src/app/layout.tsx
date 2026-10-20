@@ -28,13 +28,22 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title, description },
 }
 
+// Runs before the first paint. When the saved UI language is Indonesian, the
+// page is hidden until LanguageProvider has translated it (see globals.css).
+const LANGUAGE_BOOT_SCRIPT = `(function(){try{var s=localStorage.getItem('cv-tracker-language');var id=s?s==='id':(navigator.language||'').toLowerCase().indexOf('id')===0;if(id){var d=document.documentElement;d.lang='id';d.setAttribute('data-i18n-pending','');setTimeout(function(){d.removeAttribute('data-i18n-pending')},1000)}}catch(e){}})()`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
+      // Lets Next turn smooth scrolling off during route changes so a new page starts at the top instantly.
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: LANGUAGE_BOOT_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         <LanguageProvider>{children}</LanguageProvider>
       </body>

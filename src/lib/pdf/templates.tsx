@@ -5,1196 +5,647 @@ import {
   Text,
   View,
   Link,
-  Image,
+  Image as PDFImage,
   StyleSheet,
   Font,
   type DocumentProps,
 } from '@react-pdf/renderer'
-import type { CVWithRelations, CVTemplate } from '@/types/cv'
+import type { CVTemplate, CVWithRelations, DocumentLanguage } from '@/types/cv'
+import {
+  buildCVDocument,
+  educationHeading,
+  formatDateRange,
+  formatDisplayUrl,
+  formatMonthYear,
+  parseDescription,
+  type CVDocument,
+  type SectionKey,
+} from '@/lib/cv/document'
 
-// Disable automatic hyphenation to prevent word breaks across lines and avoid CJS packaging issues
+// Keep words whole; hyphenation also pulls in a CJS dependency we patch around.
 Font.registerHyphenationCallback((word) => [word])
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// Sizes mirror the HTML preview at 96dpi (1px = 0.75pt, 1mm = 2.835pt) so the
+// preview and the downloaded PDF look like the same document.
+const mm = (value: number) => value * 2.835
 
-function formatUrlDisplay(url?: string | null): string {
-  if (!url) return ''
-  return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
+type Styles = ReturnType<typeof StyleSheet.create>
+
+function DescriptionPDF({ text, styles }: { text?: string | null; styles: Styles }) {
+  const blocks = parseDescription(text)
+  if (blocks.length === 0) return null
+  return (
+    <View style={styles.description}>
+      {blocks.map((block, idx) =>
+        block.type === 'list' ? (
+          <View key={idx}>
+            {block.items.map((item, itemIdx) => (
+              <View key={itemIdx} style={styles.bulletRow}>
+                <Text style={styles.bulletMark}>•</Text>
+                <Text style={styles.bulletText}>{item}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text key={idx} style={styles.paragraph}>
+            {block.text}
+          </Text>
+        )
+      )}
+    </View>
+  )
 }
 
-const MONTHS_ID = [
-  'Januari',
-  'Februari',
-  'Maret',
-  'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
-  'September',
-  'Oktober',
-  'November',
-  'Desember',
-]
-
-const MONTHS_EN = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
-
-export const PDF_LABELS = {
-  id: {
-    summary: 'Ringkasan Profesional',
-    executiveSummary: 'Ringkasan Eksekutif',
-    experience: 'Pengalaman Kerja',
-    education: 'Pendidikan',
-    skills: 'Keahlian',
-    keySkills: 'Keahlian Utama',
-    projects: 'Proyek',
-    certifications: 'Sertifikasi',
-    contact: 'Kontak',
-    aboutMe: 'Tentang Saya',
-    present: 'Sekarang',
-    pageOf: (p: number, t: number) => `Halaman ${p} dari ${t}`,
-  },
-  en: {
-    summary: 'Professional Summary',
-    executiveSummary: 'Executive Summary',
-    experience: 'Experience',
-    education: 'Education',
-    skills: 'Skills',
-    keySkills: 'Key Skills',
-    projects: 'Projects',
-    certifications: 'Certifications',
-    contact: 'Contact',
-    aboutMe: 'About Me',
-    present: 'Present',
-    pageOf: (p: number, t: number) => `Page ${p} of ${t}`,
-  },
-} as const
-
-function formatDate(value?: string | null, language: 'id' | 'en' = 'id'): string {
-  if (!value) return ''
-  const trimmed = value.trim()
-  if (!trimmed) return ''
-  const months = language === 'en' ? MONTHS_EN : MONTHS_ID
-
-  // Format YYYY-MM-DD -> e.g. 26 Maret 2000 or 26 March 2000
-  const ymdMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
-  if (ymdMatch) {
-    const year = ymdMatch[1]
-    const mIndex = parseInt(ymdMatch[2], 10) - 1
-    const day = parseInt(ymdMatch[3], 10)
-    if (mIndex >= 0 && mIndex < 12) {
-      return `${day} ${months[mIndex]} ${year}`
-    }
-  }
-
-  // Format YYYY-MM -> e.g. Maret 2000 or March 2000
-  const ymMatch = /^(\d{4})-(\d{2})$/.exec(trimmed)
-  if (ymMatch) {
-    const year = ymMatch[1]
-    const mIndex = parseInt(ymMatch[2], 10) - 1
-    if (mIndex >= 0 && mIndex < 12) {
-      return `${months[mIndex]} ${year}`
-    }
-  }
-
-  // Format YYYY
-  if (/^\d{4}$/.test(trimmed)) {
-    return trimmed
-  }
-
-  return trimmed
+function PageNumber({ doc, style }: { doc: CVDocument; style: Styles[string] }) {
+  return (
+    <Text
+      style={style}
+      fixed
+      render={({ pageNumber, totalPages }) => (totalPages > 1 ? doc.labels.pageOf(pageNumber, totalPages) : '')}
+    />
+  )
 }
 
-function formatDateRange(
-  start?: string | null,
-  end?: string | null,
-  isCurrent?: boolean,
-  language: 'id' | 'en' = 'id'
-): string {
-  if (!start && !end) return ''
-  const startLabel = formatDate(start, language)
-  const endLabel = formatDate(end, language)
-  const presentLabel = language === 'en' ? 'Present' : 'Sekarang'
-  if (isCurrent) {
-    return startLabel ? `${startLabel} – ${presentLabel}` : presentLabel
-  }
-  if (startLabel && endLabel) return `${startLabel} – ${endLabel}`
-  return startLabel || endLabel
+function documentMeta(doc: CVDocument) {
+  return { title: `${doc.name || 'CV'} - CV`, author: doc.name || undefined, language: doc.language }
 }
 
-// ── 1. ATS Template (Monochrome, Single Column, High ATS Parseability) ────────
+// ── ATS Clean ────────────────────────────────────────────────────────────────
 
-const atsStyles = StyleSheet.create({
+const ats = StyleSheet.create({
   page: {
-    padding: 36,
-    fontSize: 9.5,
+    paddingHorizontal: mm(18),
+    paddingVertical: mm(16),
     fontFamily: 'Helvetica',
+    fontSize: 9,
     lineHeight: 1.35,
-    color: '#111827',
-    backgroundColor: '#ffffff',
+    color: '#262626',
   },
-  header: {
-    marginBottom: 8,
-    textAlign: 'center',
-    alignItems: 'center',
-  },
-  name: {
-    fontSize: 20,
+  name: { fontFamily: 'Helvetica-Bold', fontSize: 18, lineHeight: 1.2, color: '#0a0a0a' },
+  title: { fontSize: 9.75, marginTop: 2, color: '#262626' },
+  contacts: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 5, fontSize: 8.6, color: '#404040' },
+  contactSep: { marginHorizontal: 4, color: '#404040' },
+  contactLink: { color: '#404040', textDecoration: 'none' },
+  header: { marginBottom: 12 },
+  section: { marginBottom: 12 },
+  heading: {
     fontFamily: 'Helvetica-Bold',
-    textTransform: 'uppercase',
+    fontSize: 8.6,
     letterSpacing: 0.5,
-    lineHeight: 1.15,
-    color: '#111827',
-  },
-  title: {
-    fontSize: 10.5,
-    fontFamily: 'Helvetica',
-    color: '#374151',
     textTransform: 'uppercase',
-    lineHeight: 1.25,
-    marginTop: 5,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    marginTop: 7,
-  },
-  contactItem: {
-    fontSize: 8.5,
-    color: '#4b5563',
-    marginHorizontal: 3,
-  },
-  contactLink: {
-    fontSize: 8.5,
-    color: '#111827',
-    textDecoration: 'none',
-  },
-  bullet: {
-    fontSize: 8.5,
-    color: '#9ca3af',
-  },
-  headerDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#111827',
-    marginTop: 8,
-    marginBottom: 5,
-  },
-  section: {
-    marginTop: 8,
-    marginBottom: 3,
-  },
-  sectionTitle: {
-    fontSize: 10,
-    fontFamily: 'Helvetica-Bold',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    color: '#111827',
+    color: '#0a0a0a',
     borderBottomWidth: 0.75,
-    borderBottomColor: '#6b7280',
+    borderBottomColor: '#262626',
     paddingBottom: 1.5,
-    marginBottom: 4,
-  },
-  entry: {
     marginBottom: 5,
   },
-  entryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-  },
-  entryTitle: {
-    fontSize: 9.5,
-    fontFamily: 'Helvetica-Bold',
-    color: '#111827',
-    flexGrow: 1,
-    flexShrink: 1,
-    paddingRight: 8,
-  },
-  entryDate: {
-    fontSize: 8.5,
-    color: '#4b5563',
-    flexShrink: 0,
-    marginLeft: 8,
-    textAlign: 'right',
-  },
-  entrySubheader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginTop: 1,
-  },
-  entryCompany: {
-    fontSize: 8.5,
-    fontFamily: 'Helvetica-Oblique',
-    color: '#374151',
-    flexGrow: 1,
-    flexShrink: 1,
-    paddingRight: 8,
-  },
-  entryLocation: {
-    fontSize: 8.5,
-    color: '#6b7280',
-    flexShrink: 0,
-    marginLeft: 8,
-    textAlign: 'right',
-  },
-  entryText: {
-    fontSize: 8.5,
-    color: '#374151',
-    lineHeight: 1.35,
-    marginTop: 2,
-  },
-  skillsText: {
-    fontSize: 8.5,
-    color: '#374151',
-    lineHeight: 1.4,
-  },
-  link: {
-    color: '#111827',
-    textDecoration: 'none',
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 16,
-    left: 36,
-    right: 36,
-    textAlign: 'center',
-    fontSize: 8,
-    color: '#9ca3af',
-  },
+  entry: { marginBottom: 8 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  strong: { fontFamily: 'Helvetica-Bold', color: '#0a0a0a', flexShrink: 1, paddingRight: 10 },
+  grow: { flexShrink: 1, paddingRight: 10 },
+  date: { flexShrink: 0, textAlign: 'right' },
+  muted: { flexShrink: 0, textAlign: 'right', color: '#404040' },
+  link: { color: '#404040', textDecoration: 'none' },
+  description: { marginTop: 3 },
+  paragraph: { fontSize: 9, marginBottom: 2, lineHeight: 1.45 },
+  bulletRow: { flexDirection: 'row', marginBottom: 1.5 },
+  bulletMark: { fontSize: 9, width: 9, lineHeight: 1.45 },
+  bulletText: { fontSize: 9, flex: 1, lineHeight: 1.45 },
+  body: { fontSize: 9, lineHeight: 1.5 },
+  footer: { position: 'absolute', bottom: mm(8), left: 0, right: 0, textAlign: 'center', fontSize: 7.5, color: '#737373' },
 })
 
-export function AtsPDFDocument({
-  cv,
-  language = 'id',
-}: {
-  cv: CVWithRelations
-  language?: 'id' | 'en'
-}) {
-  const info = cv.personal_info || {}
-  const experiences = [...(cv.experiences || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const educations = [...(cv.educations || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const projects = [...(cv.projects || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const certifications = [...(cv.certifications || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const skills = (cv.skills || []).filter(Boolean)
-  const labels = PDF_LABELS[language] || PDF_LABELS.id
+function AtsSection({ doc, section }: { doc: CVDocument; section: SectionKey }) {
+  const { labels, language } = doc
+  const heading = (text: string) => (
+    <Text style={ats.heading} minPresenceAhead={30}>
+      {text}
+    </Text>
+  )
+  switch (section) {
+    case 'summary':
+      return (
+        <View style={ats.section}>
+          {heading(labels.summary)}
+          <Text style={ats.body}>{doc.summary}</Text>
+        </View>
+      )
+    case 'skills':
+      return (
+        <View style={ats.section}>
+          {heading(labels.skills)}
+          <Text style={ats.body}>{doc.skills.join(', ')}</Text>
+        </View>
+      )
+    case 'experience':
+      return (
+        <View style={ats.section}>
+          {heading(labels.experience)}
+          {doc.experiences.map((exp, idx) => (
+            <View key={exp.id || idx} style={ats.entry} wrap={false}>
+              <View style={ats.row}>
+                <Text style={ats.strong}>{exp.position}</Text>
+                <Text style={ats.date}>{formatDateRange(exp.start_date, exp.end_date, exp.is_current, language)}</Text>
+              </View>
+              <View style={ats.row}>
+                <Text style={ats.grow}>{exp.company}</Text>
+                {exp.location ? <Text style={ats.muted}>{exp.location}</Text> : null}
+              </View>
+              <DescriptionPDF text={exp.description} styles={ats} />
+            </View>
+          ))}
+        </View>
+      )
+    case 'projects':
+      return (
+        <View style={ats.section}>
+          {heading(labels.projects)}
+          {doc.projects.map((proj, idx) => (
+            <View key={proj.id || idx} style={ats.entry} wrap={false}>
+              <View style={ats.row}>
+                <Text style={ats.strong}>{proj.name}</Text>
+                <Text style={ats.date}>{formatDateRange(proj.start_date, proj.end_date, false, language)}</Text>
+              </View>
+              {proj.project_url ? (
+                <Link src={proj.project_url} style={ats.link}>
+                  {formatDisplayUrl(proj.project_url)}
+                </Link>
+              ) : null}
+              <DescriptionPDF text={proj.description} styles={ats} />
+            </View>
+          ))}
+        </View>
+      )
+    case 'education':
+      return (
+        <View style={ats.section}>
+          {heading(labels.education)}
+          {doc.educations.map((edu, idx) => (
+            <View key={edu.id || idx} style={ats.entry} wrap={false}>
+              <View style={ats.row}>
+                <Text style={ats.strong}>{edu.institution}</Text>
+                <Text style={ats.date}>{formatDateRange(edu.start_date, edu.end_date, false, language)}</Text>
+              </View>
+              {educationHeading(edu) ? <Text>{educationHeading(edu)}</Text> : null}
+              <DescriptionPDF text={edu.description} styles={ats} />
+            </View>
+          ))}
+        </View>
+      )
+    case 'certifications':
+      return (
+        <View style={ats.section}>
+          {heading(labels.certifications)}
+          {doc.certifications.map((cert, idx) => (
+            <View key={cert.id || idx} style={[ats.row, { marginBottom: 3 }]} wrap={false}>
+              <Text style={ats.grow}>
+                <Text style={{ fontFamily: 'Helvetica-Bold', color: '#0a0a0a' }}>{cert.name}</Text>
+                {cert.issuer ? `, ${cert.issuer}` : ''}
+                {cert.credential_url ? ' (' : ''}
+                {cert.credential_url ? (
+                  <Link src={cert.credential_url} style={ats.link}>
+                    {labels.credential}
+                  </Link>
+                ) : null}
+                {cert.credential_url ? ')' : ''}
+              </Text>
+              {cert.issue_date ? <Text style={ats.date}>{formatMonthYear(cert.issue_date, language)}</Text> : null}
+            </View>
+          ))}
+        </View>
+      )
+  }
+}
 
-  const contactItems: { label: string; href?: string; prefix?: string }[] = []
-  if (info.phone) contactItems.push({ label: info.phone, href: `tel:${info.phone}` })
-  if (info.email) contactItems.push({ label: info.email, href: `mailto:${info.email}` })
-  if (info.location) contactItems.push({ label: info.location })
-  if (info.linkedin) contactItems.push({ label: `LinkedIn: ${formatUrlDisplay(info.linkedin)}`, href: info.linkedin })
-  if (info.github) contactItems.push({ label: `GitHub: ${formatUrlDisplay(info.github)}`, href: info.github })
-  if (info.portfolio) contactItems.push({ label: formatUrlDisplay(info.portfolio), href: info.portfolio })
-
+export function AtsPDFDocument({ cv, language }: { cv: CVWithRelations; language?: DocumentLanguage }) {
+  const doc = buildCVDocument(cv, { language, template: 'ats' })
   return (
-    <Document title={`${info.full_name || cv.name || 'CV'} - ATS Resume`} author={info.full_name || 'CV Tracker'}>
-      <Page size="A4" style={atsStyles.page} wrap>
-        {/* Header */}
-        <View style={atsStyles.header}>
-          <Text style={atsStyles.name}>{info.full_name || cv.name || 'Candidate Name'}</Text>
-          {info.professional_title ? <Text style={atsStyles.title}>{info.professional_title}</Text> : null}
-          {contactItems.length > 0 && (
-            <View style={atsStyles.contactRow}>
-              {contactItems.map((item, idx) => (
-                <React.Fragment key={idx}>
-                  {idx > 0 && <Text style={atsStyles.bullet}> • </Text>}
+    <Document {...documentMeta(doc)}>
+      <Page size="A4" style={ats.page} wrap>
+        <View style={ats.header}>
+          <Text style={ats.name}>{doc.name}</Text>
+          {doc.title ? <Text style={ats.title}>{doc.title}</Text> : null}
+          {doc.contacts.length > 0 ? (
+            <View style={ats.contacts}>
+              {doc.contacts.map((item, idx) => (
+                <React.Fragment key={item.key}>
+                  {idx > 0 ? <Text style={ats.contactSep}>|</Text> : null}
                   {item.href ? (
-                    <Link src={item.href} style={atsStyles.contactLink}>
-                      {item.label}
+                    <Link src={item.href} style={ats.contactLink}>
+                      {item.value}
                     </Link>
                   ) : (
-                    <Text style={atsStyles.contactItem}>{item.label}</Text>
+                    <Text>{item.value}</Text>
                   )}
                 </React.Fragment>
               ))}
             </View>
-          )}
+          ) : null}
         </View>
-        <View style={atsStyles.headerDivider} />
-
-        {/* Summary */}
-        {cv.summary ? (
-          <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>{labels.summary}</Text>
-            <Text style={atsStyles.entryText}>{cv.summary}</Text>
-          </View>
-        ) : null}
-
-        {/* Experience */}
-        {experiences.length > 0 && (
-          <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>{labels.experience}</Text>
-            {experiences.map((exp, idx) => {
-              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current, language)
-              return (
-                <View key={exp.id || idx} style={atsStyles.entry} wrap={false}>
-                  <View style={atsStyles.entryHeader}>
-                    <Text style={atsStyles.entryTitle}>{exp.position}</Text>
-                    {dateStr ? <Text style={atsStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  <View style={atsStyles.entrySubheader}>
-                    <Text style={atsStyles.entryCompany}>{exp.company}</Text>
-                    {exp.location ? <Text style={atsStyles.entryLocation}>{exp.location}</Text> : null}
-                  </View>
-                  {exp.description ? <Text style={atsStyles.entryText}>{exp.description}</Text> : null}
-                </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Education */}
-        {educations.length > 0 && (
-          <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>{labels.education}</Text>
-            {educations.map((edu, idx) => {
-              const dateStr = formatDateRange(edu.start_date, edu.end_date, false, language)
-              const degreeField = [edu.degree, edu.field_of_study].filter(Boolean).join(' in ')
-              return (
-                <View key={edu.id || idx} style={atsStyles.entry} wrap={false}>
-                  <View style={atsStyles.entryHeader}>
-                    <Text style={atsStyles.entryTitle}>{edu.institution}</Text>
-                    {dateStr ? <Text style={atsStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  {degreeField ? (
-                    <View style={atsStyles.entrySubheader}>
-                      <Text style={atsStyles.entryCompany}>{degreeField}</Text>
-                    </View>
-                  ) : null}
-                  {edu.description ? <Text style={atsStyles.entryText}>{edu.description}</Text> : null}
-                </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Skills */}
-        {skills.length > 0 && (
-          <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>{labels.skills}</Text>
-            <Text style={atsStyles.skillsText}>{skills.join(' • ')}</Text>
-          </View>
-        )}
-
-        {/* Projects */}
-        {projects.length > 0 && (
-          <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>{labels.projects}</Text>
-            {projects.map((proj, idx) => {
-              const dateStr = formatDateRange(proj.start_date, proj.end_date, false, language)
-              return (
-                <View key={proj.id || idx} style={atsStyles.entry} wrap={false}>
-                  <View style={atsStyles.entryHeader}>
-                    {proj.project_url ? (
-                      <Link src={proj.project_url} style={atsStyles.link}>
-                        <Text style={atsStyles.entryTitle}>{proj.name}</Text>
-                      </Link>
-                    ) : (
-                      <Text style={atsStyles.entryTitle}>{proj.name}</Text>
-                    )}
-                    {dateStr ? <Text style={atsStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  {proj.description ? <Text style={atsStyles.entryText}>{proj.description}</Text> : null}
-                </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Certifications */}
-        {certifications.length > 0 && (
-          <View style={atsStyles.section}>
-            <Text style={atsStyles.sectionTitle}>{labels.certifications}</Text>
-            {certifications.map((cert, idx) => (
-              <View key={cert.id || idx} style={atsStyles.entry} wrap={false}>
-                <View style={atsStyles.entryHeader}>
-                  {cert.credential_url ? (
-                    <Link src={cert.credential_url} style={atsStyles.link}>
-                      <Text style={atsStyles.entryTitle}>{cert.name}</Text>
-                    </Link>
-                  ) : (
-                    <Text style={atsStyles.entryTitle}>{cert.name}</Text>
-                  )}
-                  {cert.issue_date ? <Text style={atsStyles.entryDate}>{formatDate(cert.issue_date, language)}</Text> : null}
-                </View>
-                {cert.issuer ? (
-                  <View style={atsStyles.entrySubheader}>
-                    <Text style={atsStyles.entryCompany}>{cert.issuer}</Text>
-                  </View>
-                ) : null}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Multi-page footer */}
-        <Text
-          style={atsStyles.footer}
-          render={({ pageNumber, totalPages }) => (totalPages > 1 ? labels.pageOf(pageNumber, totalPages) : '')}
-          fixed
-        />
+        {doc.sections.map((section) => (
+          <AtsSection key={section} doc={doc} section={section} />
+        ))}
+        <PageNumber doc={doc} style={ats.footer} />
       </Page>
     </Document>
   )
 }
 
-// ── 2. Professional Template (Navy/Slate, Executive Theme, Pill Badges) ───────
+// ── Professional ─────────────────────────────────────────────────────────────
 
-const profStyles = StyleSheet.create({
+const NAVY = '#1f3a5f'
+
+const prof = StyleSheet.create({
   page: {
-    padding: 32,
-    fontSize: 9,
+    paddingHorizontal: mm(17),
+    paddingVertical: mm(15),
     fontFamily: 'Helvetica',
+    fontSize: 8.6,
     lineHeight: 1.35,
-    color: '#334155',
-    backgroundColor: '#ffffff',
-  },
-  accentBar: {
-    height: 4,
-    backgroundColor: '#1e40af',
-    marginBottom: 8,
-  },
-  header: {
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-    paddingBottom: 8,
-  },
-  name: {
-    fontSize: 20,
-    fontFamily: 'Helvetica-Bold',
-    color: '#0f172a',
-    letterSpacing: -0.2,
-    lineHeight: 1.15,
-  },
-  title: {
-    fontSize: 10.5,
-    fontFamily: 'Helvetica-Bold',
-    color: '#1e40af',
-    lineHeight: 1.25,
-    marginTop: 5,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 6,
-    alignItems: 'center',
-  },
-  contactItem: {
-    fontSize: 8.5,
-    color: '#475569',
-    marginRight: 10,
-    marginVertical: 1,
-  },
-  contactLink: {
-    fontSize: 8.5,
-    color: '#1e40af',
-    textDecoration: 'none',
-    marginRight: 10,
-    marginVertical: 1,
-  },
-  section: {
-    marginTop: 7,
-    marginBottom: 3,
-  },
-  sectionTitle: {
-    fontSize: 10.5,
-    fontFamily: 'Helvetica-Bold',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    color: '#1e40af',
-    borderBottomWidth: 1.5,
-    borderBottomColor: '#1e40af',
-    paddingBottom: 2,
-    marginBottom: 5,
-  },
-  entry: {
-    marginBottom: 6,
-  },
-  entryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-  },
-  entryTitle: {
-    fontSize: 9.5,
-    fontFamily: 'Helvetica-Bold',
-    color: '#0f172a',
-    flexGrow: 1,
-    flexShrink: 1,
-    paddingRight: 8,
-  },
-  entryDate: {
-    fontSize: 8.5,
-    color: '#64748b',
-    flexShrink: 0,
-    marginLeft: 8,
-    textAlign: 'right',
-  },
-  entrySubheader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginTop: 1,
-  },
-  entryCompany: {
-    fontSize: 8.5,
-    fontFamily: 'Helvetica-Bold',
-    color: '#334155',
-    flexGrow: 1,
-    flexShrink: 1,
-    paddingRight: 8,
-  },
-  entryLocation: {
-    fontSize: 8.5,
-    color: '#64748b',
-    flexShrink: 0,
-    marginLeft: 8,
-    textAlign: 'right',
-  },
-  entryText: {
-    fontSize: 8.5,
-    color: '#334155',
-    lineHeight: 1.35,
-    marginTop: 2,
-  },
-  skillsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  skillPill: {
-    backgroundColor: '#f1f5f9',
-    borderWidth: 0.5,
-    borderColor: '#cbd5e1',
-    borderRadius: 3,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    marginRight: 4,
-    marginBottom: 4,
-  },
-  skillText: {
-    fontSize: 8,
-    fontFamily: 'Helvetica-Bold',
     color: '#1e293b',
   },
-  link: {
-    color: '#1e40af',
-    textDecoration: 'none',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    borderBottomWidth: 1.5,
+    borderBottomColor: NAVY,
+    paddingBottom: 8,
+    marginBottom: 10,
   },
-  footer: {
-    position: 'absolute',
-    bottom: 16,
-    left: 32,
-    right: 32,
-    textAlign: 'center',
-    fontSize: 8,
-    color: '#94a3b8',
+  headerMain: { flexShrink: 1, paddingRight: 16 },
+  name: { fontFamily: 'Times-Bold', fontSize: 21, lineHeight: 1.1, color: '#020617' },
+  title: { fontFamily: 'Helvetica-Bold', fontSize: 9.75, color: NAVY, marginTop: 4 },
+  contacts: { flexShrink: 0, maxWidth: mm(70), alignItems: 'flex-end', fontSize: 8.25, color: '#334155' },
+  contactLink: { color: '#334155', textDecoration: 'none' },
+  section: {
+    flexDirection: 'row',
+    borderTopWidth: 0.75,
+    borderTopColor: '#cbd5e1',
+    paddingTop: 8,
+    marginBottom: 8,
   },
+  label: {
+    width: mm(34),
+    marginRight: mm(6),
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 7.9,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: NAVY,
+  },
+  content: { flex: 1 },
+  entry: { marginBottom: 9 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  strong: { fontFamily: 'Helvetica-Bold', color: '#020617', flexShrink: 1, paddingRight: 10 },
+  date: { flexShrink: 0, fontSize: 8.25, color: '#475569', textAlign: 'right' },
+  company: { fontFamily: 'Helvetica-Bold', color: NAVY },
+  sub: { color: '#334155' },
+  link: { fontSize: 8.25, color: NAVY, textDecoration: 'none' },
+  body: { fontSize: 8.6, lineHeight: 1.55 },
+  description: { marginTop: 3 },
+  paragraph: { fontSize: 8.6, marginBottom: 2, lineHeight: 1.5 },
+  bulletRow: { flexDirection: 'row', marginBottom: 1.5 },
+  bulletMark: { fontSize: 8.6, width: 9, lineHeight: 1.5 },
+  bulletText: { fontSize: 8.6, flex: 1, lineHeight: 1.5 },
+  footer: { position: 'absolute', bottom: mm(8), left: 0, right: 0, textAlign: 'center', fontSize: 7.5, color: '#94a3b8' },
 })
 
-export function ProfessionalPDFDocument({
-  cv,
-  language = 'id',
-}: {
-  cv: CVWithRelations
-  language?: 'id' | 'en'
-}) {
-  const info = cv.personal_info || {}
-  const experiences = [...(cv.experiences || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const educations = [...(cv.educations || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const projects = [...(cv.projects || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const certifications = [...(cv.certifications || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const skills = (cv.skills || []).filter(Boolean)
-  const labels = PDF_LABELS[language] || PDF_LABELS.id
+function ProfessionalSection({ doc, section }: { doc: CVDocument; section: SectionKey }) {
+  const { labels, language } = doc
+  const wrapRow = (label: string, children: React.ReactNode) => (
+    <View style={prof.section} minPresenceAhead={30}>
+      <Text style={prof.label}>{label}</Text>
+      <View style={prof.content}>{children}</View>
+    </View>
+  )
+  switch (section) {
+    case 'summary':
+      return wrapRow(labels.summary, <Text style={prof.body}>{doc.summary}</Text>)
+    case 'skills':
+      // One box per skill: a joined string lets the line breaker split at the separator and insert hyphens.
+      return wrapRow(
+        labels.skills,
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {doc.skills.map((skill, idx) => (
+            <Text key={skill} style={prof.body}>
+              {skill}
+              {idx < doc.skills.length - 1 ? '  ·  ' : ''}
+            </Text>
+          ))}
+        </View>
+      )
+    case 'experience':
+      return wrapRow(
+        labels.experience,
+        doc.experiences.map((exp, idx) => (
+          <View key={exp.id || idx} style={prof.entry} wrap={false}>
+            <View style={prof.row}>
+              <Text style={prof.strong}>{exp.position}</Text>
+              <Text style={prof.date}>{formatDateRange(exp.start_date, exp.end_date, exp.is_current, language)}</Text>
+            </View>
+            <Text style={prof.sub}>
+              <Text style={prof.company}>{exp.company}</Text>
+              {exp.location ? `, ${exp.location}` : ''}
+            </Text>
+            <DescriptionPDF text={exp.description} styles={prof} />
+          </View>
+        ))
+      )
+    case 'projects':
+      return wrapRow(
+        labels.projects,
+        doc.projects.map((proj, idx) => (
+          <View key={proj.id || idx} style={prof.entry} wrap={false}>
+            <View style={prof.row}>
+              <Text style={prof.strong}>{proj.name}</Text>
+              <Text style={prof.date}>{formatDateRange(proj.start_date, proj.end_date, false, language)}</Text>
+            </View>
+            {proj.project_url ? (
+              <Link src={proj.project_url} style={prof.link}>
+                {formatDisplayUrl(proj.project_url)}
+              </Link>
+            ) : null}
+            <DescriptionPDF text={proj.description} styles={prof} />
+          </View>
+        ))
+      )
+    case 'education':
+      return wrapRow(
+        labels.education,
+        doc.educations.map((edu, idx) => (
+          <View key={edu.id || idx} style={prof.entry} wrap={false}>
+            <View style={prof.row}>
+              <Text style={prof.strong}>{edu.institution}</Text>
+              <Text style={prof.date}>{formatDateRange(edu.start_date, edu.end_date, false, language)}</Text>
+            </View>
+            {educationHeading(edu) ? <Text style={prof.sub}>{educationHeading(edu)}</Text> : null}
+            <DescriptionPDF text={edu.description} styles={prof} />
+          </View>
+        ))
+      )
+    case 'certifications':
+      return wrapRow(
+        labels.certifications,
+        doc.certifications.map((cert, idx) => (
+          <View key={cert.id || idx} style={[prof.row, { marginBottom: 3 }]} wrap={false}>
+            <Text style={{ flexShrink: 1, paddingRight: 10 }}>
+              {cert.credential_url ? (
+                <Link src={cert.credential_url} style={{ fontFamily: 'Helvetica-Bold', color: '#020617', textDecoration: 'none' }}>
+                  {cert.name}
+                </Link>
+              ) : (
+                <Text style={{ fontFamily: 'Helvetica-Bold', color: '#020617' }}>{cert.name}</Text>
+              )}
+              {cert.issuer ? `, ${cert.issuer}` : ''}
+            </Text>
+            {cert.issue_date ? <Text style={prof.date}>{formatMonthYear(cert.issue_date, language)}</Text> : null}
+          </View>
+        ))
+      )
+  }
+}
 
-  const contactItems: { label: string; href?: string }[] = []
-  if (info.phone) contactItems.push({ label: info.phone, href: `tel:${info.phone}` })
-  if (info.email) contactItems.push({ label: info.email, href: `mailto:${info.email}` })
-  if (info.location) contactItems.push({ label: info.location })
-  if (info.linkedin) contactItems.push({ label: `LinkedIn: ${formatUrlDisplay(info.linkedin)}`, href: info.linkedin })
-  if (info.github) contactItems.push({ label: `GitHub: ${formatUrlDisplay(info.github)}`, href: info.github })
-  if (info.portfolio) contactItems.push({ label: formatUrlDisplay(info.portfolio), href: info.portfolio })
-
+export function ProfessionalPDFDocument({ cv, language }: { cv: CVWithRelations; language?: DocumentLanguage }) {
+  const doc = buildCVDocument(cv, { language, template: 'professional' })
   return (
-    <Document
-      title={`${info.full_name || cv.name || 'CV'} - Professional Resume`}
-      author={info.full_name || 'CV Tracker'}
-    >
-      <Page size="A4" style={profStyles.page} wrap>
-        {/* Accent Top Bar */}
-        <View style={profStyles.accentBar} />
-
-        {/* Header */}
-        <View style={profStyles.header}>
-          <Text style={profStyles.name}>{info.full_name || cv.name || 'Candidate Name'}</Text>
-          {info.professional_title ? <Text style={profStyles.title}>{info.professional_title}</Text> : null}
-          {contactItems.length > 0 && (
-            <View style={profStyles.contactRow}>
-              {contactItems.map((item, idx) =>
+    <Document {...documentMeta(doc)}>
+      <Page size="A4" style={prof.page} wrap>
+        <View style={prof.header}>
+          <View style={prof.headerMain}>
+            <Text style={prof.name}>{doc.name}</Text>
+            {doc.title ? <Text style={prof.title}>{doc.title}</Text> : null}
+          </View>
+          {doc.contacts.length > 0 ? (
+            <View style={prof.contacts}>
+              {doc.contacts.map((item) =>
                 item.href ? (
-                  <Link key={idx} src={item.href} style={profStyles.contactLink}>
-                    {item.label}
+                  <Link key={item.key} src={item.href} style={prof.contactLink}>
+                    {item.value}
                   </Link>
                 ) : (
-                  <Text key={idx} style={profStyles.contactItem}>
-                    {item.label}
-                  </Text>
+                  <Text key={item.key}>{item.value}</Text>
                 )
               )}
             </View>
-          )}
+          ) : null}
         </View>
-
-        {/* Executive Summary */}
-        {cv.summary ? (
-          <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>{labels.executiveSummary}</Text>
-            <Text style={profStyles.entryText}>{cv.summary}</Text>
-          </View>
-        ) : null}
-
-        {/* Professional Experience */}
-        {experiences.length > 0 && (
-          <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>{labels.experience}</Text>
-            {experiences.map((exp, idx) => {
-              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current, language)
-              return (
-                <View key={exp.id || idx} style={profStyles.entry} wrap={false}>
-                  <View style={profStyles.entryHeader}>
-                    <Text style={profStyles.entryTitle}>{exp.position}</Text>
-                    {dateStr ? <Text style={profStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  <View style={profStyles.entrySubheader}>
-                    <Text style={profStyles.entryCompany}>{exp.company}</Text>
-                    {exp.location ? <Text style={profStyles.entryLocation}>{exp.location}</Text> : null}
-                  </View>
-                  {exp.description ? <Text style={profStyles.entryText}>{exp.description}</Text> : null}
-                </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Education & Credentials */}
-        {educations.length > 0 && (
-          <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>{labels.education}</Text>
-            {educations.map((edu, idx) => {
-              const dateStr = formatDateRange(edu.start_date, edu.end_date, false, language)
-              const degreeField = [edu.degree, edu.field_of_study].filter(Boolean).join(' in ')
-              return (
-                <View key={edu.id || idx} style={profStyles.entry} wrap={false}>
-                  <View style={profStyles.entryHeader}>
-                    <Text style={profStyles.entryTitle}>{edu.institution}</Text>
-                    {dateStr ? <Text style={profStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  {degreeField ? (
-                    <View style={profStyles.entrySubheader}>
-                      <Text style={profStyles.entryCompany}>{degreeField}</Text>
-                    </View>
-                  ) : null}
-                  {edu.description ? <Text style={profStyles.entryText}>{edu.description}</Text> : null}
-                </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Key Skills */}
-        {skills.length > 0 && (
-          <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>{labels.keySkills}</Text>
-            <View style={profStyles.skillsContainer}>
-              {skills.map((skill, idx) => (
-                <View key={idx} style={profStyles.skillPill}>
-                  <Text style={profStyles.skillText}>{skill}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* Featured Projects */}
-        {projects.length > 0 && (
-          <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>{labels.projects}</Text>
-            {projects.map((proj, idx) => {
-              const dateStr = formatDateRange(proj.start_date, proj.end_date, false, language)
-              return (
-                <View key={proj.id || idx} style={profStyles.entry} wrap={false}>
-                  <View style={profStyles.entryHeader}>
-                    {proj.project_url ? (
-                      <Link src={proj.project_url} style={profStyles.link}>
-                        <Text style={profStyles.entryTitle}>{proj.name}</Text>
-                      </Link>
-                    ) : (
-                      <Text style={profStyles.entryTitle}>{proj.name}</Text>
-                    )}
-                    {dateStr ? <Text style={profStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  {proj.description ? <Text style={profStyles.entryText}>{proj.description}</Text> : null}
-                </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Certifications */}
-        {certifications.length > 0 && (
-          <View style={profStyles.section}>
-            <Text style={profStyles.sectionTitle}>{labels.certifications}</Text>
-            {certifications.map((cert, idx) => (
-              <View key={cert.id || idx} style={profStyles.entry} wrap={false}>
-                <View style={profStyles.entryHeader}>
-                  {cert.credential_url ? (
-                    <Link src={cert.credential_url} style={profStyles.link}>
-                      <Text style={profStyles.entryTitle}>{cert.name}</Text>
-                    </Link>
-                  ) : (
-                    <Text style={profStyles.entryTitle}>{cert.name}</Text>
-                  )}
-                  {cert.issue_date ? <Text style={profStyles.entryDate}>{formatDate(cert.issue_date, language)}</Text> : null}
-                </View>
-                {cert.issuer ? (
-                  <View style={profStyles.entrySubheader}>
-                    <Text style={profStyles.entryCompany}>{cert.issuer}</Text>
-                  </View>
-                ) : null}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Multi-page footer */}
-        <Text
-          style={profStyles.footer}
-          render={({ pageNumber, totalPages }) => (totalPages > 1 ? labels.pageOf(pageNumber, totalPages) : '')}
-          fixed
-        />
+        {doc.sections.map((section) => (
+          <ProfessionalSection key={section} doc={doc} section={section} />
+        ))}
+        <PageNumber doc={doc} style={prof.footer} />
       </Page>
     </Document>
   )
 }
 
-// ── 3. Modern Template (Contemporary Aesthetic, Blue Accents, Header Card) ─
+// ── Modern ───────────────────────────────────────────────────────────────────
 
-const modernStyles = StyleSheet.create({
+const TEAL = '#155e63'
+const SIDEBAR_WIDTH = mm(64)
+
+const modern = StyleSheet.create({
   page: {
-    padding: 30,
-    fontSize: 9,
+    flexDirection: 'row',
+    paddingVertical: mm(14),
     fontFamily: 'Helvetica',
+    fontSize: 8.6,
     lineHeight: 1.35,
-    color: '#334155',
-    backgroundColor: '#ffffff',
+    color: '#1e293b',
   },
-  headerCard: {
-    backgroundColor: '#0f172a',
-    borderRadius: 4,
-    padding: 12,
-    marginBottom: 8,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  photo: {
-    width: 52,
-    height: 52,
-    borderRadius: 6,
-    marginRight: 12,
-    objectFit: 'cover',
-  },
-  headerDetails: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 19,
+  // Painted on every page so the sidebar colour continues after a page break.
+  sidebarFill: { position: 'absolute', top: 0, bottom: 0, left: 0, width: SIDEBAR_WIDTH, backgroundColor: '#eef3f3' },
+  sidebar: { width: SIDEBAR_WIDTH, paddingHorizontal: mm(7), fontSize: 8.25 },
+  main: { flex: 1, paddingHorizontal: mm(9) },
+  photo: { width: mm(30), height: mm(30), borderRadius: 4, objectFit: 'cover', marginBottom: 14 },
+  sideSection: { marginBottom: 14 },
+  sideHeading: {
     fontFamily: 'Helvetica-Bold',
-    color: '#ffffff',
-    letterSpacing: -0.2,
-    lineHeight: 1.15,
-  },
-  title: {
-    fontSize: 10,
-    fontFamily: 'Helvetica-Bold',
-    color: '#93c5fd',
-    lineHeight: 1.25,
-    marginTop: 5,
+    fontSize: 7.5,
+    letterSpacing: 0.75,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 6,
-    alignItems: 'center',
-  },
-  contactItem: {
-    fontSize: 8,
-    color: '#cbd5e1',
-    marginRight: 8,
-    marginVertical: 1,
-  },
-  contactLink: {
-    fontSize: 8,
-    color: '#bfdbfe',
-    textDecoration: 'none',
-    marginRight: 8,
-    marginVertical: 1,
-  },
-  section: {
-    marginTop: 7,
-    marginBottom: 3,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-    paddingBottom: 2,
-  },
-  accentDot: {
-    width: 3,
-    height: 10,
-    backgroundColor: '#2563eb',
-    marginRight: 4,
-    borderRadius: 1,
-  },
-  sectionTitle: {
-    fontSize: 10.5,
-    fontFamily: 'Helvetica-Bold',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    color: '#0f172a',
-  },
-  entry: {
-    marginBottom: 6,
-    paddingLeft: 4,
-    borderLeftWidth: 1.5,
-    borderLeftColor: '#e2e8f0',
-  },
-  entryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-  },
-  entryTitle: {
-    fontSize: 9.5,
-    fontFamily: 'Helvetica-Bold',
-    color: '#0f172a',
-    flexGrow: 1,
-    flexShrink: 1,
-    paddingRight: 8,
-  },
-  entryDate: {
-    fontSize: 8,
-    fontFamily: 'Helvetica-Bold',
-    color: '#2563eb',
-    flexShrink: 0,
-    marginLeft: 8,
-    textAlign: 'right',
-  },
-  entrySubheader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginTop: 1,
-  },
-  entryCompany: {
-    fontSize: 8.5,
-    fontFamily: 'Helvetica-Bold',
-    color: '#475569',
-    flexGrow: 1,
-    flexShrink: 1,
-    paddingRight: 8,
-  },
-  entryLocation: {
-    fontSize: 8,
-    color: '#94a3b8',
-    flexShrink: 0,
-    marginLeft: 8,
-    textAlign: 'right',
-  },
-  entryText: {
-    fontSize: 8.5,
-    color: '#334155',
-    lineHeight: 1.35,
-    marginTop: 2,
-  },
-  skillsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  skillTag: {
-    backgroundColor: '#eff6ff',
-    borderWidth: 0.5,
-    borderColor: '#bfdbfe',
-    borderRadius: 3,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    marginRight: 4,
+    color: TEAL,
     marginBottom: 4,
   },
-  skillText: {
-    fontSize: 8,
+  contactLabel: { fontFamily: 'Helvetica-Bold', fontSize: 7.1, letterSpacing: 0.3, textTransform: 'uppercase', color: '#64748b' },
+  contactValue: { color: '#1e293b', textDecoration: 'none', marginBottom: 4 },
+  sideItem: { marginBottom: 7 },
+  sideStrong: { fontFamily: 'Helvetica-Bold', color: '#020617' },
+  sideMuted: { color: '#64748b' },
+  name: { fontFamily: 'Helvetica-Bold', fontSize: 20, lineHeight: 1.2, color: '#020617' },
+  title: { fontFamily: 'Helvetica-Bold', fontSize: 10, color: TEAL, marginTop: 3 },
+  header: { marginBottom: 14 },
+  mainSection: { marginBottom: 14 },
+  mainHeading: {
     fontFamily: 'Helvetica-Bold',
-    color: '#1e40af',
+    fontSize: 8.25,
+    letterSpacing: 0.75,
+    textTransform: 'uppercase',
+    color: TEAL,
+    borderBottomWidth: 0.75,
+    borderBottomColor: '#e2e8f0',
+    paddingBottom: 2,
+    marginBottom: 5,
   },
-  link: {
-    color: '#2563eb',
-    textDecoration: 'none',
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 16,
-    left: 30,
-    right: 30,
-    textAlign: 'center',
-    fontSize: 8,
-    color: '#94a3b8',
-  },
+  entry: { marginBottom: 9 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  strong: { fontFamily: 'Helvetica-Bold', color: '#020617', flexShrink: 1, paddingRight: 10 },
+  date: { flexShrink: 0, fontSize: 8.25, color: '#64748b', textAlign: 'right' },
+  sub: { color: '#334155' },
+  link: { fontSize: 8.25, color: TEAL, textDecoration: 'none' },
+  body: { fontSize: 8.6, lineHeight: 1.55 },
+  description: { marginTop: 3 },
+  paragraph: { fontSize: 8.6, marginBottom: 2, lineHeight: 1.5 },
+  bulletRow: { flexDirection: 'row', marginBottom: 1.5 },
+  bulletMark: { fontSize: 8.6, width: 9, lineHeight: 1.5 },
+  bulletText: { fontSize: 8.6, flex: 1, lineHeight: 1.5 },
+  footer: { position: 'absolute', bottom: mm(8), left: SIDEBAR_WIDTH, right: 0, textAlign: 'center', fontSize: 7.5, color: '#94a3b8' },
 })
 
-export function ModernPDFDocument({
-  cv,
-  language = 'id',
-}: {
-  cv: CVWithRelations
-  language?: 'id' | 'en'
-}) {
-  const info = cv.personal_info || {}
-  const experiences = [...(cv.experiences || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const educations = [...(cv.educations || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const projects = [...(cv.projects || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const certifications = [...(cv.certifications || [])].sort((a, b) => a.sort_order - b.sort_order)
-  const skills = (cv.skills || []).filter(Boolean)
-  const labels = PDF_LABELS[language] || PDF_LABELS.id
-
-  const contactItems: { label: string; href?: string }[] = []
-  if (info.phone) contactItems.push({ label: info.phone, href: `tel:${info.phone}` })
-  if (info.email) contactItems.push({ label: info.email, href: `mailto:${info.email}` })
-  if (info.location) contactItems.push({ label: info.location })
-  if (info.linkedin) contactItems.push({ label: `LinkedIn: ${formatUrlDisplay(info.linkedin)}`, href: info.linkedin })
-  if (info.github) contactItems.push({ label: `GitHub: ${formatUrlDisplay(info.github)}`, href: info.github })
-  if (info.portfolio) contactItems.push({ label: formatUrlDisplay(info.portfolio), href: info.portfolio })
-
+export function ModernPDFDocument({ cv, language }: { cv: CVWithRelations; language?: DocumentLanguage }) {
+  const doc = buildCVDocument(cv, { language, template: 'modern' })
+  const { labels } = doc
+  const has = (key: SectionKey) => doc.sections.includes(key)
   return (
-    <Document
-      title={`${info.full_name || cv.name || 'CV'} - Modern Resume`}
-      author={info.full_name || 'CV Tracker'}
-    >
-      <Page size="A4" style={modernStyles.page} wrap>
-        {/* Dark Modern Header Card */}
-        <View style={modernStyles.headerCard}>
-          <View style={modernStyles.headerContent}>
-            {info.photo_url ? (
-              <Image src={info.photo_url} style={modernStyles.photo} />
-            ) : null}
-            <View style={modernStyles.headerDetails}>
-              <Text style={modernStyles.name}>{info.full_name || cv.name || 'Candidate Name'}</Text>
-              {info.professional_title ? <Text style={modernStyles.title}>{info.professional_title}</Text> : null}
-              {contactItems.length > 0 && (
-                <View style={modernStyles.contactRow}>
-                  {contactItems.map((item, idx) =>
-                    item.href ? (
-                      <Link key={idx} src={item.href} style={modernStyles.contactLink}>
-                        {item.label}
-                      </Link>
-                    ) : (
-                      <Text key={idx} style={modernStyles.contactItem}>
-                        {item.label}
-                      </Text>
-                    )
+    <Document {...documentMeta(doc)}>
+      <Page size="A4" style={modern.page} wrap>
+        <View style={modern.sidebarFill} fixed />
+        <View style={modern.sidebar}>
+          {doc.photoUrl ? <PDFImage src={doc.photoUrl} style={modern.photo} /> : null}
+          {doc.contacts.length > 0 ? (
+            <View style={modern.sideSection}>
+              <Text style={modern.sideHeading}>{labels.contact}</Text>
+              {doc.contacts.map((item) => (
+                <View key={item.key} wrap={false}>
+                  <Text style={modern.contactLabel}>{item.label}</Text>
+                  {item.href ? (
+                    <Link src={item.href} style={modern.contactValue}>
+                      {item.value}
+                    </Link>
+                  ) : (
+                    <Text style={modern.contactValue}>{item.value}</Text>
                   )}
-                </View>
-              )}
-            </View>
-          </View>
-        </View>
-
-        {/* Summary */}
-        {cv.summary ? (
-          <View style={modernStyles.section}>
-            <View style={modernStyles.sectionHeader}>
-              <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>{labels.summary}</Text>
-            </View>
-            <Text style={modernStyles.entryText}>{cv.summary}</Text>
-          </View>
-        ) : null}
-
-        {/* Experience */}
-        {experiences.length > 0 && (
-          <View style={modernStyles.section}>
-            <View style={modernStyles.sectionHeader}>
-              <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>{labels.experience}</Text>
-            </View>
-            {experiences.map((exp, idx) => {
-              const dateStr = formatDateRange(exp.start_date, exp.end_date, exp.is_current, language)
-              return (
-                <View key={exp.id || idx} style={modernStyles.entry} wrap={false}>
-                  <View style={modernStyles.entryHeader}>
-                    <Text style={modernStyles.entryTitle}>{exp.position}</Text>
-                    {dateStr ? <Text style={modernStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  <View style={modernStyles.entrySubheader}>
-                    <Text style={modernStyles.entryCompany}>{exp.company}</Text>
-                    {exp.location ? <Text style={modernStyles.entryLocation}>{exp.location}</Text> : null}
-                  </View>
-                  {exp.description ? <Text style={modernStyles.entryText}>{exp.description}</Text> : null}
-                </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Education */}
-        {educations.length > 0 && (
-          <View style={modernStyles.section}>
-            <View style={modernStyles.sectionHeader}>
-              <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>{labels.education}</Text>
-            </View>
-            {educations.map((edu, idx) => {
-              const dateStr = formatDateRange(edu.start_date, edu.end_date, false, language)
-              const degreeField = [edu.degree, edu.field_of_study].filter(Boolean).join(' in ')
-              return (
-                <View key={edu.id || idx} style={modernStyles.entry} wrap={false}>
-                  <View style={modernStyles.entryHeader}>
-                    <Text style={modernStyles.entryTitle}>{edu.institution}</Text>
-                    {dateStr ? <Text style={modernStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  {degreeField ? (
-                    <View style={modernStyles.entrySubheader}>
-                      <Text style={modernStyles.entryCompany}>{degreeField}</Text>
-                    </View>
-                  ) : null}
-                  {edu.description ? <Text style={modernStyles.entryText}>{edu.description}</Text> : null}
-                </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Skills */}
-        {skills.length > 0 && (
-          <View style={modernStyles.section}>
-            <View style={modernStyles.sectionHeader}>
-              <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>{labels.skills}</Text>
-            </View>
-            <View style={modernStyles.skillsContainer}>
-              {skills.map((skill, idx) => (
-                <View key={idx} style={modernStyles.skillTag}>
-                  <Text style={modernStyles.skillText}>{skill}</Text>
                 </View>
               ))}
             </View>
-          </View>
-        )}
-
-        {/* Projects */}
-        {projects.length > 0 && (
-          <View style={modernStyles.section}>
-            <View style={modernStyles.sectionHeader}>
-              <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>{labels.projects}</Text>
+          ) : null}
+          {has('skills') ? (
+            <View style={modern.sideSection}>
+              <Text style={modern.sideHeading}>{labels.skills}</Text>
+              {doc.skills.map((skill) => (
+                <Text key={skill} style={{ marginBottom: 1.5 }}>
+                  {skill}
+                </Text>
+              ))}
             </View>
-            {projects.map((proj, idx) => {
-              const dateStr = formatDateRange(proj.start_date, proj.end_date, false, language)
-              return (
-                <View key={proj.id || idx} style={modernStyles.entry} wrap={false}>
-                  <View style={modernStyles.entryHeader}>
-                    {proj.project_url ? (
-                      <Link src={proj.project_url} style={modernStyles.link}>
-                        <Text style={modernStyles.entryTitle}>{proj.name}</Text>
-                      </Link>
-                    ) : (
-                      <Text style={modernStyles.entryTitle}>{proj.name}</Text>
-                    )}
-                    {dateStr ? <Text style={modernStyles.entryDate}>{dateStr}</Text> : null}
-                  </View>
-                  {proj.description ? <Text style={modernStyles.entryText}>{proj.description}</Text> : null}
+          ) : null}
+          {has('education') ? (
+            <View style={modern.sideSection}>
+              <Text style={modern.sideHeading}>{labels.education}</Text>
+              {doc.educations.map((edu, idx) => (
+                <View key={edu.id || idx} style={modern.sideItem} wrap={false}>
+                  <Text style={modern.sideStrong}>{edu.institution}</Text>
+                  {educationHeading(edu) ? <Text>{educationHeading(edu)}</Text> : null}
+                  <Text style={modern.sideMuted}>{formatDateRange(edu.start_date, edu.end_date, false, doc.language)}</Text>
+                  <DescriptionPDF text={edu.description} styles={modern} />
                 </View>
-              )
-            })}
-          </View>
-        )}
-
-        {/* Certifications */}
-        {certifications.length > 0 && (
-          <View style={modernStyles.section}>
-            <View style={modernStyles.sectionHeader}>
-              <View style={modernStyles.accentDot} />
-              <Text style={modernStyles.sectionTitle}>{labels.certifications}</Text>
+              ))}
             </View>
-            {certifications.map((cert, idx) => (
-              <View key={cert.id || idx} style={modernStyles.entry} wrap={false}>
-                <View style={modernStyles.entryHeader}>
+          ) : null}
+          {has('certifications') ? (
+            <View style={modern.sideSection}>
+              <Text style={modern.sideHeading}>{labels.certifications}</Text>
+              {doc.certifications.map((cert, idx) => (
+                <View key={cert.id || idx} style={modern.sideItem} wrap={false}>
                   {cert.credential_url ? (
-                    <Link src={cert.credential_url} style={modernStyles.link}>
-                      <Text style={modernStyles.entryTitle}>{cert.name}</Text>
+                    <Link src={cert.credential_url} style={[modern.sideStrong, { textDecoration: 'none' }]}>
+                      {cert.name}
                     </Link>
                   ) : (
-                    <Text style={modernStyles.entryTitle}>{cert.name}</Text>
+                    <Text style={modern.sideStrong}>{cert.name}</Text>
                   )}
-                  {cert.issue_date ? <Text style={modernStyles.entryDate}>{formatDate(cert.issue_date, language)}</Text> : null}
+                  <Text style={modern.sideMuted}>
+                    {[cert.issuer, formatMonthYear(cert.issue_date, doc.language)].filter(Boolean).join(', ')}
+                  </Text>
                 </View>
-                {cert.issuer ? (
-                  <View style={modernStyles.entrySubheader}>
-                    <Text style={modernStyles.entryCompany}>{cert.issuer}</Text>
-                  </View>
-                ) : null}
-              </View>
-            ))}
-          </View>
-        )}
+              ))}
+            </View>
+          ) : null}
+        </View>
 
-        {/* Multi-page footer */}
-        <Text
-          style={modernStyles.footer}
-          render={({ pageNumber, totalPages }) => (totalPages > 1 ? labels.pageOf(pageNumber, totalPages) : '')}
-          fixed
-        />
+        <View style={modern.main}>
+          <View style={modern.header}>
+            <Text style={modern.name}>{doc.name}</Text>
+            {doc.title ? <Text style={modern.title}>{doc.title}</Text> : null}
+          </View>
+          {has('summary') ? (
+            <View style={modern.mainSection}>
+              <Text style={modern.mainHeading}>{labels.summary}</Text>
+              <Text style={modern.body}>{doc.summary}</Text>
+            </View>
+          ) : null}
+          {has('experience') ? (
+            <View style={modern.mainSection}>
+              <Text style={modern.mainHeading} minPresenceAhead={30}>
+                {labels.experience}
+              </Text>
+              {doc.experiences.map((exp, idx) => (
+                <View key={exp.id || idx} style={modern.entry} wrap={false}>
+                  <View style={modern.row}>
+                    <Text style={modern.strong}>{exp.position}</Text>
+                    <Text style={modern.date}>
+                      {formatDateRange(exp.start_date, exp.end_date, exp.is_current, doc.language)}
+                    </Text>
+                  </View>
+                  <Text style={modern.sub}>
+                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>{exp.company}</Text>
+                    {exp.location ? `, ${exp.location}` : ''}
+                  </Text>
+                  <DescriptionPDF text={exp.description} styles={modern} />
+                </View>
+              ))}
+            </View>
+          ) : null}
+          {has('projects') ? (
+            <View style={modern.mainSection}>
+              <Text style={modern.mainHeading} minPresenceAhead={30}>
+                {labels.projects}
+              </Text>
+              {doc.projects.map((proj, idx) => (
+                <View key={proj.id || idx} style={modern.entry} wrap={false}>
+                  <View style={modern.row}>
+                    <Text style={modern.strong}>{proj.name}</Text>
+                    <Text style={modern.date}>{formatDateRange(proj.start_date, proj.end_date, false, doc.language)}</Text>
+                  </View>
+                  {proj.project_url ? (
+                    <Link src={proj.project_url} style={modern.link}>
+                      {formatDisplayUrl(proj.project_url)}
+                    </Link>
+                  ) : null}
+                  <DescriptionPDF text={proj.description} styles={modern} />
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </View>
+        <PageNumber doc={doc} style={modern.footer} />
       </Page>
     </Document>
   )
 }
 
-// ── Universal Factory ─────────────────────────────────────────────────────────
+// ── Factory ──────────────────────────────────────────────────────────────────
 
 export function createPDFDocument(
   cv: CVWithRelations,
   templateOverride?: CVTemplate | string,
-  language: 'id' | 'en' = 'id'
+  language?: DocumentLanguage
 ): React.ReactElement<DocumentProps> {
-  const selectedTemplate = (templateOverride || cv.template || 'ats').toString().toLowerCase()
-
-  switch (selectedTemplate) {
+  switch ((templateOverride || cv.template || 'ats').toString().toLowerCase()) {
     case 'modern':
       return <ModernPDFDocument cv={cv} language={language} />
     case 'professional':
       return <ProfessionalPDFDocument cv={cv} language={language} />
-    case 'ats':
     default:
       return <AtsPDFDocument cv={cv} language={language} />
   }

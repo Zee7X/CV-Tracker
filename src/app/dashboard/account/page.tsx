@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import DashboardShell from '@/components/layout/dashboard-shell'
+import { PageHeader } from '@/components/layout/page-header'
 import { AccountSettingsForm } from '@/components/account/account-settings-form'
 
 export const metadata = {
@@ -34,15 +34,12 @@ export default async function AccountPage() {
   }
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Account</h1>
-          <p className="text-slate-600">Manage your profile details and security settings.</p>
-        </div>
+        <PageHeader title="Account" description="Your profile photo, name and password." />
 
         <AccountSettingsForm initialProfile={initialProfile} />
       </div>
-    </DashboardShell>
+    </>
   )
 }

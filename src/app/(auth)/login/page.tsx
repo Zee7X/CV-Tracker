@@ -39,14 +39,13 @@ function LoginForm() {
           name="password"
           autoComplete="current-password"
           required
-          placeholder="••••••••"
-        />
+                  />
       </Field>
 
       <div className="flex justify-end">
         <Link
           href="/forgot-password"
-          className="text-xs text-blue-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+          className="text-sm text-blue-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800 rounded"
         >
           Forgot password?
         </Link>
@@ -64,9 +63,9 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <div className="rounded-lg border border-stone-300 bg-[#fffefa] p-8">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-stone-950">Welcome back</h1>
-        <p className="mt-1 text-sm text-stone-600">Sign in to your CV Tracker account</p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-stone-950">Sign in</h1>
+        <p className="mt-1 text-sm text-stone-600">Use the email and password you registered with.</p>
       </div>
 
       <Suspense>
@@ -75,9 +74,9 @@ export default function LoginPage() {
 
       <LoginForm />
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-sm text-stone-600">
         Don&apos;t have an account?{' '}
-        <Link href="/register" className="text-blue-600 hover:underline font-medium">
+        <Link href="/register" className="font-medium text-blue-800 underline-offset-4 hover:underline">
           Create one
         </Link>
       </p>

@@ -15,9 +15,9 @@ export default function RegisterPage() {
 
   return (
     <div className="rounded-lg border border-stone-300 bg-[#fffefa] p-8">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-stone-950">Create an account</h1>
-        <p className="mt-1 text-sm text-stone-600">Start building and tracking your CVs</p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-stone-950">Create an account</h1>
+        <p className="mt-1 text-sm text-stone-600">Free. You can write your first CV right after signing up.</p>
       </div>
 
       {done ? (
@@ -31,7 +31,7 @@ export default function RegisterPage() {
               type="text"
               autoComplete="name"
               required
-              placeholder="Nadia Putri"
+              placeholder="As it should appear on your CV"
             />
           </Field>
 
@@ -75,9 +75,9 @@ export default function RegisterPage() {
         </form>
       )}
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-sm text-stone-600">
         Already have an account?{' '}
-        <Link href="/login" className="text-blue-600 hover:underline font-medium">
+        <Link href="/login" className="font-medium text-blue-800 underline-offset-4 hover:underline">
           Sign in
         </Link>
       </p>

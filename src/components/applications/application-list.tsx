@@ -1,20 +1,14 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
-import Link from 'next/link'
+import React, { useMemo, useState } from 'react'
 import type { JobApplicationWithCV, ApplicationStatus } from '@/types/application'
 import { APPLICATION_STATUSES } from '@/types/application'
 import { ApplicationCard } from './application-card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import {
-  Search,
-  X,
-  Plus,
-  Briefcase,
-  Sparkles,
-  Filter,
-} from 'lucide-react'
+import { ButtonLink } from '@/components/ui/button-link'
+import { EmptyState } from '@/components/layout/page-header'
+import { Plus, Search, X } from 'lucide-react'
 
 interface ApplicationListProps {
   initialApplications: JobApplicationWithCV[]
@@ -24,197 +18,116 @@ export function ApplicationList({ initialApplications }: ApplicationListProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<ApplicationStatus | 'all'>('all')
 
-  // Calculate status counts based on total applications
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { all: initialApplications.length }
-    APPLICATION_STATUSES.forEach((s) => {
-      counts[s.value] = 0
-    })
-    initialApplications.forEach((app) => {
-      if (counts[app.status] !== undefined) {
-        counts[app.status]++
-      }
-    })
+    for (const status of APPLICATION_STATUSES) counts[status.value] = 0
+    for (const app of initialApplications) counts[app.status] = (counts[app.status] ?? 0) + 1
     return counts
   }, [initialApplications])
 
-  // Filter applications by search term and status
   const filteredApplications = useMemo(() => {
-    return initialApplications.filter((app) => {
-      // Status filter
-      if (selectedStatus !== 'all' && app.status !== selectedStatus) {
-        return false
-      }
-
-      // Search filter (company name, position, notes)
-      if (searchTerm.trim()) {
-        const term = searchTerm.toLowerCase().trim()
-        const matchCompany = app.company_name.toLowerCase().includes(term)
-        const matchPosition = app.position.toLowerCase().includes(term)
-        const matchNotes = app.notes?.toLowerCase().includes(term) ?? false
-        if (!matchCompany && !matchPosition && !matchNotes) {
-          return false
-        }
-      }
-
-      return true
-    })
+    const term = searchTerm.toLowerCase().trim()
+    return initialApplications
+      .filter((app) => selectedStatus === 'all' || app.status === selectedStatus)
+      .filter(
+        (app) =>
+          !term ||
+          app.company_name.toLowerCase().includes(term) ||
+          app.position.toLowerCase().includes(term) ||
+          (app.notes?.toLowerCase().includes(term) ?? false)
+      )
+      .sort((a, b) => (b.applied_date || '').localeCompare(a.applied_date || ''))
   }, [initialApplications, selectedStatus, searchTerm])
 
-  const handleClearFilters = () => {
-    setSearchTerm('')
-    setSelectedStatus('all')
-  }
-
-  // Entire empty state (User has no applications at all)
   if (initialApplications.length === 0) {
     return (
-      <div className="rounded-lg border border-stone-300 bg-[#fffefa] p-12 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-          <Briefcase className="h-8 w-8" />
-        </div>
-        <h2 className="text-xl font-semibold text-slate-900">No Job Applications Yet</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
-          Start organizing your job search. Log applied positions, track interview stages, link tailored CVs, and monitor your progress.
-        </p>
-        <div className="mt-6">
-          <Link href="/dashboard/applications/new">
-            <Button size="lg" className="gap-2">
-              <Sparkles className="h-5 w-5" />
-              Add Your First Application
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <EmptyState
+        title="No applications yet"
+        description="Log each job you apply to with the CV you sent, the posting link and the current stage. You will see what needs a follow-up at a glance."
+        action={
+          <ButtonLink href="/dashboard/applications/new">
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Add your first application
+          </ButtonLink>
+        }
+      />
     )
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Search and Filters Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Search Input */}
-        <div className="relative flex-1 max-w-md">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-            <Search className="h-4 w-4" />
-          </div>
-          <Input
-            type="text"
-            placeholder="Search by company, position, or notes..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 pr-9"
-            aria-label="Search applications"
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={() => setSearchTerm('')}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus-visible:outline-none"
-              aria-label="Clear search query"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+  const filters: { value: ApplicationStatus | 'all'; label: string }[] = [
+    { value: 'all', label: 'All' },
+    ...APPLICATION_STATUSES.map((status) => ({ value: status.value, label: status.label })),
+  ]
 
-        {/* Add Application Button */}
-        <Link href="/dashboard/applications/new" className="shrink-0">
-          <Button className="w-full gap-2 sm:w-auto">
-            <Plus className="h-4 w-4" />
-            Add Application
-          </Button>
-        </Link>
+  return (
+    <div className="space-y-4">
+      <div className="relative max-w-md">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" aria-hidden="true" />
+        <Input
+          type="search"
+          placeholder="Search company, position or notes"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          className="pl-9"
+          aria-label="Search applications"
+        />
       </div>
 
-      {/* Status Filter Tabs / Pills */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4">
-        <span className="mr-1 flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
-          <Filter className="h-3.5 w-3.5" />
-          Status:
-        </span>
-
-        {/* All Tab */}
-        <button
-          type="button"
-          onClick={() => setSelectedStatus('all')}
-          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:py-1 ${
-            selectedStatus === 'all'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
-          }`}
-          aria-pressed={selectedStatus === 'all'}
-        >
-          <span>All</span>
-          <span
-            className={`rounded-full px-1.5 py-0.5 text-[10px] ${
-              selectedStatus === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-700'
-            }`}
-          >
-            {statusCounts.all}
-          </span>
-        </button>
-
-        {/* Status Option Tabs */}
-        {APPLICATION_STATUSES.map((status) => {
-          const count = statusCounts[status.value] || 0
-          const isSelected = selectedStatus === status.value
-          return (
-            <button
-              key={status.value}
-              type="button"
-              onClick={() => setSelectedStatus(status.value)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:py-1 ${
-                isSelected
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
-              }`}
-              aria-pressed={isSelected}
-            >
-              <span>{status.label}</span>
-              <span
-                className={`rounded-full px-1.5 py-0.5 text-[10px] ${
-                  isSelected ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-700'
+      <div className="scrollbar-none -mx-1 overflow-x-auto px-1">
+        <div role="tablist" aria-label="Filter by status" className="flex min-w-max gap-1 border-b border-stone-300">
+          {filters.map((filter) => {
+            const selected = selectedStatus === filter.value
+            const count = statusCounts[filter.value] ?? 0
+            return (
+              <button
+                key={filter.value}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setSelectedStatus(filter.value)}
+                className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-800 ${
+                  selected
+                    ? 'border-blue-800 text-stone-950'
+                    : 'border-transparent text-stone-600 hover:border-stone-400 hover:text-stone-950'
                 }`}
               >
-                {count}
-              </span>
-            </button>
-          )
-        })}
+                {filter.label}
+                <span className="tabular-nums text-xs text-stone-500">{count}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      {/* Filtered List Results */}
       {filteredApplications.length === 0 ? (
-        /* Filter / Search yielded no results */
-        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-10 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-            <Search className="h-6 w-6" />
-          </div>
-          <h3 className="text-base font-semibold text-slate-900">No matching applications</h3>
-          <p className="mt-1 text-xs text-slate-500">
-            No applications matched your search or status filters.
+        <div className="rounded-lg border border-dashed border-stone-300 px-4 py-10 text-center">
+          <p className="text-sm text-stone-700">
+            No applications match
+            {searchTerm.trim() ? <> &quot;{searchTerm.trim()}&quot;</> : null}
+            {selectedStatus !== 'all' ? <> in {APPLICATION_STATUSES.find((s) => s.value === selectedStatus)?.label}</> : null}.
           </p>
-          <div className="mt-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleClearFilters}
-              className="gap-1.5"
-            >
-              <X className="h-3.5 w-3.5" />
-              Clear Filters
-            </Button>
-          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            onClick={() => {
+              setSearchTerm('')
+              setSelectedStatus('all')
+            }}
+          >
+            <X className="h-3.5 w-3.5" aria-hidden="true" />
+            Clear filters
+          </Button>
         </div>
       ) : (
-        /* Applications Grid */
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="divide-y divide-stone-200 overflow-hidden rounded-lg border border-stone-300 bg-white">
           {filteredApplications.map((app) => (
-            <ApplicationCard key={app.id} application={app} />
+            <li key={app.id}>
+              <ApplicationCard application={app} />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   )

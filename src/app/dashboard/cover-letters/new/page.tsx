@@ -2,7 +2,6 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getUserCVs } from '@/lib/cv/queries'
-import DashboardShell from '@/components/layout/dashboard-shell'
 import { CoverLetterForm } from '@/components/cover-letter/cover-letter-form'
 
 export const dynamic = 'force-dynamic'
@@ -37,9 +36,9 @@ export default async function NewCoverLetterPage() {
   }
 
   return (
-    <DashboardShell>
+    <>
       <CoverLetterForm availableCVs={cvs} userProfile={userProfile} />
-    </DashboardShell>
+    </>
   )
 }
 

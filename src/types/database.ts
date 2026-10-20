@@ -283,6 +283,75 @@ export interface Database {
         }
         Relationships: []
       }
+      cover_letters: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          template: 'formal_id' | 'professional_en' | 'email_short' | 'creative'
+          job_title: string
+          company_name: string
+          company_address: string | null
+          recipient_name: string | null
+          source: string | null
+          letter_date: string
+          sender_name: string
+          sender_email: string
+          sender_phone: string | null
+          sender_location: string | null
+          opening: string
+          body: string
+          closing: string
+          cv_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          template?: 'formal_id' | 'professional_en' | 'email_short' | 'creative'
+          job_title: string
+          company_name: string
+          company_address?: string | null
+          recipient_name?: string | null
+          source?: string | null
+          letter_date: string
+          sender_name: string
+          sender_email: string
+          sender_phone?: string | null
+          sender_location?: string | null
+          opening?: string
+          body?: string
+          closing?: string
+          cv_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          template?: 'formal_id' | 'professional_en' | 'email_short' | 'creative'
+          job_title?: string
+          company_name?: string
+          company_address?: string | null
+          recipient_name?: string | null
+          source?: string | null
+          letter_date?: string
+          sender_name?: string
+          sender_email?: string
+          sender_phone?: string | null
+          sender_location?: string | null
+          opening?: string
+          body?: string
+          closing?: string
+          cv_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,4 +1,4 @@
-import type { CoverLetter, CoverLetterInput, CoverLetterTemplate } from '@/types/cover-letter'
+import type { CoverLetterInput, CoverLetterTemplate } from '@/types/cover-letter'
 
 export interface TemplateDefinition {
   id: CoverLetterTemplate
@@ -11,33 +11,52 @@ export interface TemplateDefinition {
 export const COVER_LETTER_TEMPLATES: TemplateDefinition[] = [
   {
     id: 'formal_id',
-    name: 'Formal Indonesian',
-    badge: 'Official / BUMN',
-    description: 'Standard formal format with polite structure, perfect for national corporations and institutions.',
+    name: 'Formal letter',
+    badge: 'Indonesian',
+    description: 'Surat lamaran baku: Dengan hormat, data diri singkat, Hormat saya. Expected by BUMN, government and most local companies.',
     language: 'id',
   },
   {
     id: 'professional_en',
-    name: 'Professional English',
-    badge: 'International',
-    description: 'Structured corporate format with strong impact paragraphs for multinational & remote companies.',
+    name: 'Professional letter',
+    badge: 'English',
+    description: 'A standard English cover letter for multinational and remote employers.',
     language: 'en',
   },
   {
     id: 'email_short',
-    name: 'Concise Email Body',
-    badge: 'Email Ready',
-    description: 'Compact & to-the-point format ready to paste directly into your email body when attaching your CV.',
+    name: 'Short email',
+    badge: 'Either language',
+    description: 'Three short paragraphs to paste into the email you send with your CV attached.',
     language: 'id',
   },
   {
     id: 'creative',
-    name: 'Creative Startup',
-    badge: 'Modern Tech',
-    description: 'Dynamic, confident pitch highlighting projects, initiative, and cultural alignment with the company.',
+    name: 'Personal',
+    badge: 'Either language',
+    description: 'A less formal tone for startups and small teams. Edit it so it sounds like you.',
     language: 'id',
   },
 ]
+
+/** Templates whose language is fixed by the format itself. */
+export function isFixedLanguageTemplate(template?: CoverLetterTemplate | null): boolean {
+  return template === 'formal_id' || template === 'professional_en'
+}
+
+const ID_MARKERS = /\b(saya|dengan|yang|untuk|dan|di|sebagai|kepada|hormat|perusahaan|lamaran|terima kasih)\b/gi
+const EN_MARKERS = /\b(i|the|and|to|for|my|your|with|position|application|thank you|sincerely)\b/gi
+
+/**
+ * The language is not stored for letters, so infer it from what the user wrote.
+ * Counts common function words; falls back to the given default when the text is empty or ambiguous.
+ */
+export function detectLetterLanguage(text: string, fallback: 'id' | 'en' = 'id'): 'id' | 'en' {
+  const id = text.match(ID_MARKERS)?.length ?? 0
+  const en = text.match(EN_MARKERS)?.length ?? 0
+  if (id === en) return fallback
+  return id > en ? 'id' : 'en'
+}
 
 interface GenerateParams {
   template: CoverLetterTemplate
@@ -139,7 +158,6 @@ export function generateTemplateContent({
   companyName = '',
   recipientName = '',
   source = '',
-  senderName = '',
   skillsSummary = '',
   language = 'id',
 }: GenerateParams): { opening: string; body: string; closing: string } {
@@ -147,7 +165,6 @@ export function generateTemplateContent({
   const isEn = docLang === 'en'
   const defaultJobTitle = isEn ? '[Job Title]' : '[Posisi Pekerjaan]'
   const defaultCompanyName = isEn ? '[Company Name]' : '[Nama Perusahaan]'
-  const defaultSenderName = isEn ? '[Your Name]' : '[Nama Anda]'
   const actualJobTitle = jobTitle?.trim() || defaultJobTitle
   const actualCompanyName = companyName?.trim() || defaultCompanyName
   const recipient = recipientName?.trim() || (isEn ? 'Hiring Manager' : 'Bapak/Ibu HRD')
@@ -230,7 +247,7 @@ export function formatCoverLetterPlaintext(
   const address = letter.company_address ? `\n${letter.company_address}` : ''
 
   if (isEmail) {
-    const subjectPrefix = isEn ? 'Subject: Job Application' : 'Subject: Lamaran Pekerjaan'
+    const subjectPrefix = isEn ? 'Subject: Job Application' : 'Subjek: Lamaran Pekerjaan'
     const signOff = isEn ? 'Sincerely,' : 'Hormat saya,'
     return `${subjectPrefix} - ${position} - ${senderName}
 
@@ -255,9 +272,7 @@ To:
 ${recipient}
 ${company}${address}
 
-Dear ${recipient},
-
-${letter.opening || ''}
+${letter.template === 'professional_en' ? `Dear ${recipient},\n\n` : ''}${letter.opening || ''}
 
 ${letter.body || ''}
 
@@ -272,7 +287,7 @@ ${senderName}`
   const city = letter.sender_location ? `${letter.sender_location.split(',')[0].trim()}, ` : ''
   return `${city}${formattedDate}
 
-Hal: Lamaran Pekerjaan — ${position}
+Perihal: Lamaran Pekerjaan sebagai ${position}
 Lampiran: Berkas CV dan Dokumen Pendukung
 
 Kepada Yth.
@@ -280,13 +295,13 @@ ${recipient}
 ${company}${address}
 
 ${letter.opening || ''}
-
-Berikut adalah ringkasan data diri saya:
-Nama: ${senderName}
-Email: ${senderEmail}
-Telepon: ${letter.sender_phone || '-'}
-Lokasi: ${letter.sender_location || '-'}
-
+${letter.template === 'formal_id' ? `
+Data diri:
+Nama     : ${senderName}
+Email    : ${senderEmail}
+Telepon  : ${letter.sender_phone || '-'}
+Domisili : ${letter.sender_location || '-'}
+` : ''}
 ${letter.body || ''}
 
 ${letter.closing || ''}

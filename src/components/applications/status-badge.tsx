@@ -11,13 +11,13 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   const statusConfig = APPLICATION_STATUSES.find((s) => s.value === status) || {
     value: status,
     label: status.charAt(0).toUpperCase() + status.slice(1),
-    color: 'bg-slate-100 text-slate-700 border-slate-200',
+    color: 'bg-stone-100 text-stone-700 border-stone-300',
   }
 
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize',
+        'inline-flex shrink-0 items-center rounded border px-2 py-0.5 text-xs font-medium',
         statusConfig.color,
         className
       )}

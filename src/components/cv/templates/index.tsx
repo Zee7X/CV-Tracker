@@ -1,79 +1,51 @@
 import React from 'react'
-import type { CVTemplate, CVWithRelations } from '@/types/cv'
+import type { CVTemplate, CVWithRelations, DocumentLanguage } from '@/types/cv'
 import { AtsTemplate } from './ats'
 import { ProfessionalTemplate } from './professional'
 import { ModernTemplate } from './modern'
-import { SAMPLE_CV, EMPTY_CV, isEmptyCV, formatDateRange, formatMonthYear, formatDisplayUrl } from './sample-data'
+import { SAMPLE_CV, EMPTY_CV, isEmptyCV } from './sample-data'
 
-export {
-  AtsTemplate,
-  ProfessionalTemplate,
-  ModernTemplate,
-  SAMPLE_CV,
-  EMPTY_CV,
-  isEmptyCV,
-  formatDateRange,
-  formatMonthYear,
-  formatDisplayUrl,
-}
+export { AtsTemplate, ProfessionalTemplate, ModernTemplate, SAMPLE_CV, EMPTY_CV, isEmptyCV }
 
 export interface TemplateMetadata {
   id: CVTemplate
   name: string
   description: string
-  recommendedFor: string
-  features: string[]
 }
 
 export const TEMPLATES_METADATA: TemplateMetadata[] = [
   {
     id: 'ats',
     name: 'ATS Clean',
-    description: 'Minimal single-column layout optimized for high readability and ATS parseability.',
-    recommendedFor: 'Enterprise systems, automated job applications, and online portals.',
-    features: ['Single-column', 'Linear hierarchy', 'High contrast', 'Parser-safe'],
+    description: 'One column, plain headings. Safest for job portals that parse your CV automatically.',
   },
   {
     id: 'professional',
-    name: 'Professional Executive',
-    description: 'Distinguished corporate layout with navy/slate accents and structured skill badges.',
-    recommendedFor: 'Finance, consulting, operations, management, and corporate roles.',
-    features: ['Corporate navy theme', 'Skill pills', 'Accent bars', 'Structured entries'],
+    name: 'Professional',
+    description: 'Section labels in a left column with a navy accent. Suits formal and corporate roles.',
   },
   {
     id: 'modern',
-    name: 'Modern Creative',
-    description: 'Contemporary asymmetrical two-column layout with a strong sidebar and clear timeline.',
-    recommendedFor: 'Client-facing, portfolio-based, creative, and modern professional roles.',
-    features: ['Two-column sidebar', 'Experience timeline', 'Avatar support', 'Blue accents'],
+    name: 'Modern',
+    description: 'Two columns with a sidebar for contact and skills. Best when a person, not a parser, reads first.',
   },
 ]
 
 export interface CVTemplateRendererProps {
   cv: CVWithRelations
   template?: CVTemplate
+  language?: DocumentLanguage
   className?: string
 }
 
-/**
- * Universal CV Template Renderer
- * Dynamically renders the selected template with responsive fallback.
- */
-export function CVTemplateRenderer({
-  cv,
-  template,
-  className = '',
-}: CVTemplateRendererProps) {
-  const selectedTemplate: CVTemplate = template || cv.template || 'ats'
-
-  switch (selectedTemplate) {
+export function CVTemplateRenderer({ cv, template, language, className = '' }: CVTemplateRendererProps) {
+  switch (template || cv.template || 'ats') {
     case 'modern':
-      return <ModernTemplate cv={cv} className={className} />
+      return <ModernTemplate cv={cv} language={language} className={className} />
     case 'professional':
-      return <ProfessionalTemplate cv={cv} className={className} />
-    case 'ats':
+      return <ProfessionalTemplate cv={cv} language={language} className={className} />
     default:
-      return <AtsTemplate cv={cv} className={className} />
+      return <AtsTemplate cv={cv} language={language} className={className} />
   }
 }
 

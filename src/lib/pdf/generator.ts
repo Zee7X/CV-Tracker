@@ -1,14 +1,15 @@
 import { pdf, type DocumentProps } from '@react-pdf/renderer'
 import { createPDFDocument } from './templates'
-import type { CVWithRelations, CVTemplate } from '@/types/cv'
+import type { CVWithRelations, CVTemplate, DocumentLanguage } from '@/types/cv'
 
 /**
  * Generates a PDF Blob from CV data using @react-pdf/renderer.
+ * Language defaults to the CV's own document language, not the app UI language.
  */
 export async function generatePDF(
   cv: CVWithRelations,
   templateOverride?: CVTemplate | string,
-  language: 'id' | 'en' = 'id'
+  language?: DocumentLanguage
 ): Promise<Blob> {
   const doc = createPDFDocument(cv, templateOverride, language)
   const instance = pdf(doc as React.ReactElement<DocumentProps>)
@@ -22,7 +23,7 @@ export async function generatePDF(
 export async function generatePDFBuffer(
   cv: CVWithRelations,
   templateOverride?: CVTemplate | string,
-  language: 'id' | 'en' = 'id'
+  language?: DocumentLanguage
 ): Promise<Buffer> {
   const blob = await generatePDF(cv, templateOverride, language)
   const arrayBuffer = await blob.arrayBuffer()
@@ -48,8 +49,8 @@ export function sanitizeFilename(filename?: string | null): string {
  */
 export function getPDFFileName(cv: CVWithRelations): string {
   const rawName = cv.personal_info?.full_name?.trim() || cv.name?.trim() || 'CV'
-  const sanitized = sanitizeFilename(rawName)
-  const cleanName = sanitized.replace(/^_+|_+$/g, '') || 'CV'
+  const sanitized = sanitizeFilename(rawName.replace(/\s+/g, '-'))
+  const cleanName = sanitized.replace(/^[_-]+|[_-]+$/g, '') || 'CV'
   return `${cleanName}-CV.pdf`
 }
 

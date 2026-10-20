@@ -1,73 +1,55 @@
 import React from 'react'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getDashboardData } from '@/lib/dashboard/queries'
-import DashboardShell from '@/components/layout/dashboard-shell'
+import { PageHeader } from '@/components/layout/page-header'
 import { MetricCards } from '@/components/dashboard/metric-cards'
 import { RecentCVs } from '@/components/dashboard/recent-cvs'
 import { RecentApplications } from '@/components/dashboard/recent-applications'
-import { Button } from '@/components/ui/button'
-import { Plus, FileText, Briefcase } from 'lucide-react'
+import { ButtonLink } from '@/components/ui/button-link'
+import { Plus } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-
-  // Verify authentication
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser()
+  if (authError || !user) redirect('/login')
 
-  if (authError || !user) {
-    redirect('/login')
-  }
-
-  // Fetch real user-owned dashboard metrics and recent activity
   const data = await getDashboardData(5)
 
   return (
-    <DashboardShell>
-      <div className="space-y-8">
-        {/* Page Header with Quick Actions */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Dashboard</h1>
-            <p className="text-sm text-slate-600">
-              Welcome back! Track your job applications and manage your CVs in one place.
-            </p>
-          </div>
+    <>
+      <div className="space-y-6">
+        <PageHeader
+          title="Overview"
+          description="Your latest applications and the CVs you used for them."
+          actions={
+            <>
+              <ButtonLink href="/dashboard/cv/new" variant="outline">
+                New CV
+              </ButtonLink>
+              <ButtonLink href="/dashboard/applications/new">
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                Add application
+              </ButtonLink>
+            </>
+          }
+        />
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Link href="/dashboard/cv/new">
-              <Button variant="outline" className="gap-2">
-                <FileText className="h-4 w-4" />
-                <span>Create CV</span>
-              </Button>
-            </Link>
-            <Link href="/dashboard/applications/new">
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                <Briefcase className="h-4 w-4" />
-                <span>Add Application</span>
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Real Metrics Grid */}
-        <section aria-label="Dashboard Metrics">
+        <section aria-label="Totals">
           <MetricCards metrics={data.metrics} />
         </section>
 
-        {/* Recent Activity Grid */}
-        <section aria-label="Recent Activity" className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <RecentCVs cvs={data.recentCVs} />
+        {/* Applications are the day-to-day work, so they take the wider column. */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <RecentApplications applications={data.recentApplications} />
-        </section>
+          <RecentCVs cvs={data.recentCVs} />
+        </div>
       </div>
-    </DashboardShell>
+    </>
   )
 }

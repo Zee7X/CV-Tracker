@@ -14,10 +14,10 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="rounded-lg border border-stone-300 bg-[#fffefa] p-8">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold text-slate-900">Reset your password</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Enter your email and we&apos;ll send a reset link
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-stone-950">Reset your password</h1>
+        <p className="mt-1 text-sm text-stone-600">
+          Enter the email you registered with. We will send a link to set a new password.
         </p>
       </div>
 
@@ -44,8 +44,8 @@ export default function ForgotPasswordPage() {
         </form>
       )}
 
-      <p className="mt-6 text-center text-sm text-slate-500">
-        <Link href="/login" className="text-blue-600 hover:underline font-medium">
+      <p className="mt-6 text-sm text-stone-600">
+        <Link href="/login" className="font-medium text-blue-800 underline-offset-4 hover:underline">
           Back to sign in
         </Link>
       </p>

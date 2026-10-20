@@ -1,31 +1,17 @@
 'use client'
 
-import React, { useState, useMemo, useRef, useEffect } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Minus, Plus } from 'lucide-react'
 import type { CVTemplate, CVWithRelations } from '@/types/cv'
-import {
-  CVTemplateRenderer,
-  TEMPLATES_METADATA,
-  SAMPLE_CV,
-  isEmptyCV,
-} from './templates'
-import {
-  ZoomIn,
-  ZoomOut,
-  Sparkles,
-  Maximize2,
-  Printer,
-  LayoutTemplate,
-  Eye,
-  FileCheck,
-} from 'lucide-react'
+import { CVTemplateRenderer, TEMPLATES_METADATA, SAMPLE_CV, isEmptyCV } from './templates'
 
-const A4_PIXEL_WIDTH = 794 // Approx A4 width in px (210mm @ 96dpi)
-const CONTAINER_PADDING = 48
-const DESKTOP_BREAKPOINT = 1024
+const A4_PIXEL_WIDTH = 794 // 210mm at 96dpi
+const MIN_SCALE = 0.3
+const MAX_SCALE = 1.5
 
 // Pure so it's unit-testable without a DOM.
 export function computeFitScale(containerWidth: number, a4PixelWidth = A4_PIXEL_WIDTH): number {
-  return Math.min(1.1, Math.max(0.4, Number((containerWidth / a4PixelWidth).toFixed(2))))
+  return Math.min(1.1, Math.max(MIN_SCALE, Math.floor((containerWidth / a4PixelWidth) * 100) / 100))
 }
 
 export interface LivePreviewProps {
@@ -34,10 +20,12 @@ export interface LivePreviewProps {
   onTemplateChange?: (template: CVTemplate) => void
   showControls?: boolean
   showSampleToggle?: boolean
-  initialScale?: number
   className?: string
   containerClassName?: string
 }
+
+// useLayoutEffect warns during SSR; this keeps the measurement synchronous in the browser only.
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export function LivePreview({
   cv,
@@ -45,260 +33,147 @@ export function LivePreview({
   onTemplateChange,
   showControls = true,
   showSampleToggle = true,
-  initialScale = 1,
   className = '',
   containerClassName = '',
 }: LivePreviewProps) {
-  const [internalTemplate, setInternalTemplate] = useState<CVTemplate>(
-    cv?.template || 'professional'
-  )
-  const [scale, setScale] = useState<number>(initialScale)
-  const [useSampleData, setUseSampleData] = useState<boolean>(false)
-  const [fitMode, setFitMode] = useState<boolean>(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const userZoomedRef = useRef(false)
+  const [internalTemplate, setInternalTemplate] = useState<CVTemplate>(cv?.template || 'ats')
+  const [useSampleData, setUseSampleData] = useState(false)
+  // null = follow the container width; a number = the user picked a zoom level.
+  const [manualScale, setManualScale] = useState<number | null>(null)
+  const [fitScale, setFitScale] = useState(0.7)
+  const [sheetHeight, setSheetHeight] = useState(1123)
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const sheetRef = useRef<HTMLDivElement>(null)
 
   const activeTemplate = controlledTemplate ?? internalTemplate
-
-  const handleTemplateSelect = (newTemplate: CVTemplate) => {
-    setInternalTemplate(newTemplate)
-    if (onTemplateChange) {
-      onTemplateChange(newTemplate)
-    }
-  }
-
   const isCVEmpty = useMemo(() => isEmptyCV(cv), [cv])
-  const showingSampleData = useSampleData || isCVEmpty
+  const showingSample = useSampleData || isCVEmpty
+  // An empty A4 page looks broken, so show an unsaved example until the user starts typing.
+  const activeCV = showingSample ? { ...SAMPLE_CV, template: activeTemplate } : cv
+  const scale = manualScale ?? fitScale
 
-  // An empty A4 page looks broken, so use a non-persistent example until the user starts typing.
-  const activeCV = useMemo(() => {
-    if (showingSampleData) {
-      return {
-        ...SAMPLE_CV,
-        template: activeTemplate,
-      }
+  useIsomorphicLayoutEffect(() => {
+    const viewport = viewportRef.current
+    const sheet = sheetRef.current
+    if (!viewport || !sheet) return
+    const measure = () => {
+      const styles = window.getComputedStyle(viewport)
+      const usable = viewport.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight)
+      if (usable > 0) setFitScale(computeFitScale(usable))
+      setSheetHeight(sheet.offsetHeight)
     }
-    return cv || SAMPLE_CV
-  }, [showingSampleData, cv, activeTemplate])
-
-  // Zoom handlers
-  const handleZoomIn = () => {
-    userZoomedRef.current = true
-    setFitMode(false)
-    setScale((prev) => Math.min(1.5, Number((prev + 0.1).toFixed(2))))
-  }
-
-  const handleZoomOut = () => {
-    userZoomedRef.current = true
-    setFitMode(false)
-    setScale((prev) => Math.max(0.4, Number((prev - 0.1).toFixed(2))))
-  }
-
-  const handleResetZoom = () => {
-    userZoomedRef.current = true
-    setFitMode(false)
-    setScale(1)
-  }
-
-  const handleFitToWidth = () => {
-    if (!containerRef.current) return
-    const containerWidth = containerRef.current.clientWidth - CONTAINER_PADDING
-    if (containerWidth > 0) {
-      userZoomedRef.current = false // re-enable auto-refit on resize
-      setScale(computeFitScale(containerWidth))
-      setFitMode(true)
-    }
-  }
-
-  // Auto-fit on mount and on resize/orientation change (mobile only), unless
-  // the user explicitly zoomed. Desktop (>=1024px) keeps initialScale.
-  useEffect(() => {
-    const node = containerRef.current
-    if (!node) return
-    let frame = 0
-    const applyFit = () => {
-      if (userZoomedRef.current || !containerRef.current) return
-      if (window.innerWidth >= DESKTOP_BREAKPOINT) return
-      const containerWidth = containerRef.current.clientWidth - CONTAINER_PADDING
-      if (containerWidth > 0) {
-        setScale(computeFitScale(containerWidth))
-        setFitMode(true)
-      }
-    }
-    applyFit()
-    const observer = new ResizeObserver(() => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(applyFit)
-    })
-    observer.observe(node)
-    return () => {
-      cancelAnimationFrame(frame)
-      observer.disconnect()
-    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(viewport)
+    observer.observe(sheet)
+    return () => observer.disconnect()
   }, [])
 
-  const handlePrint = () => {
-    if (typeof window !== 'undefined') {
-      window.print()
-    }
+  const selectTemplate = (next: CVTemplate) => {
+    setInternalTemplate(next)
+    onTemplateChange?.(next)
   }
+
+  const zoom = (delta: number) =>
+    setManualScale(Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round((scale + delta) * 10) / 10)))
 
   return (
     <section
-      className={`flex flex-col overflow-hidden rounded-lg border border-stone-300 bg-stone-100 text-slate-900 shadow-sm ${containerClassName}`}
-      aria-label="CV Live Preview Container"
+      className={`flex flex-col overflow-hidden rounded-lg border border-stone-300 bg-stone-200/60 ${containerClassName}`}
+      aria-label="CV preview"
       data-testid="cv-live-preview"
     >
-      {/* Control Bar */}
-      {showControls && (
-        <header className="z-10 flex flex-wrap items-center justify-between gap-3 border-b border-stone-300 bg-white px-4 py-3">
-          {/* Template Switcher Buttons */}
-          <div className="flex items-center gap-1.5 overflow-x-auto py-0.5" role="tablist" aria-label="CV Template Selector">
-            <span className="mr-1.5 flex items-center gap-1 text-xs font-semibold text-slate-600">
-              <LayoutTemplate className="h-3.5 w-3.5 text-blue-600" />
-              Template:
-            </span>
+      {showControls ? (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-300 bg-[#fffefa] px-3 py-2">
+          <div role="radiogroup" aria-label="Template" className="flex rounded-md border border-stone-300 bg-stone-100 p-0.5">
             {TEMPLATES_METADATA.map((tmpl) => {
-              const isSelected = activeTemplate === tmpl.id
+              const selected = activeTemplate === tmpl.id
               return (
                 <button
                   key={tmpl.id}
                   type="button"
-                  role="tab"
-                  aria-selected={isSelected}
-                  aria-controls={`preview-panel-${tmpl.id}`}
-                  onClick={() => handleTemplateSelect(tmpl.id)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                    isSelected
-                      ? 'bg-blue-600 text-white font-semibold'
-                      : 'border border-stone-300 bg-stone-50 text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700'
+                  role="radio"
+                  aria-checked={selected}
+                  title={tmpl.description}
+                  onClick={() => selectTemplate(tmpl.id)}
+                  className={`rounded px-2.5 py-1 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800 ${
+                    selected ? 'bg-white text-stone-950 shadow-sm' : 'text-stone-600 hover:text-stone-950'
                   }`}
+                  data-no-translate
                 >
-                  <span>{tmpl.name}</span>
-                  {isSelected && <FileCheck className="h-3 w-3 text-blue-100" />}
+                  {tmpl.name}
                 </button>
               )
             })}
           </div>
 
-          {/* Action & Zoom Controls */}
-          <div className="flex items-center gap-2 ml-auto">
-            {/* Sample CV Toggle */}
-            {showSampleToggle && (
+          <div className="flex items-center gap-2">
+            {showSampleToggle && !isCVEmpty ? (
+              <label className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-stone-600">
+                <input
+                  type="checkbox"
+                  checked={useSampleData}
+                  onChange={(event) => setUseSampleData(event.target.checked)}
+                  className="h-3.5 w-3.5 rounded border-stone-400 accent-blue-700"
+                />
+                Show sample
+              </label>
+            ) : null}
+            <div className="flex items-center rounded-md border border-stone-300 bg-white">
               <button
                 type="button"
-                onClick={() => setUseSampleData((prev) => !prev)}
-                disabled={isCVEmpty}
-                className={`px-2.5 py-1.5 text-xs rounded-lg border transition-all flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                  showingSampleData
-                    ? 'border-blue-200 bg-blue-50 text-blue-700 font-medium disabled:cursor-default'
-                    : 'border-stone-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50'
-                }`}
-                title="Toggle between your CV data and filled sample data"
-                aria-pressed={showingSampleData}
-              >
-                <Sparkles className={`h-3.5 w-3.5 ${showingSampleData ? 'text-blue-600' : 'text-slate-500'}`} />
-                <span>{isCVEmpty ? 'Sample preview' : useSampleData ? 'Sample Data ON' : 'Show Sample'}</span>
-              </button>
-            )}
-
-            {/* Scale / Zoom Actions */}
-            <div className="flex items-center rounded-lg border border-stone-300 bg-stone-50 p-0.5 text-xs">
-              <button
-                type="button"
-                onClick={handleZoomOut}
-                disabled={scale <= 0.4}
-                className="flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-md p-1.5 text-slate-600 hover:bg-stone-200 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
-                title="Zoom Out"
+                onClick={() => zoom(-0.1)}
+                disabled={scale <= MIN_SCALE}
                 aria-label="Zoom Out"
+                className="flex h-8 w-8 items-center justify-center text-stone-600 hover:text-stone-950 disabled:opacity-30"
               >
-                <ZoomOut className="w-3.5 h-3.5" />
+                <Minus className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
-
               <button
                 type="button"
-                onClick={handleResetZoom}
-                className="flex min-h-10 cursor-pointer items-center justify-center rounded-md px-2 py-1 font-mono text-[11px] text-slate-600 hover:bg-stone-200 hover:text-slate-900"
-                title="Reset Zoom to 100%"
-                aria-label="Reset Zoom"
+                onClick={() => setManualScale(null)}
+                aria-label="Fit to Width"
+                title="Fit to width"
+                className={`h-8 min-w-12 border-x border-stone-300 px-1.5 text-xs tabular-nums ${
+                  manualScale === null ? 'font-semibold text-stone-950' : 'text-stone-600 hover:text-stone-950'
+                }`}
               >
                 {Math.round(scale * 100)}%
               </button>
-
               <button
                 type="button"
-                onClick={handleZoomIn}
-                disabled={scale >= 1.5}
-                className="flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-md p-1.5 text-slate-600 hover:bg-stone-200 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
-                title="Zoom In"
+                onClick={() => zoom(0.1)}
+                disabled={scale >= MAX_SCALE}
                 aria-label="Zoom In"
+                className="flex h-8 w-8 items-center justify-center text-stone-600 hover:text-stone-950 disabled:opacity-30"
               >
-                <ZoomIn className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleFitToWidth}
-                className={`flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-stone-200 ${
-                  fitMode ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Fit to Container Width"
-                aria-label="Fit to Width"
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
+                <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
             </div>
-
-            {/* Print / Preview Button */}
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-lg border border-stone-300 bg-white p-1.5 text-slate-600 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              title="Print CV or Save as PDF"
-              aria-label="Print or Save CV"
-            >
-              <Printer className="w-3.5 h-3.5" />
-            </button>
           </div>
-        </header>
-      )}
-
-      {/* Empty State Banner */}
-      {isCVEmpty && (
-        <div
-          role="status"
-          className="flex items-center gap-2 border-b border-blue-200 bg-blue-50 px-4 py-2 text-xs text-blue-900"
-        >
-          <Eye className="h-4 w-4 shrink-0 text-blue-600" />
-          <span>Your CV is empty, so this preview uses sample data. The sample will not be saved.</span>
         </div>
-      )}
+      ) : null}
 
-      {/* Preview Viewport & A4 Stage */}
-      <main
-        ref={containerRef}
-        id={`preview-panel-${activeTemplate}`}
-        role="tabpanel"
-        className="relative flex min-h-[500px] flex-1 items-start justify-center overflow-auto bg-stone-200/70 p-4 md:p-8"
-        tabIndex={0}
-        aria-label={`Live preview of ${activeTemplate} CV`}
-      >
-        {/* Scaled A4 Paper Wrapper */}
-        <div
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: 'top center',
-            transition: 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-          className="w-full max-w-[210mm] rounded-sm bg-white text-slate-900 shadow-lg ring-1 ring-stone-300 print:transform-none print:shadow-none print:ring-0"
-        >
-          <CVTemplateRenderer
-            cv={activeCV}
-            template={activeTemplate}
-            className={className}
-          />
+      {showingSample ? (
+        <p role="status" className="border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-900">
+          {isCVEmpty
+            ? 'Your CV is empty, so this preview uses sample data. The sample will not be saved.'
+            : 'Showing sample data. Your own content is unchanged.'}
+        </p>
+      ) : null}
+
+      <div ref={viewportRef} className="flex-1 overflow-auto p-4 sm:p-6" aria-label={`Preview of ${activeTemplate} CV`}>
+        {/* The sheet keeps its real A4 width; only the visual scale changes, so line breaks match the PDF. */}
+        <div className="mx-auto" style={{ width: A4_PIXEL_WIDTH * scale, height: sheetHeight * scale }}>
+          <div
+            ref={sheetRef}
+            style={{ width: A4_PIXEL_WIDTH, transform: `scale(${scale})`, transformOrigin: 'top left' }}
+            className="shadow-[0_1px_3px_rgba(0,0,0,0.12)] ring-1 ring-stone-300"
+          >
+            <CVTemplateRenderer cv={activeCV} template={activeTemplate} className={className} />
+          </div>
         </div>
-      </main>
+      </div>
     </section>
   )
 }

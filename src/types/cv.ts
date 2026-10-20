@@ -2,7 +2,11 @@ import type { CVTemplate } from './database'
 
 export type { CVTemplate }
 
+export type DocumentLanguage = 'en' | 'id'
+
 export interface PersonalInfo {
+  /** Language the CV document itself is written in; independent of the app UI language. */
+  document_language?: DocumentLanguage
   full_name: string
   professional_title?: string
   email: string

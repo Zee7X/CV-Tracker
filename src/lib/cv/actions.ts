@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { cvSchema, type CVInput } from '@/lib/validations/cv'
+import { toStoredDate } from '@/lib/cv/document'
 
 export type ActionResult<T = unknown> =
   | { success: true; data: T; error?: never }
@@ -14,14 +15,28 @@ const sanitize = (str?: string | null): string | null => {
   return trimmed === '' ? null : trimmed
 }
 
+// Stored as jsonb; document_language lives here so no schema migration is needed.
+const toPersonalInfo = (info: CVInput['personal_info']) => ({
+  document_language: info.document_language,
+  full_name: info.full_name.trim(),
+  email: info.email.trim(),
+  professional_title: sanitize(info.professional_title) ?? undefined,
+  phone: sanitize(info.phone) ?? undefined,
+  location: sanitize(info.location) ?? undefined,
+  linkedin: sanitize(info.linkedin) ?? undefined,
+  github: sanitize(info.github) ?? undefined,
+  portfolio: sanitize(info.portfolio) ?? undefined,
+  photo_url: sanitize(info.photo_url) ?? undefined,
+})
+
 // Row mappers shared by createCV/updateCV to build the RPC's jsonb payloads.
 const toExperienceRows = (rows: CVInput['experiences']) =>
   rows.map((exp, idx) => ({
     company: exp.company.trim(),
     position: exp.position.trim(),
     location: sanitize(exp.location),
-    start_date: exp.start_date.trim(),
-    end_date: exp.is_current ? null : sanitize(exp.end_date),
+    start_date: toStoredDate(exp.start_date) as string,
+    end_date: exp.is_current ? null : toStoredDate(exp.end_date),
     is_current: Boolean(exp.is_current),
     description: sanitize(exp.description),
     sort_order: idx,
@@ -32,8 +47,8 @@ const toEducationRows = (rows: CVInput['educations']) =>
     institution: edu.institution.trim(),
     degree: sanitize(edu.degree),
     field_of_study: sanitize(edu.field_of_study),
-    start_date: sanitize(edu.start_date),
-    end_date: sanitize(edu.end_date),
+    start_date: toStoredDate(edu.start_date),
+    end_date: toStoredDate(edu.end_date),
     description: sanitize(edu.description),
     sort_order: idx,
   }))
@@ -43,8 +58,8 @@ const toProjectRows = (rows: CVInput['projects']) =>
     name: proj.name.trim(),
     description: sanitize(proj.description),
     project_url: sanitize(proj.project_url),
-    start_date: sanitize(proj.start_date),
-    end_date: sanitize(proj.end_date),
+    start_date: toStoredDate(proj.start_date),
+    end_date: toStoredDate(proj.end_date),
     sort_order: idx,
   }))
 
@@ -52,7 +67,7 @@ const toCertificationRows = (rows: CVInput['certifications']) =>
   rows.map((cert, idx) => ({
     name: cert.name.trim(),
     issuer: sanitize(cert.issuer),
-    issue_date: sanitize(cert.issue_date),
+    issue_date: toStoredDate(cert.issue_date),
     credential_url: sanitize(cert.credential_url),
     sort_order: idx,
   }))
@@ -81,17 +96,7 @@ export async function createCV(input: CVInput): Promise<ActionResult<{ id: strin
   const { data: cvId, error: rpcError } = await supabase.rpc('create_cv_with_relations', {
     p_name: validData.name.trim(),
     p_template: validData.template,
-    p_personal_info: {
-      full_name: validData.personal_info.full_name.trim(),
-      email: validData.personal_info.email.trim(),
-      professional_title: sanitize(validData.personal_info.professional_title) ?? undefined,
-      phone: sanitize(validData.personal_info.phone) ?? undefined,
-      location: sanitize(validData.personal_info.location) ?? undefined,
-      linkedin: sanitize(validData.personal_info.linkedin) ?? undefined,
-      github: sanitize(validData.personal_info.github) ?? undefined,
-      portfolio: sanitize(validData.personal_info.portfolio) ?? undefined,
-      photo_url: sanitize(validData.personal_info.photo_url) ?? undefined,
-    },
+    p_personal_info: toPersonalInfo(validData.personal_info),
     p_summary: sanitize(validData.summary),
     p_skills: validData.skills.map((s) => s.trim()).filter(Boolean),
     p_experiences: toExperienceRows(validData.experiences),
@@ -135,17 +140,7 @@ export async function updateCV(id: string, input: CVInput): Promise<ActionResult
     p_cv_id: id,
     p_name: validData.name.trim(),
     p_template: validData.template,
-    p_personal_info: {
-      full_name: validData.personal_info.full_name.trim(),
-      email: validData.personal_info.email.trim(),
-      professional_title: sanitize(validData.personal_info.professional_title) ?? undefined,
-      phone: sanitize(validData.personal_info.phone) ?? undefined,
-      location: sanitize(validData.personal_info.location) ?? undefined,
-      linkedin: sanitize(validData.personal_info.linkedin) ?? undefined,
-      github: sanitize(validData.personal_info.github) ?? undefined,
-      portfolio: sanitize(validData.personal_info.portfolio) ?? undefined,
-      photo_url: sanitize(validData.personal_info.photo_url) ?? undefined,
-    },
+    p_personal_info: toPersonalInfo(validData.personal_info),
     p_summary: sanitize(validData.summary),
     p_skills: validData.skills.map((s) => s.trim()).filter(Boolean),
     p_experiences: toExperienceRows(validData.experiences),

@@ -2,7 +2,6 @@ import React from 'react'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getCVWithRelations } from '@/lib/cv/queries'
-import DashboardShell from '@/components/layout/dashboard-shell'
 import { CVForm } from '@/components/cv/editor/cv-form'
 
 export const dynamic = 'force-dynamic'
@@ -27,10 +26,10 @@ export default async function CVDetailPage({ params }: CVDetailPageProps) {
   }
 
   return (
-    <DashboardShell>
-      <div className="mx-auto max-w-5xl">
+    <>
+      <div>
         <CVForm initialData={cv} />
       </div>
-    </DashboardShell>
+    </>
   )
 }
