@@ -52,29 +52,29 @@ export function CoverLetterCard({ letter }: CoverLetterCardProps) {
 
   return (
     <>
-      <article className="group flex h-full flex-col overflow-hidden rounded-3xl glass transition-[border-color,box-shadow] hover:border-stone-900/10 hover:shadow-[0_4px_16px_-6px_rgba(28,25,23,0.12)]">
+      <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs transition-all hover:border-slate-300 hover:shadow-sm">
         <Link
           href={href}
-          className="flex flex-1 flex-col px-5 py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
+          className="flex flex-1 flex-col px-5 py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600"
         >
           <div className="flex items-start gap-3">
             <Monogram name={letter.company_name || letter.title} size="lg" />
             <div className="min-w-0 flex-1">
-              <h2 className="line-clamp-2 text-[15px] font-semibold leading-snug text-stone-900" data-no-translate>
+              <h2 className="line-clamp-2 text-[15px] font-bold leading-snug text-slate-900" data-no-translate>
                 {letter.title}
               </h2>
-              <p className="mt-0.5 truncate text-sm text-stone-600" data-no-translate>
+              <p className="mt-0.5 truncate text-xs text-slate-500" data-no-translate>
                 {`${letter.job_title} · ${letter.company_name}`}
               </p>
             </div>
           </div>
           {letter.opening ? (
-            <p className="mt-4 line-clamp-3 rounded-lg bg-white/50 px-3 py-2.5 font-serif text-[13px] leading-5 text-stone-600" data-no-translate>
+            <p className="mt-4 line-clamp-3 rounded-xl border border-slate-100 bg-slate-50/70 px-3.5 py-2.5 font-serif text-[13px] leading-5 text-slate-600" data-no-translate>
               {letter.opening}
             </p>
           ) : null}
-          <div className="mt-auto flex flex-wrap items-center gap-2 pt-4 text-xs text-stone-500">
-            <span className="rounded-md bg-brand-50 px-1.5 py-0.5 font-medium text-brand-800">{FORMAT_LABELS[letter.template] ?? letter.template}</span>
+          <div className="mt-auto flex flex-wrap items-center gap-2 pt-4 text-xs text-slate-400">
+            <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">{FORMAT_LABELS[letter.template] ?? letter.template}</span>
             <span>
               <span>Edited</span> <LocalDate value={letter.updated_at} />
             </span>
@@ -87,10 +87,10 @@ export function CoverLetterCard({ letter }: CoverLetterCardProps) {
           </p>
         ) : null}
 
-        <div className="flex items-center gap-1 border-t border-stone-900/[0.06] px-3 py-2">
+        <div className="flex items-center gap-1 border-t border-slate-100 px-3 py-2">
           <Link
             href={href}
-            className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-brand-700 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-brand-600 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
             <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
             Edit
@@ -99,7 +99,7 @@ export function CoverLetterCard({ letter }: CoverLetterCardProps) {
             type="button"
             size="sm"
             variant="ghost"
-            className="h-8"
+            className="h-8 rounded-full text-slate-600"
             onClick={() => run('duplicate', () => duplicateCoverLetter(letter.id), 'Could not duplicate the letter.')}
             disabled={isPending}
             aria-label={`Duplicate ${letter.title}`}
@@ -115,7 +115,7 @@ export function CoverLetterCard({ letter }: CoverLetterCardProps) {
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
             disabled={isPending}
-            className="ml-auto flex h-8 w-8 items-center justify-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 disabled:opacity-50"
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 disabled:opacity-50"
             aria-label={`Delete ${letter.title}`}
             title="Delete"
           >

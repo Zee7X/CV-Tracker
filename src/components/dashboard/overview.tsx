@@ -15,7 +15,7 @@ import { CVThumbnail } from '@/components/cv/cv-thumbnail'
 
 type Summary = ReturnType<typeof summarize>
 
-const linkClass = 'text-xs font-semibold text-brand-700 underline-offset-4 hover:underline'
+const linkClass = 'text-xs font-semibold text-brand-600 underline-offset-4 hover:underline'
 
 /* Stat strip: real counts only, each with the sentence that explains it. */
 export function StatStrip({ summary }: { summary: Summary }) {
@@ -59,25 +59,25 @@ export function StatStrip({ summary }: { summary: Summary }) {
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
       {items.map((item) => {
         const Icon = item.icon
         return (
           <Link
             key={item.label}
             href={item.href}
-            className="group rounded-3xl glass p-4 shadow-[0_1px_2px_rgba(28,25,23,0.04)] transition-colors hover:border-stone-900/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 sm:p-5"
+            className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:border-slate-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-medium text-stone-600">{item.label}</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900/[0.05] text-stone-500 transition-colors group-hover:bg-brand-50 group-hover:text-brand-700">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{item.label}</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-brand-600 transition-colors group-hover:bg-brand-600 group-hover:text-white">
                 <Icon className="h-4 w-4" aria-hidden="true" />
               </span>
             </div>
-            <p className="mt-2 text-[28px] font-semibold leading-9 tabular-nums tracking-[-0.02em] text-stone-900" data-no-translate>
+            <p className="mt-2 text-[30px] font-bold leading-9 tabular-nums tracking-tight text-slate-900" data-no-translate>
               {item.value}
             </p>
-            <p className="mt-0.5 text-xs leading-5 text-stone-500">{item.note}</p>
+            <p className="mt-1 text-xs text-slate-500">{item.note}</p>
           </Link>
         )
       })}
@@ -86,12 +86,12 @@ export function StatStrip({ summary }: { summary: Summary }) {
 }
 
 const BAR_COLORS: Record<string, string> = {
-  applied: 'bg-stone-400',
+  applied: 'bg-slate-400',
   screening: 'bg-amber-400',
   interview: 'bg-brand-600',
   offering: 'bg-emerald-500',
   accepted: 'bg-emerald-700',
-  rejected: 'bg-stone-200',
+  rejected: 'bg-slate-200',
 }
 
 /* Where every application stands, as one bar plus a clickable legend. */
@@ -109,12 +109,12 @@ export function Pipeline({ summary }: { summary: Summary }) {
     >
       {summary.total === 0 ? (
         <div className="space-y-3">
-          <div className="h-3 rounded-full bg-stone-900/[0.05]" />
-          <p className="text-sm text-stone-500">Stages appear here once you log your first application.</p>
+          <div className="h-3 rounded-full bg-slate-100" />
+          <p className="text-sm text-slate-500">Stages appear here once you log your first application.</p>
         </div>
       ) : (
         <>
-          <div className="flex h-3 overflow-hidden rounded-full bg-stone-900/[0.05]" aria-hidden="true">
+          <div className="flex h-3 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
             {APPLICATION_STATUSES.map((status) => {
               const count = summary.byStatus[status.value] ?? 0
               if (!count) return null
@@ -134,11 +134,11 @@ export function Pipeline({ summary }: { summary: Summary }) {
                 <li key={status.value}>
                   <Link
                     href={`/dashboard/applications?status=${status.value}`}
-                    className="flex items-center gap-2.5 rounded-lg border border-white/70 px-3 py-2.5 transition-colors hover:border-stone-900/10 hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
+                    className="flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/50 px-3 py-2.5 transition-colors hover:border-slate-300 hover:bg-slate-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
                   >
                     <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${BAR_COLORS[status.value]}`} aria-hidden="true" />
-                    <span className="flex-1 text-sm text-stone-700">{status.label}</span>
-                    <span className="text-sm font-semibold tabular-nums text-stone-900" data-no-translate>
+                    <span className="flex-1 text-xs font-semibold text-slate-700">{status.label}</span>
+                    <span className="text-xs font-bold tabular-nums text-slate-900" data-no-translate>
                       {count}
                     </span>
                   </Link>
@@ -169,26 +169,26 @@ export function FollowUps({ items }: { items: Summary['followUps'] }) {
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
             <Check className="h-4 w-4" aria-hidden="true" />
           </span>
-          <p className="text-sm leading-6 text-stone-600">Nothing to chase right now. Older applications that are still waiting show up here.</p>
+          <p className="text-sm leading-6 text-slate-600">Nothing to chase right now. Older applications that are still waiting show up here.</p>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-900/[0.06]">
+        <ul className="divide-y divide-slate-100">
           {shown.map(({ app, days }) => (
             <li key={app.id}>
               <Link
                 href={`/dashboard/applications/${app.id}`}
-                className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
+                className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600"
               >
                 <Monogram name={app.company_name} size="sm" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-stone-900" data-no-translate>
+                  <span className="block truncate text-sm font-semibold text-slate-900" data-no-translate>
                     {app.company_name}
                   </span>
-                  <span className="block truncate text-xs text-stone-500" data-no-translate>
+                  <span className="block truncate text-xs text-slate-500" data-no-translate>
                     {app.position}
                   </span>
                 </span>
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800">
                   <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
                   <span className="tabular-nums" data-no-translate>{days}</span>
                   <span>days</span>
@@ -199,7 +199,7 @@ export function FollowUps({ items }: { items: Summary['followUps'] }) {
         </ul>
       )}
       {items.length > shown.length ? (
-        <div className="border-t border-stone-900/[0.06] px-5 py-3 text-xs text-stone-500">
+        <div className="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">
           <span data-no-translate>+{items.length - shown.length}</span> <span>more in the applications list</span>
         </div>
       ) : null}
@@ -222,33 +222,33 @@ export function RecentApplicationsPanel({ applications }: { applications: JobApp
     >
       {rows.length === 0 ? (
         <div className="px-5 py-10 text-center">
-          <p className="text-sm font-medium text-stone-800">No applications logged yet.</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-stone-500">
+          <p className="text-sm font-semibold text-slate-800">No applications logged yet.</p>
+          <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500">
             Record each job you apply to so you know which CV you sent and when to follow up.
           </p>
-          <ButtonLink href="/dashboard/applications/new" size="sm" className="mt-4">
+          <ButtonLink href="/dashboard/applications/new" size="sm" className="mt-4 rounded-full">
             Add application
           </ButtonLink>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-900/[0.06]">
+        <ul className="divide-y divide-slate-100">
           {rows.map((app) => (
             <li key={app.id}>
               <Link
                 href={`/dashboard/applications/${app.id}`}
-                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-5 py-3.5 transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700 sm:grid-cols-[auto_minmax(0,1fr)_200px_96px_92px]"
+                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-5 py-3.5 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600 sm:grid-cols-[auto_minmax(0,1fr)_200px_96px_92px]"
               >
-                <Monogram name={app.company_name} />
+                <Monogram name={app.company_name} size="sm" />
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-medium text-stone-900" data-no-translate>
+                  <span className="block truncate text-sm font-semibold text-slate-900" data-no-translate>
                     {app.position}
                   </span>
-                  <span className="block truncate text-xs text-stone-500" data-no-translate>
+                  <span className="block truncate text-xs text-slate-500" data-no-translate>
                     {app.company_name}
                   </span>
                 </span>
-                <span className="hidden min-w-0 items-center gap-1.5 truncate text-xs text-stone-500 sm:flex">
-                  <FileText className="h-3.5 w-3.5 shrink-0 text-stone-400" aria-hidden="true" />
+                <span className="hidden min-w-0 items-center gap-1.5 truncate text-xs text-slate-500 sm:flex">
+                  <FileText className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden="true" />
                   {app.cv ? (
                     <span className="truncate" data-no-translate>
                       {app.cv.name}
@@ -257,7 +257,7 @@ export function RecentApplicationsPanel({ applications }: { applications: JobApp
                     <span>No CV linked</span>
                   )}
                 </span>
-                <span className="hidden text-xs tabular-nums text-stone-500 sm:block">
+                <span className="hidden text-xs tabular-nums text-slate-500 sm:block">
                   <LocalDate value={app.applied_date} />
                 </span>
                 <span className="flex justify-end">
@@ -287,32 +287,32 @@ export function CVShelf({ cvs, letterCount }: { cvs: CV[]; letterCount: number }
     >
       {shown.length === 0 ? (
         <div className="px-5 py-8 text-center">
-          <p className="text-sm font-medium text-stone-800">No CVs yet.</p>
-          <p className="mt-1 text-sm text-stone-500">Create one, then attach it to the applications you send.</p>
-          <ButtonLink href="/dashboard/cv/new" size="sm" className="mt-4">
+          <p className="text-sm font-semibold text-slate-800">No CVs yet.</p>
+          <p className="mt-1 text-xs text-slate-500">Create one, then attach it to the applications you send.</p>
+          <ButtonLink href="/dashboard/cv/new" size="sm" className="mt-4 rounded-full">
             Create CV
           </ButtonLink>
         </div>
       ) : (
-        <ul className="divide-y divide-stone-900/[0.06]">
+        <ul className="divide-y divide-slate-100">
           {shown.map((cv) => (
             <li key={cv.id}>
               <Link
                 href={`/dashboard/cv/${cv.id}`}
-                className="flex items-center gap-3.5 px-5 py-3 transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
+                className="flex items-center gap-3.5 px-5 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600"
               >
                 <CVThumbnail cv={cv} className="w-11" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-stone-900" data-no-translate>
+                  <span className="block truncate text-sm font-semibold text-slate-900" data-no-translate>
                     {cv.name}
                   </span>
-                  <span className="block truncate text-xs text-stone-500">
+                  <span className="block truncate text-xs text-slate-500">
                     <span data-no-translate>{TEMPLATE_NAMES[cv.template] ?? cv.template}</span>
                     <span aria-hidden="true"> · </span>
                     <span>Edited</span> <LocalDate value={cv.updated_at} />
                   </span>
                 </span>
-                <ArrowUpRight className="h-4 w-4 shrink-0 text-stone-300" aria-hidden="true" />
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300" aria-hidden="true" />
               </Link>
             </li>
           ))}
@@ -320,13 +320,13 @@ export function CVShelf({ cvs, letterCount }: { cvs: CV[]; letterCount: number }
       )}
       <Link
         href="/dashboard/cover-letters"
-        className="flex items-center gap-3 border-t border-stone-900/[0.06] px-5 py-3.5 text-sm transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
+        className="flex items-center gap-3 border-t border-slate-100 px-5 py-3.5 text-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900/[0.05] text-stone-500">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600">
           <Mail className="h-4 w-4" aria-hidden="true" />
         </span>
-        <span className="flex-1 font-medium text-stone-800">Cover letters</span>
-        <span className="text-sm font-semibold tabular-nums text-stone-900" data-no-translate>
+        <span className="flex-1 text-xs font-semibold text-slate-800">Cover letters</span>
+        <span className="text-xs font-bold tabular-nums text-slate-900" data-no-translate>
           {letterCount}
         </span>
       </Link>
@@ -369,26 +369,26 @@ export function GettingStarted({ hasCV, hasApplication, hasLetter }: { hasCV: bo
           <span data-no-translate>{doneCount}/3</span> <span>steps done</span>
         </>
       }
-      bodyClassName="grid gap-px overflow-hidden rounded-b-xl bg-stone-900/[0.05] md:grid-cols-3"
+      bodyClassName="grid gap-px overflow-hidden rounded-b-2xl bg-slate-100 md:grid-cols-3"
     >
       {steps.map((step, index) => (
         <div key={step.title} className="flex flex-col bg-white p-5">
           <span
             className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-              step.done ? 'bg-emerald-600 text-white' : 'bg-stone-900/[0.05] text-stone-600'
+              step.done ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
             }`}
             aria-hidden="true"
           >
             {step.done ? <Check className="h-4 w-4" /> : index + 1}
           </span>
-          <h3 className={`mt-3 text-sm font-semibold ${step.done ? 'text-stone-500 line-through decoration-stone-300' : 'text-stone-900'}`}>
+          <h3 className={`mt-3 text-sm font-semibold ${step.done ? 'text-slate-400 line-through decoration-slate-300' : 'text-slate-900'}`}>
             {step.title}
           </h3>
-          <p className="mt-1 flex-1 text-sm leading-6 text-stone-600">{step.copy}</p>
+          <p className="mt-1 flex-1 text-xs leading-5 text-slate-500">{step.copy}</p>
           {step.done ? (
-            <span className="mt-4 text-xs font-medium text-emerald-700">Done</span>
+            <span className="mt-4 text-xs font-semibold text-emerald-700">Done</span>
           ) : (
-            <ButtonLink href={step.href} size="sm" variant="outline" className="mt-4 self-start">
+            <ButtonLink href={step.href} size="sm" variant="outline" className="mt-4 self-start rounded-full">
               {step.cta}
             </ButtonLink>
           )}

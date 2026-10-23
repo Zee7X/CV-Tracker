@@ -6,10 +6,10 @@
  * they are what recruiters read, so none of this reaches them.
  */
 :root {
-  --paper: #f6efeb;
-  --ink: #1f1a24;
-  --line: rgb(31 26 36 / 0.1);
-  --highlight: #ffe0d2;
+  --paper: #f8fafc;
+  --ink: #0f172a;
+  --line: rgb(226 232 240 / 0.85);
+  --highlight: #dbeafe;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -20,18 +20,18 @@
   --font-display: var(--font-poppins), var(--font-inter), ui-sans-serif, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Coral accent. 600 and darker pass 4.5:1 on white for text and buttons. */
-  --color-brand-50: #fff5f0;
-  --color-brand-100: #ffe8dd;
-  --color-brand-200: #ffcfba;
-  --color-brand-300: #ffab8c;
-  --color-brand-400: #fb845f;
-  --color-brand-500: #f2663c;
-  --color-brand-600: #cc4219;
-  --color-brand-700: #ad3714;
-  --color-brand-800: #8c2f17;
-  --color-brand-900: #732916;
-  --color-brand-950: #3f1208;
+  /* Royal blue primary accent matching modern clean dashboard standards */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
+  --color-brand-950: #172554;
 }
 
 @layer base {
@@ -46,12 +46,11 @@
   body {
     color: var(--ink);
     background-color: var(--paper);
-    /* The aurora: three blurred light sources fixed behind every page. */
+    /* Soft ambient sky and lavender glow pinned to top, matching EduMate aesthetic */
     background-image:
-      radial-gradient(60rem 40rem at -10% -10%, rgb(255 178 145 / 0.85), transparent 60%),
-      radial-gradient(50rem 40rem at 110% 0%, rgb(255 196 226 / 0.85), transparent 60%),
-      radial-gradient(55rem 45rem at 100% 110%, rgb(200 176 255 / 0.8), transparent 60%),
-      radial-gradient(40rem 30rem at 0% 100%, rgb(255 210 180 / 0.75), transparent 60%);
+      radial-gradient(55rem 35rem at 15% -8%, rgb(219 234 254 / 0.75), transparent 65%),
+      radial-gradient(50rem 35rem at 85% -8%, rgb(237 233 254 / 0.75), transparent 65%),
+      radial-gradient(40rem 25rem at 50% -12%, rgb(224 242 254 / 0.5), transparent 60%);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
   }
@@ -71,32 +70,28 @@
 }
 
 @layer components {
-  /* Frosted panel: the base surface for cards, panels, dialogs and menus. */
+  /* Crisp clean white surface for cards and dashboard panels */
   .glass {
-    background: rgb(255 255 255 / 0.62);
-    border: 1px solid rgb(255 255 255 / 0.75);
+    background: #ffffff;
+    border: 1px solid rgb(226 232 240 / 0.85);
     box-shadow:
-      0 1px 0 rgb(255 255 255 / 0.9) inset,
-      0 10px 30px -12px rgb(120 60 80 / 0.18),
-      0 2px 6px -2px rgb(120 60 80 / 0.08);
-    backdrop-filter: blur(22px) saturate(1.5);
-    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+      0 1px 3px 0 rgb(15 23 42 / 0.03),
+      0 1px 2px -1px rgb(15 23 42 / 0.03);
   }
 
-  /* Lighter glass for sidebars and top bars, which sit over large areas. */
+  /* Floating translucent panel for sidebar and headers */
   .glass-soft {
-    background: rgb(255 255 255 / 0.4);
-    border-color: rgb(255 255 255 / 0.6);
-    backdrop-filter: blur(24px) saturate(1.4);
-    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    background: rgb(255 255 255 / 0.88);
+    border: 1px solid rgb(226 232 240 / 0.8);
+    box-shadow: 0 4px 24px -6px rgb(15 23 42 / 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
-  /* Glowing orb: the brand mark and the avatar fallback. */
+  /* Sleek modern brand orb */
   .orb {
-    background: radial-gradient(circle at 32% 28%, #ffd9c4 0%, #ff9a73 32%, #f0603a 62%, #b8326b 100%);
-    box-shadow:
-      0 6px 18px -4px rgb(240 96 58 / 0.55),
-      inset 0 -2px 6px rgb(120 20 60 / 0.25);
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+    box-shadow: 0 4px 14px -2px rgb(37 99 235 / 0.45);
   }
 }
 

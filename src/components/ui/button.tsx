@@ -8,14 +8,18 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-gradient-to-b from-brand-500 to-brand-600 text-white shadow-[0_8px_20px_-8px_rgba(204,66,25,0.7),inset_0_1px_0_rgba(255,255,255,0.25)] hover:from-brand-600 hover:to-brand-700',
+          'bg-brand-600 text-white shadow-xs hover:bg-brand-700 active:bg-brand-800',
         secondary:
-          'bg-white/60 text-stone-900 hover:bg-white/80',
+          'bg-slate-100 text-slate-800 hover:bg-slate-200/80',
         outline:
-          'border border-white/80 bg-white/60 text-stone-900 shadow-[0_4px_14px_-6px_rgba(120,60,80,0.2)] backdrop-blur-md hover:bg-white/85',
+          'border border-slate-200/90 bg-white text-slate-800 shadow-xs hover:bg-slate-50 hover:text-slate-900',
         ghost:
-          'text-stone-700 hover:bg-white/60 hover:text-stone-900',
-        link: 'h-auto p-0 text-brand-800 underline-offset-4 hover:underline',
+          'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900',
+        dangerOutline:
+          'border border-red-200 bg-white text-red-600 hover:bg-red-50 hover:border-red-300',
+        brandOutline:
+          'border border-brand-200 bg-white text-brand-700 hover:bg-brand-50 hover:border-brand-300',
+        link: 'h-auto p-0 text-brand-700 underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 px-5 py-2',

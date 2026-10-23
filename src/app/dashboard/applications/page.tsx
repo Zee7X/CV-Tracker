@@ -10,9 +10,10 @@ import { APPLICATION_STATUSES, type ApplicationStatus } from '@/types/applicatio
 
 export const dynamic = 'force-dynamic'
 
-export default async function ApplicationsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
-  const { status } = await searchParams
+export default async function ApplicationsPage({ searchParams }: { searchParams: Promise<{ status?: string; search?: string }> }) {
+  const { status, search } = await searchParams
   const initialStatus = APPLICATION_STATUSES.some((item) => item.value === status) ? (status as ApplicationStatus) : 'all'
+  const initialSearch = typeof search === 'string' ? search : ''
   const supabase = await createClient()
   const {
     data: { user },
@@ -36,7 +37,12 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
             ) : undefined
           }
         />
-        <ApplicationList key={initialStatus} initialApplications={applications} initialStatus={initialStatus} />
+        <ApplicationList
+          key={`${initialStatus}-${initialSearch}`}
+          initialApplications={applications}
+          initialStatus={initialStatus}
+          initialSearch={initialSearch}
+        />
       </div>
     </>
   )

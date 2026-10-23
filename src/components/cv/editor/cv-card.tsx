@@ -48,31 +48,31 @@ export function CVCard({ cv }: CVCardProps) {
 
   return (
     <>
-      <article className="group flex h-full flex-col overflow-hidden rounded-3xl glass transition-[border-color,box-shadow] hover:border-stone-900/10 hover:shadow-[0_4px_16px_-6px_rgba(28,25,23,0.12)]">
+      <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs transition-all hover:border-slate-300 hover:shadow-sm">
         <Link
           href={`/dashboard/cv/${cv.id}`}
-          className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
+          className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600"
         >
-          <div className="flex justify-center border-b border-stone-900/[0.06] bg-gradient-to-br from-brand-50 via-white/60 to-violet-50 px-6 pt-6">
+          <div className="flex justify-center border-b border-slate-100 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 px-6 pt-6">
             <CVThumbnail cv={cv} className="w-[46%] translate-y-1 rounded-b-none transition-transform duration-200 group-hover:-translate-y-0.5" />
           </div>
           <div className="flex flex-1 flex-col px-5 py-4">
             <div className="flex items-start justify-between gap-3">
-              <h2 className="line-clamp-2 text-[15px] font-semibold leading-snug text-stone-900" data-no-translate>
+              <h2 className="line-clamp-2 text-[15px] font-bold leading-snug text-slate-900" data-no-translate>
                 {cv.name}
               </h2>
-              <span className="shrink-0 rounded-md bg-stone-900/[0.05] px-1.5 py-0.5 text-[11px] font-semibold uppercase text-stone-600" data-no-translate>
+              <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-slate-600" data-no-translate>
                 {resolveDocumentLanguage(info?.document_language)}
               </span>
             </div>
-            <p className="mt-1 truncate text-sm text-stone-600">
+            <p className="mt-1 truncate text-xs text-slate-500">
               {info?.full_name ? (
                 <span data-no-translate>{[info.full_name, info.professional_title].filter(Boolean).join(' · ')}</span>
               ) : (
                 <span>No name yet</span>
               )}
             </p>
-            <p className="mt-auto pt-3 text-xs text-stone-500">
+            <p className="mt-auto pt-3 text-xs text-slate-400">
               <span data-no-translate>{TEMPLATE_NAMES[cv.template] ?? cv.template}</span>
               <span aria-hidden="true"> · </span>
               <span>Edited</span> <LocalDate value={cv.updated_at} />
@@ -86,10 +86,10 @@ export function CVCard({ cv }: CVCardProps) {
           </p>
         ) : null}
 
-        <div className="flex items-center gap-1 border-t border-stone-900/[0.06] px-3 py-2">
+        <div className="flex items-center gap-1 border-t border-slate-100 px-3 py-2">
           <Link
             href={`/dashboard/cv/${cv.id}`}
-            className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-brand-700 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-brand-600 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
             <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
             Edit
@@ -98,7 +98,7 @@ export function CVCard({ cv }: CVCardProps) {
             type="button"
             variant="ghost"
             size="sm"
-            className="h-8"
+            className="h-8 rounded-full text-slate-600"
             onClick={() => run('duplicate', () => duplicateCV(cv.id), 'Could not duplicate the CV.')}
             disabled={isPending}
             aria-label={`Duplicate ${cv.name}`}
@@ -112,7 +112,7 @@ export function CVCard({ cv }: CVCardProps) {
           </Button>
           <button
             type="button"
-            className="ml-auto flex h-8 w-8 items-center justify-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 disabled:opacity-50"
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 disabled:opacity-50"
             onClick={() => setShowDeleteConfirm(true)}
             disabled={isPending}
             aria-label={`Delete ${cv.name}`}
