@@ -12,8 +12,8 @@ const points = [
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen p-3 sm:p-5">
-      <div className="grid min-h-[calc(100vh-1.5rem)] overflow-hidden rounded-[36px] border border-slate-200/80 bg-surface shadow-[0_20px_50px_-30px_rgba(24,24,27,0.35)] sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+    <div className="min-h-screen">
+      <div className="grid min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
         <div className="flex flex-col px-5 py-6 sm:px-10">
           <div className="flex items-center justify-between">
             <Logo />
@@ -23,13 +23,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
           <div className="flex flex-1 items-center justify-center py-10">
-            <div className="w-full max-w-[420px] rounded-[28px] border border-slate-200/90 bg-slate-50 p-7 sm:p-9">{children}</div>
+            <div className="w-full max-w-[420px] rounded-[28px] border border-slate-200/90 bg-surface p-7 shadow-[0_20px_50px_-30px_rgba(24,24,27,0.35)] sm:p-9">{children}</div>
           </div>
           <p className="text-xs text-slate-400">© {new Date().getFullYear()} CV Tracker</p>
         </div>
 
         {/* Product panel: ink, like the landing page nav. `dark` flips the slate text inside to light. */}
-        <aside className="dark relative m-3 hidden overflow-hidden rounded-[30px] bg-ink lg:flex lg:flex-col" aria-label="About CV Tracker">
+        <aside className="dark sticky top-0 hidden h-screen overflow-hidden bg-ink lg:flex lg:flex-col" aria-label="About CV Tracker">
           <LogoMark className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 opacity-[0.12]" />
           <div className="relative z-10 px-12 pt-14 xl:px-16">
             <p className="font-heading max-w-lg text-[40px] font-black leading-[1.08] text-white xl:text-[46px]">

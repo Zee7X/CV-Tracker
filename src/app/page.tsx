@@ -185,29 +185,28 @@ export default function LandingPage() {
       <Watermark />
 
       <header className="sticky top-3 z-40 px-3 sm:top-4">
-        {/* The pill is always ink; `dark` flips the language and theme controls to their light-on-dark look. */}
-        <div className="dark mx-auto flex h-14 w-fit max-w-full items-center gap-1 rounded-full bg-ink py-1.5 pl-2.5 pr-1.5 shadow-[0_12px_30px_-12px_rgba(24,24,27,0.6)] sm:gap-2">
-          <Link href="/" aria-label="CV Tracker home" className="mr-1 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">
+        <div className="mx-auto flex h-14 w-fit max-w-full items-center gap-1 rounded-full border border-slate-200/80 bg-surface/85 py-1.5 pl-2.5 pr-1.5 shadow-[0_12px_30px_-16px_rgba(24,24,27,0.35)] backdrop-blur-md sm:gap-2">
+          <Link href="/" aria-label="CV Tracker home" className="mr-1 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600">
             <LogoMark className="h-9 w-9" />
           </Link>
           <nav aria-label="Main" className="hidden items-center md:flex">
             {navLinks.map((link) => (
-              <a key={link.href} href={link.href} className="rounded-full px-3 py-2 text-[13px] font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white">
+              <a key={link.href} href={link.href} className="rounded-full px-3 py-2 text-[13px] font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">
                 {link.label}
               </a>
             ))}
-            <Link href="/login" className="rounded-full px-3 py-2 text-[13px] font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white">
+            <Link href="/login" className="rounded-full px-3 py-2 text-[13px] font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">
               Sign in
             </Link>
           </nav>
           <LanguageSwitcher compact />
-          <ThemeToggleButton className="h-9 w-9 hover:bg-white/10" />
-          <Link href="/login" className="rounded-full px-2.5 py-2 text-[13px] font-medium text-white/85 hover:text-white md:hidden">
+          <ThemeToggleButton className="h-9 w-9" />
+          <Link href="/login" className="rounded-full px-2.5 py-2 text-[13px] font-medium text-slate-700 hover:text-slate-900 md:hidden">
             Sign in
           </Link>
           <Link
             href="/register"
-            className="font-display inline-flex h-11 items-center rounded-full bg-blush px-5 text-[13px] font-semibold text-ink transition-colors hover:bg-blush-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blush focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            className="font-display inline-flex h-11 items-center rounded-full bg-blush px-5 text-[13px] font-semibold text-ink transition-colors hover:bg-blush-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2"
           >
             Get started
           </Link>
