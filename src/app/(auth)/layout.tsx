@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react'
-import { Logo, LogoMark } from '@/components/brand/logo'
+import { Logo, LogoGlyph } from '@/components/brand/logo'
 import { LanguageSwitcher } from '@/components/i18n/language-switcher'
 import { ThemeToggleButton } from '@/components/theme/theme-toggle'
 import { ModernTemplate, SAMPLE_CV } from '@/components/cv/templates'
@@ -30,7 +30,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         {/* Product panel: ink, like the landing page nav. `dark` flips the slate text inside to light. */}
         <aside className="dark sticky top-0 hidden h-screen overflow-hidden bg-ink lg:flex lg:flex-col" aria-label="About CV Tracker">
-          <LogoMark className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 opacity-[0.12]" />
+          <LogoGlyph className="pointer-events-none absolute -right-16 -top-16 h-96 w-96 rotate-12 text-brand-400 opacity-[0.14]" />
           <div className="relative z-10 px-12 pt-14 xl:px-16">
             <p className="font-heading max-w-lg text-[40px] font-black leading-[1.08] text-white xl:text-[46px]">
               <span>Write the CV once. </span>
