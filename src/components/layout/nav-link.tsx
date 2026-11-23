@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react'
 function PendingIndicator({ variant }: { variant: 'bar' | 'spinner' }) {
   const { pending } = useLinkStatus()
   if (variant === 'spinner') {
-    return pending ? <Loader2 className="ml-auto h-3.5 w-3.5 animate-spin text-stone-400" aria-hidden="true" /> : null
+    return pending ? <Loader2 className="ml-auto h-3.5 w-3.5 animate-spin text-slate-400" aria-hidden="true" /> : null
   }
   return (
     <span

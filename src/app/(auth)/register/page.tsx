@@ -16,8 +16,8 @@ export default function RegisterPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-stone-900">Create an account</h1>
-        <p className="mt-2 text-sm leading-6 text-stone-600">Free. You can write your first CV right after signing up.</p>
+        <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-slate-900">Create an account</h1>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Free. You can write your first CV right after signing up.</p>
       </div>
 
       {done ? (
@@ -75,7 +75,7 @@ export default function RegisterPage() {
         </form>
       )}
 
-      <p className="mt-6 text-sm text-stone-600">
+      <p className="mt-6 text-sm text-slate-600">
         Already have an account?{' '}
         <Link href="/login" className="font-medium text-brand-700 underline-offset-4 hover:underline">
           Sign in

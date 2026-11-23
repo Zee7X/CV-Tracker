@@ -66,7 +66,7 @@ export function StatStrip({ summary }: { summary: Summary }) {
           <Link
             key={item.label}
             href={item.href}
-            className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:border-slate-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
+            className="group rounded-2xl border border-slate-200/80 bg-surface p-5 shadow-xs transition-all hover:border-slate-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{item.label}</span>
@@ -121,7 +121,7 @@ export function Pipeline({ summary }: { summary: Summary }) {
               return (
                 <span
                   key={status.value}
-                  className={`${BAR_COLORS[status.value]} border-r-2 border-white last:border-r-0`}
+                  className={`${BAR_COLORS[status.value]} border-r-2 border-surface last:border-r-0`}
                   style={{ width: `${(count / summary.total) * 100}%` }}
                 />
               )
@@ -372,7 +372,7 @@ export function GettingStarted({ hasCV, hasApplication, hasLetter }: { hasCV: bo
       bodyClassName="grid gap-px overflow-hidden rounded-b-2xl bg-slate-100 md:grid-cols-3"
     >
       {steps.map((step, index) => (
-        <div key={step.title} className="flex flex-col bg-white p-5">
+        <div key={step.title} className="flex flex-col bg-surface p-5">
           <span
             className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
               step.done ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'

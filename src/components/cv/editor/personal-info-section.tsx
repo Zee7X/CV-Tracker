@@ -117,28 +117,28 @@ export function PersonalInfoSection({ register, errors, watch, setValue, templat
         </Field>
       </div>
 
-      <div className="border-t border-white/70 pt-4">
+      <div className="border-t border-surface/70 pt-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-          <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md border border-stone-900/10 bg-stone-900/[0.05]">
+          <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-900/10 bg-slate-900/[0.05]">
             {photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={photoUrl} alt="CV photo" className="h-full w-full object-cover" />
             ) : (
-              <User className="h-8 w-8 text-stone-400" aria-hidden="true" />
+              <User className="h-8 w-8 text-slate-400" aria-hidden="true" />
             )}
             {isCompressing ? (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                <Loader2 className="h-5 w-5 animate-spin text-stone-700" aria-label="Processing photo" />
+              <div className="absolute inset-0 flex items-center justify-center bg-surface/80">
+                <Loader2 className="h-5 w-5 animate-spin text-slate-700" aria-label="Processing photo" />
               </div>
             ) : null}
           </div>
 
           <div className="min-w-0 flex-1 space-y-2">
             <div>
-              <h3 className="text-sm font-medium text-stone-800">
-                Photo <span className="font-normal text-stone-500">(optional)</span>
+              <h3 className="text-sm font-medium text-slate-800">
+                Photo <span className="font-normal text-slate-500">(optional)</span>
               </h3>
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-slate-500">
                 {template === 'modern'
                   ? 'Shown in the Modern template sidebar. JPG, PNG or WebP.'
                   : 'Only the Modern template shows a photo. Many international employers prefer CVs without one.'}

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Panel, PageHeader } from '@/components/layout/page-header'
 import { LocalDate } from '@/components/i18n/local-date'
 import { AccountSettingsForm } from '@/components/account/account-settings-form'
+import { ThemeSwitcher } from '@/components/theme/theme-toggle'
 
 export const metadata = {
   title: 'Account Settings - CV Tracker',
@@ -56,26 +57,35 @@ export default async function AccountPage() {
         <AccountSettingsForm initialProfile={initialProfile} />
 
         <aside className="space-y-4 xl:sticky xl:top-8">
-          <Panel title="In your account" bodyClassName="divide-y divide-stone-900/[0.06]">
+          <Panel title="Appearance" bodyClassName="space-y-3 px-5 py-4 text-sm">
+            <p className="text-slate-600">
+              Choose how CV Tracker looks on this device. System follows your operating system setting.
+            </p>
+            <ThemeSwitcher className="w-full [&>button]:flex-1" />
+            <p className="text-xs text-slate-500">
+              CV and cover letter previews always stay white, matching the exported PDF.
+            </p>
+          </Panel>
+          <Panel title="In your account" bodyClassName="divide-y divide-slate-900/[0.06]">
             {usage.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="flex items-center justify-between px-5 py-3 text-sm transition-colors hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
+                className="flex items-center justify-between px-5 py-3 text-sm transition-colors hover:bg-surface/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-700"
               >
-                <span className="text-stone-700">{item.label}</span>
-                <span className="font-semibold tabular-nums text-stone-900" data-no-translate>
+                <span className="text-slate-700">{item.label}</span>
+                <span className="font-semibold tabular-nums text-slate-900" data-no-translate>
                   {item.value}
                 </span>
               </Link>
             ))}
           </Panel>
           <Panel title="Signed in as" bodyClassName="space-y-1 px-5 py-4 text-sm">
-            <p className="truncate font-medium text-stone-900" data-no-translate>
+            <p className="truncate font-medium text-slate-900" data-no-translate>
               {initialProfile.email}
             </p>
             {initialProfile.created_at ? (
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-slate-500">
                 <span>Member since</span> <LocalDate value={initialProfile.created_at} />
               </p>
             ) : null}

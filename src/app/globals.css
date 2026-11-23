@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Dark mode is class-based: ThemeProvider (and the boot script in the root
+   layout) put `.dark` on <html> from the saved choice or the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Visual language: soft warm aurora behind frosted glass panels, coral accent,
  * Poppins for headings and UI. CV documents (templates, PDF) stay plain white:
@@ -10,15 +14,150 @@
   --ink: #0f172a;
   --line: rgb(226 232 240 / 0.85);
   --highlight: #dbeafe;
+  --surface: #ffffff;
+  --glow-1: rgb(219 234 254 / 0.75);
+  --glow-2: rgb(237 233 254 / 0.75);
+  --glow-3: rgb(224 242 254 / 0.5);
+  --shadow-ink: 15 23 42;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+}
+
+/*
+ * Dark theme. Instead of a `dark:` twin on every class, the neutral (slate)
+ * scale is flipped, `surface` turns dark, and the light tints (50-200) become
+ * translucent washes. Components keep their light-mode classes and still read
+ * correctly: `text-slate-900` becomes near-white, `bg-slate-100` a raised grey.
+ * Prefer `bg-surface` over `bg-white` for panels so they follow the theme.
+ */
+.dark {
+  --paper: #020617;
+  --ink: #f1f5f9;
+  --line: rgb(51 65 85 / 0.7);
+  --highlight: rgb(59 130 246 / 0.35);
+  --surface: #0f172a;
+  --glow-1: rgb(37 99 235 / 0.16);
+  --glow-2: rgb(124 58 237 / 0.12);
+  --glow-3: rgb(14 165 233 / 0.08);
+  --shadow-ink: 0 0 0;
+  color-scheme: dark;
+  --color-slate-50: oklch(17.5% 0.035 265);
+  --color-slate-100: oklch(27.9% 0.041 260.031);
+  --color-slate-200: oklch(37.2% 0.044 257.287);
+  --color-slate-300: oklch(44.6% 0.043 257.281);
+  --color-slate-400: oklch(55.4% 0.046 257.417);
+  --color-slate-500: oklch(70.4% 0.04 256.788);
+  --color-slate-600: oklch(86.9% 0.022 252.894);
+  --color-slate-700: oklch(92.9% 0.013 255.508);
+  --color-slate-800: oklch(96.8% 0.007 247.896);
+  --color-slate-900: oklch(98.4% 0.003 247.858);
+  --color-slate-950: #fff;
+  --color-red-50: color-mix(in oklab, oklch(63.7% 0.237 25.331) 14%, transparent);
+  --color-red-100: color-mix(in oklab, oklch(63.7% 0.237 25.331) 22%, transparent);
+  --color-red-200: color-mix(in oklab, oklch(63.7% 0.237 25.331) 34%, transparent);
+  --color-rose-50: color-mix(in oklab, oklch(64.5% 0.246 16.439) 14%, transparent);
+  --color-rose-100: color-mix(in oklab, oklch(64.5% 0.246 16.439) 22%, transparent);
+  --color-rose-200: color-mix(in oklab, oklch(64.5% 0.246 16.439) 34%, transparent);
+  --color-emerald-50: color-mix(in oklab, oklch(69.6% 0.17 162.48) 14%, transparent);
+  --color-emerald-100: color-mix(in oklab, oklch(69.6% 0.17 162.48) 22%, transparent);
+  --color-emerald-200: color-mix(in oklab, oklch(69.6% 0.17 162.48) 34%, transparent);
+  --color-green-50: color-mix(in oklab, oklch(72.3% 0.219 149.579) 14%, transparent);
+  --color-green-100: color-mix(in oklab, oklch(72.3% 0.219 149.579) 22%, transparent);
+  --color-green-200: color-mix(in oklab, oklch(72.3% 0.219 149.579) 34%, transparent);
+  --color-amber-50: color-mix(in oklab, oklch(76.9% 0.188 70.08) 14%, transparent);
+  --color-amber-100: color-mix(in oklab, oklch(76.9% 0.188 70.08) 22%, transparent);
+  --color-amber-200: color-mix(in oklab, oklch(76.9% 0.188 70.08) 34%, transparent);
+  --color-yellow-50: color-mix(in oklab, oklch(79.5% 0.184 86.047) 14%, transparent);
+  --color-yellow-100: color-mix(in oklab, oklch(79.5% 0.184 86.047) 22%, transparent);
+  --color-yellow-200: color-mix(in oklab, oklch(79.5% 0.184 86.047) 34%, transparent);
+  --color-orange-50: color-mix(in oklab, oklch(70.5% 0.213 47.604) 14%, transparent);
+  --color-orange-100: color-mix(in oklab, oklch(70.5% 0.213 47.604) 22%, transparent);
+  --color-orange-200: color-mix(in oklab, oklch(70.5% 0.213 47.604) 34%, transparent);
+  --color-sky-50: color-mix(in oklab, oklch(68.5% 0.169 237.323) 14%, transparent);
+  --color-sky-100: color-mix(in oklab, oklch(68.5% 0.169 237.323) 22%, transparent);
+  --color-sky-200: color-mix(in oklab, oklch(68.5% 0.169 237.323) 34%, transparent);
+  --color-blue-50: color-mix(in oklab, oklch(62.3% 0.214 259.815) 14%, transparent);
+  --color-blue-100: color-mix(in oklab, oklch(62.3% 0.214 259.815) 22%, transparent);
+  --color-blue-200: color-mix(in oklab, oklch(62.3% 0.214 259.815) 34%, transparent);
+  --color-indigo-50: color-mix(in oklab, oklch(58.5% 0.233 277.117) 14%, transparent);
+  --color-indigo-100: color-mix(in oklab, oklch(58.5% 0.233 277.117) 22%, transparent);
+  --color-indigo-200: color-mix(in oklab, oklch(58.5% 0.233 277.117) 34%, transparent);
+  --color-violet-50: color-mix(in oklab, oklch(60.6% 0.25 292.717) 14%, transparent);
+  --color-violet-100: color-mix(in oklab, oklch(60.6% 0.25 292.717) 22%, transparent);
+  --color-violet-200: color-mix(in oklab, oklch(60.6% 0.25 292.717) 34%, transparent);
+  --color-brand-50: color-mix(in oklab, #3b82f6 14%, transparent);
+  --color-brand-100: color-mix(in oklab, #3b82f6 22%, transparent);
+  --color-brand-200: color-mix(in oklab, #3b82f6 34%, transparent);
+}
+
+/*
+ * Paper: anything that previews a printed document (CV sheets, thumbnails,
+ * the cover letter preview) stays dark on white in every theme, like the PDF.
+ */
+.paper {
+  --surface: #ffffff;
+  --line: rgb(226 232 240 / 0.85);
+  color-scheme: light;
+  --color-slate-50: oklch(98.4% 0.003 247.858);
+  --color-slate-100: oklch(96.8% 0.007 247.896);
+  --color-slate-200: oklch(92.9% 0.013 255.508);
+  --color-slate-300: oklch(86.9% 0.022 252.894);
+  --color-slate-400: oklch(70.4% 0.04 256.788);
+  --color-slate-500: oklch(55.4% 0.046 257.417);
+  --color-slate-600: oklch(44.6% 0.043 257.281);
+  --color-slate-700: oklch(37.2% 0.044 257.287);
+  --color-slate-800: oklch(27.9% 0.041 260.031);
+  --color-slate-900: oklch(20.8% 0.042 265.755);
+  --color-slate-950: oklch(12.9% 0.042 264.695);
+  --color-red-50: oklch(97.1% 0.013 17.38);
+  --color-red-100: oklch(93.6% 0.032 17.717);
+  --color-red-200: oklch(88.5% 0.062 18.334);
+  --color-rose-50: oklch(96.9% 0.015 12.422);
+  --color-rose-100: oklch(94.1% 0.03 12.58);
+  --color-rose-200: oklch(89.2% 0.058 10.001);
+  --color-emerald-50: oklch(97.9% 0.021 166.113);
+  --color-emerald-100: oklch(95% 0.052 163.051);
+  --color-emerald-200: oklch(90.5% 0.093 164.15);
+  --color-green-50: oklch(98.2% 0.018 155.826);
+  --color-green-100: oklch(96.2% 0.044 156.743);
+  --color-green-200: oklch(92.5% 0.084 155.995);
+  --color-amber-50: oklch(98.7% 0.022 95.277);
+  --color-amber-100: oklch(96.2% 0.059 95.617);
+  --color-amber-200: oklch(92.4% 0.12 95.746);
+  --color-yellow-50: oklch(98.7% 0.026 102.212);
+  --color-yellow-100: oklch(97.3% 0.071 103.193);
+  --color-yellow-200: oklch(94.5% 0.129 101.54);
+  --color-orange-50: oklch(98% 0.016 73.684);
+  --color-orange-100: oklch(95.4% 0.038 75.164);
+  --color-orange-200: oklch(90.1% 0.076 70.697);
+  --color-sky-50: oklch(97.7% 0.013 236.62);
+  --color-sky-100: oklch(95.1% 0.026 236.824);
+  --color-sky-200: oklch(90.1% 0.058 230.902);
+  --color-blue-50: oklch(97% 0.014 254.604);
+  --color-blue-100: oklch(93.2% 0.032 255.585);
+  --color-blue-200: oklch(88.2% 0.059 254.128);
+  --color-indigo-50: oklch(96.2% 0.018 272.314);
+  --color-indigo-100: oklch(93% 0.034 272.788);
+  --color-indigo-200: oklch(87% 0.065 274.039);
+  --color-violet-50: oklch(96.9% 0.016 293.756);
+  --color-violet-100: oklch(94.3% 0.029 294.588);
+  --color-violet-200: oklch(89.4% 0.057 293.283);
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
 }
 
 @theme inline {
   --color-background: var(--paper);
   --color-foreground: var(--ink);
+  --color-surface: var(--surface);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-poppins), var(--font-inter), ui-sans-serif, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Not inline, so the dark theme can override the light brand tints. */
+@theme {
 
   /* Royal blue primary accent matching modern clean dashboard standards */
   --color-brand-50: #eff6ff;
@@ -48,9 +187,9 @@
     background-color: var(--paper);
     /* Soft ambient sky and lavender glow pinned to top, matching EduMate aesthetic */
     background-image:
-      radial-gradient(55rem 35rem at 15% -8%, rgb(219 234 254 / 0.75), transparent 65%),
-      radial-gradient(50rem 35rem at 85% -8%, rgb(237 233 254 / 0.75), transparent 65%),
-      radial-gradient(40rem 25rem at 50% -12%, rgb(224 242 254 / 0.5), transparent 60%);
+      radial-gradient(55rem 35rem at 15% -8%, var(--glow-1), transparent 65%),
+      radial-gradient(50rem 35rem at 85% -8%, var(--glow-2), transparent 65%),
+      radial-gradient(40rem 25rem at 50% -12%, var(--glow-3), transparent 60%);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
   }
@@ -72,18 +211,18 @@
 @layer components {
   /* Crisp clean white surface for cards and dashboard panels */
   .glass {
-    background: #ffffff;
-    border: 1px solid rgb(226 232 240 / 0.85);
+    background: var(--surface);
+    border: 1px solid var(--line);
     box-shadow:
-      0 1px 3px 0 rgb(15 23 42 / 0.03),
-      0 1px 2px -1px rgb(15 23 42 / 0.03);
+      0 1px 3px 0 rgb(var(--shadow-ink) / 0.03),
+      0 1px 2px -1px rgb(var(--shadow-ink) / 0.03);
   }
 
   /* Floating translucent panel for sidebar and headers */
   .glass-soft {
-    background: rgb(255 255 255 / 0.88);
-    border: 1px solid rgb(226 232 240 / 0.8);
-    box-shadow: 0 4px 24px -6px rgb(15 23 42 / 0.06);
+    background: color-mix(in oklab, var(--surface) 88%, transparent);
+    border: 1px solid var(--line);
+    box-shadow: 0 4px 24px -6px rgb(var(--shadow-ink) / 0.06);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -179,6 +318,10 @@
   }
 }
 
+.dark .skeleton-bone {
+  background-image: linear-gradient(90deg, rgb(148 163 184 / 0.14) 0%, rgb(148 163 184 / 0.07) 40%, rgb(148 163 184 / 0.14) 80%);
+}
+
 /* Native <dialog>: fade the backdrop, lift the panel. */
 .app-dialog {
   margin: auto;
@@ -214,6 +357,10 @@
 .app-dialog[open]::backdrop {
   background-color: rgb(60 30 50 / 0.25);
   backdrop-filter: blur(6px);
+}
+
+.dark .app-dialog[open]::backdrop {
+  background-color: rgb(2 6 23 / 0.6);
 }
 
 @starting-style {
@@ -257,6 +404,65 @@ html[data-i18n-pending] body {
   visibility: hidden;
 }
 
+/* Tinted text (status badges, alerts, links) moves to the light end of its
+   scale on dark backgrounds. Paper previews keep their print colours. */
+.dark .text-red-600:not(.paper *) { color: oklch(70.4% 0.191 22.216); }
+.dark .text-red-700:not(.paper *) { color: oklch(80.8% 0.114 19.571); }
+.dark .text-red-800:not(.paper *) { color: oklch(88.5% 0.062 18.334); }
+.dark .text-red-900:not(.paper *) { color: oklch(93.6% 0.032 17.717); }
+.dark .text-rose-600:not(.paper *) { color: oklch(71.2% 0.194 13.428); }
+.dark .text-rose-700:not(.paper *) { color: oklch(81% 0.117 11.638); }
+.dark .text-rose-800:not(.paper *) { color: oklch(89.2% 0.058 10.001); }
+.dark .text-rose-900:not(.paper *) { color: oklch(94.1% 0.03 12.58); }
+.dark .text-emerald-600:not(.paper *) { color: oklch(76.5% 0.177 163.223); }
+.dark .text-emerald-700:not(.paper *) { color: oklch(84.5% 0.143 164.978); }
+.dark .text-emerald-800:not(.paper *) { color: oklch(90.5% 0.093 164.15); }
+.dark .text-emerald-900:not(.paper *) { color: oklch(95% 0.052 163.051); }
+.dark .text-green-600:not(.paper *) { color: oklch(79.2% 0.209 151.711); }
+.dark .text-green-700:not(.paper *) { color: oklch(87.1% 0.15 154.449); }
+.dark .text-green-800:not(.paper *) { color: oklch(92.5% 0.084 155.995); }
+.dark .text-green-900:not(.paper *) { color: oklch(96.2% 0.044 156.743); }
+.dark .text-amber-600:not(.paper *) { color: oklch(82.8% 0.189 84.429); }
+.dark .text-amber-700:not(.paper *) { color: oklch(87.9% 0.169 91.605); }
+.dark .text-amber-800:not(.paper *) { color: oklch(92.4% 0.12 95.746); }
+.dark .text-amber-900:not(.paper *) { color: oklch(96.2% 0.059 95.617); }
+.dark .text-yellow-600:not(.paper *) { color: oklch(85.2% 0.199 91.936); }
+.dark .text-yellow-700:not(.paper *) { color: oklch(90.5% 0.182 98.111); }
+.dark .text-yellow-800:not(.paper *) { color: oklch(94.5% 0.129 101.54); }
+.dark .text-yellow-900:not(.paper *) { color: oklch(97.3% 0.071 103.193); }
+.dark .text-orange-600:not(.paper *) { color: oklch(75% 0.183 55.934); }
+.dark .text-orange-700:not(.paper *) { color: oklch(83.7% 0.128 66.29); }
+.dark .text-orange-800:not(.paper *) { color: oklch(90.1% 0.076 70.697); }
+.dark .text-orange-900:not(.paper *) { color: oklch(95.4% 0.038 75.164); }
+.dark .text-sky-600:not(.paper *) { color: oklch(74.6% 0.16 232.661); }
+.dark .text-sky-700:not(.paper *) { color: oklch(82.8% 0.111 230.318); }
+.dark .text-sky-800:not(.paper *) { color: oklch(90.1% 0.058 230.902); }
+.dark .text-sky-900:not(.paper *) { color: oklch(95.1% 0.026 236.824); }
+.dark .text-blue-600:not(.paper *) { color: oklch(70.7% 0.165 254.624); }
+.dark .text-blue-700:not(.paper *) { color: oklch(80.9% 0.105 251.813); }
+.dark .text-blue-800:not(.paper *) { color: oklch(88.2% 0.059 254.128); }
+.dark .text-blue-900:not(.paper *) { color: oklch(93.2% 0.032 255.585); }
+.dark .text-indigo-600:not(.paper *) { color: oklch(67.3% 0.182 276.935); }
+.dark .text-indigo-700:not(.paper *) { color: oklch(78.5% 0.115 274.713); }
+.dark .text-indigo-800:not(.paper *) { color: oklch(87% 0.065 274.039); }
+.dark .text-indigo-900:not(.paper *) { color: oklch(93% 0.034 272.788); }
+.dark .text-violet-600:not(.paper *) { color: oklch(70.2% 0.183 293.541); }
+.dark .text-violet-700:not(.paper *) { color: oklch(81.1% 0.111 293.571); }
+.dark .text-violet-800:not(.paper *) { color: oklch(89.4% 0.057 293.283); }
+.dark .text-violet-900:not(.paper *) { color: oklch(94.3% 0.029 294.588); }
+.dark .text-brand-600:not(.paper *) { color: #60a5fa; }
+.dark .text-brand-700:not(.paper *) { color: #93c5fd; }
+.dark .text-brand-800:not(.paper *) { color: #bfdbfe; }
+.dark .text-brand-900:not(.paper *) { color: #dbeafe; }
+
+/* While ThemeProvider switches theme, everything recolours at once instead of
+   each transition-colors element fading on its own. */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -269,6 +475,6 @@ html[data-i18n-pending] body {
 
   .skeleton-bone {
     animation: none;
-    background: rgb(120 90 100 / 0.1);
+    background: rgb(148 163 184 / 0.12);
   }
 }

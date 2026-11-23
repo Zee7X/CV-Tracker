@@ -41,9 +41,9 @@ export function ProjectsSection({ control, register, errors, watch }: SectionPro
       action={fields.length > 0 ? addButton : undefined}
     >
       {fields.length === 0 ? (
-        <div className="rounded-md border border-dashed border-stone-900/10 px-4 py-8 text-center">
-          <p className="text-sm text-stone-700">No projects yet.</p>
-          <p className="mt-1 text-xs text-stone-500">Optional. Add work that shows a skill your job history doesn&apos;t.</p>
+        <div className="rounded-md border border-dashed border-slate-900/10 px-4 py-8 text-center">
+          <p className="text-sm text-slate-700">No projects yet.</p>
+          <p className="mt-1 text-xs text-slate-500">Optional. Add work that shows a skill your job history doesn&apos;t.</p>
           <div className="mt-4">{addButton}</div>
         </div>
       ) : (

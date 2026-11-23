@@ -51,7 +51,7 @@ export function Sheet({
     <article
       data-template={template}
       data-no-translate
-      className={`mx-auto min-h-[297mm] w-[210mm] max-w-full bg-white wrap-break-word text-left print:min-h-0 print:w-full ${className}`}
+      className={`paper mx-auto min-h-[297mm] w-[210mm] max-w-full bg-surface wrap-break-word text-left print:min-h-0 print:w-full ${className}`}
     >
       {children}
     </article>

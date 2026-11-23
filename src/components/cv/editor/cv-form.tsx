@@ -369,14 +369,14 @@ export function CVForm({ initialData }: CVFormProps) {
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/dashboard/cv"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/70 bg-white/60 text-stone-700 shadow-[0_1px_1px_rgba(28,25,23,0.04)] hover:bg-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-surface/70 bg-surface/60 text-slate-700 shadow-[0_1px_1px_rgba(28,25,23,0.04)] hover:bg-surface/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
             aria-label="Back to all CVs"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </Link>
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-semibold tracking-[-0.01em] text-stone-900">{isEditing ? <span data-no-translate>{cvName}</span> : 'New CV'}</h1>
-            <p className="text-sm text-stone-600" aria-live="polite">
+            <h1 className="truncate text-xl font-semibold tracking-[-0.01em] text-slate-900">{isEditing ? <span data-no-translate>{cvName}</span> : 'New CV'}</h1>
+            <p className="text-sm text-slate-600" aria-live="polite">
               {saveStatus}
             </p>
           </div>
@@ -386,7 +386,7 @@ export function CVForm({ initialData }: CVFormProps) {
           <button
             type="button"
             onClick={() => setShowPreview((value) => !value)}
-            className="hidden h-9 items-center gap-1.5 rounded-md px-2.5 text-xs font-semibold text-stone-700 hover:bg-stone-200/70 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800 lg:inline-flex"
+            className="hidden h-9 items-center gap-1.5 rounded-md px-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-200/70 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800 lg:inline-flex"
             aria-pressed={showPreview}
           >
             {showPreview ? (
@@ -429,14 +429,14 @@ export function CVForm({ initialData }: CVFormProps) {
               {menuOpen ? (
                 <div
                   role="menu"
-                  className="menu-enter glass absolute right-0 top-full z-30 mt-1.5 w-52 rounded-2xl bg-white/85 p-1.5"
+                  className="menu-enter glass absolute right-0 top-full z-30 mt-1.5 w-52 rounded-2xl bg-surface/85 p-1.5"
                 >
                   <button
                     type="button"
                     role="menuitem"
                     onClick={handleDuplicate}
                     disabled={isBusy}
-                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-stone-800 outline-none hover:bg-stone-900/[0.05] focus-visible:bg-stone-900/[0.05] disabled:opacity-50"
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-slate-800 outline-none hover:bg-slate-900/[0.05] focus-visible:bg-slate-900/[0.05] disabled:opacity-50"
                   >
                     Duplicate CV
                   </button>
@@ -475,7 +475,7 @@ export function CVForm({ initialData }: CVFormProps) {
       ) : null}
 
       {/* Mobile: switch between form and preview */}
-      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-full border border-white/70 bg-white/40 p-1 backdrop-blur-md lg:hidden">
+      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-full border border-surface/70 bg-surface/40 p-1 backdrop-blur-md lg:hidden">
         {(['edit', 'preview'] as const).map((tab) => (
           <button
             key={tab}
@@ -484,7 +484,7 @@ export function CVForm({ initialData }: CVFormProps) {
             aria-selected={mobileTab === tab}
             onClick={() => setMobileTab(tab)}
             className={`rounded-full py-2 text-sm font-semibold transition-colors ${
-              mobileTab === tab ? 'bg-white/90 text-stone-900 shadow-sm' : 'text-stone-600'
+              mobileTab === tab ? 'bg-surface/90 text-slate-900 shadow-sm' : 'text-slate-600'
             }`}
           >
             {tab === 'edit' ? 'Edit' : 'Preview'}
@@ -496,7 +496,7 @@ export function CVForm({ initialData }: CVFormProps) {
         {/* Editor */}
         <div className={`min-w-0 space-y-5 ${mobileTab === 'preview' ? 'hidden lg:block' : ''} ${showPreview ? '' : 'lg:mx-auto lg:w-full lg:max-w-3xl'}`}>
           <nav ref={sectionNavRef} aria-label="CV sections" className="scrollbar-none -mx-1 scroll-mt-20 overflow-x-auto px-1">
-            <ul className="flex min-w-max gap-1 border-b border-stone-900/10">
+            <ul className="flex min-w-max gap-1 border-b border-slate-900/10">
               {SECTIONS.map((section) => {
                 const isActive = activeSection === section.id
                 const hasError = invalidSections.has(section.id)
@@ -509,10 +509,10 @@ export function CVForm({ initialData }: CVFormProps) {
                       data-has-error={hasError || undefined}
                       className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-800 ${
                         isActive
-                          ? 'border-brand-800 text-stone-900'
+                          ? 'border-brand-800 text-slate-900'
                           : hasError
                             ? 'border-transparent text-red-700 hover:border-red-300'
-                            : 'border-transparent text-stone-600 hover:border-stone-400 hover:text-stone-900'
+                            : 'border-transparent text-slate-600 hover:border-slate-400 hover:text-slate-900'
                       }`}
                     >
                       {section.label}
@@ -534,8 +534,8 @@ export function CVForm({ initialData }: CVFormProps) {
                 </Field>
 
                 <fieldset className="space-y-2">
-                  <legend className="text-sm font-medium text-stone-800">CV language</legend>
-                  <p className="text-xs text-stone-500">
+                  <legend className="text-sm font-medium text-slate-800">CV language</legend>
+                  <p className="text-xs text-slate-500">
                     Sets section headings and dates (for example &quot;Jun 2024 – Present&quot;). Write your own text in the same language.
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -544,8 +544,8 @@ export function CVForm({ initialData }: CVFormProps) {
                         key={language.id}
                         className={`flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm ${
                           documentLanguage === language.id
-                            ? 'border-brand-800 bg-brand-50 text-stone-900'
-                            : 'border-stone-900/10 bg-white text-stone-700 hover:border-stone-500'
+                            ? 'border-brand-800 bg-brand-50 text-slate-900'
+                            : 'border-slate-900/10 bg-surface text-slate-700 hover:border-slate-500'
                         }`}
                       >
                         <input
@@ -563,7 +563,7 @@ export function CVForm({ initialData }: CVFormProps) {
                 </fieldset>
 
                 <fieldset className="space-y-2">
-                  <legend className="text-sm font-medium text-stone-800">Template</legend>
+                  <legend className="text-sm font-medium text-slate-800">Template</legend>
                   <div className="grid grid-cols-1 gap-2">
                     {TEMPLATES_METADATA.map((template) => {
                       const selected = selectedTemplate === template.id
@@ -571,7 +571,7 @@ export function CVForm({ initialData }: CVFormProps) {
                         <label
                           key={template.id}
                           className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-3 ${
-                            selected ? 'border-brand-800 bg-brand-50' : 'border-stone-900/10 bg-white hover:border-stone-500'
+                            selected ? 'border-brand-800 bg-brand-50' : 'border-slate-900/10 bg-surface hover:border-slate-500'
                           }`}
                         >
                           <input
@@ -583,10 +583,10 @@ export function CVForm({ initialData }: CVFormProps) {
                             className="mt-0.5 accent-brand-800"
                           />
                           <span>
-                            <span className="block text-sm font-semibold text-stone-900" data-no-translate>
+                            <span className="block text-sm font-semibold text-slate-900" data-no-translate>
                               {template.name}
                             </span>
-                            <span className="block text-sm text-stone-600">{template.description}</span>
+                            <span className="block text-sm text-slate-600">{template.description}</span>
                           </span>
                         </label>
                       )

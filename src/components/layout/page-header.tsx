@@ -40,7 +40,7 @@ export function Panel({
   bodyClassName?: string
 }) {
   return (
-    <section className={cn('rounded-3xl border border-slate-200/80 bg-white shadow-xs', className)}>
+    <section className={cn('rounded-3xl border border-slate-200/80 bg-surface shadow-xs', className)}>
       {title ? (
         <header className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-4">
           <div className="min-w-0">
@@ -70,7 +70,7 @@ export function EmptyState({
 }) {
   return (
     <div
-      className={`rounded-3xl border border-dashed border-slate-300 bg-white/70 text-center shadow-xs ${compact ? 'px-4 py-8' : 'px-6 py-16'}`}
+      className={`rounded-3xl border border-dashed border-slate-300 bg-surface/70 text-center shadow-xs ${compact ? 'px-4 py-8' : 'px-6 py-16'}`}
     >
       {icon ? (
         <div className="orb mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-white">{icon}</div>

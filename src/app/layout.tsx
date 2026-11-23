@@ -1,6 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, Poppins } from 'next/font/google'
 import { LanguageProvider } from '@/components/i18n/language-provider'
+import { THEME_BOOT_SCRIPT, ThemeProvider } from '@/components/theme/theme-provider'
 import './globals.css'
 
 const inter = Inter({
@@ -30,6 +31,14 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title, description },
 }
 
+// Colours the mobile browser bar to match the page in light and dark.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+    { media: '(prefers-color-scheme: dark)', color: '#020617' },
+  ],
+}
+
 // Runs before the first paint. When the saved UI language is Indonesian, the
 // page is hidden until LanguageProvider has translated it (see globals.css).
 const LANGUAGE_BOOT_SCRIPT = `(function(){try{var s=localStorage.getItem('cv-tracker-language');var id=s?s==='id':(navigator.language||'').toLowerCase().indexOf('id')===0;if(id){var d=document.documentElement;d.lang='id';d.setAttribute('data-i18n-pending','');setTimeout(function(){d.removeAttribute('data-i18n-pending')},1000)}}catch(e){}})()`
@@ -44,10 +53,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${poppins.variable} h-full scroll-smooth antialiased`}
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: LANGUAGE_BOOT_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col font-sans">
-        <LanguageProvider>{children}</LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

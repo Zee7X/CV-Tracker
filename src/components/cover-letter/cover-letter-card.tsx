@@ -52,7 +52,7 @@ export function CoverLetterCard({ letter }: CoverLetterCardProps) {
 
   return (
     <>
-      <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs transition-all hover:border-slate-300 hover:shadow-sm">
+      <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-surface shadow-xs transition-all hover:border-slate-300 hover:shadow-sm">
         <Link
           href={href}
           className="flex flex-1 flex-col px-5 py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600"

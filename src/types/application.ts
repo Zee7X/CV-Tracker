@@ -8,12 +8,12 @@ export const APPLICATION_STATUSES: {
   label: string
   color: string
 }[] = [
-  { value: 'applied', label: 'Applied', color: 'bg-stone-100 text-stone-800 border-stone-300' },
+  { value: 'applied', label: 'Applied', color: 'bg-slate-100 text-slate-800 border-slate-300' },
   { value: 'screening', label: 'Screening', color: 'bg-amber-50 text-amber-900 border-amber-200' },
   { value: 'interview', label: 'Interview', color: 'bg-brand-50 text-brand-900 border-brand-200' },
   { value: 'offering', label: 'Offer', color: 'bg-emerald-50 text-emerald-900 border-emerald-200' },
   { value: 'accepted', label: 'Accepted', color: 'bg-emerald-700 text-white border-emerald-700' },
-  { value: 'rejected', label: 'Rejected', color: 'bg-white text-stone-500 border-stone-300' },
+  { value: 'rejected', label: 'Rejected', color: 'bg-surface text-slate-500 border-slate-300' },
 ]
 
 export interface JobApplication {
