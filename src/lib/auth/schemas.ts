@@ -36,8 +36,9 @@ export const resetPasswordSchema = z.object({
 /** Validate that a post-auth redirect target is safe (relative path only). */
 export function isSafeRedirect(url: string): boolean {
   if (!url) return false
-  // Must start with / and not be a protocol-relative URL (//) or absolute URL
-  return url.startsWith('/') && !url.startsWith('//')
+  // Must be a same-site path: not protocol-relative (//), and no backslashes,
+  // which browsers treat like slashes (/\evil.com behaves as //evil.com).
+  return url.startsWith('/') && !url.startsWith('//') && !url.includes('\\')
 }
 
 export type LoginInput = z.infer<typeof loginSchema>

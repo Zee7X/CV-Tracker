@@ -1,12 +1,11 @@
+import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   const supabase = await createClient()
-
-  // Sign out the user
   await supabase.auth.signOut()
 
-  // Redirect to home page
-  redirect('/')
+  // 303 so the browser follows with GET. redirect() from a route handler sends
+  // 307, which would repeat the POST against the login page.
+  return NextResponse.redirect(new URL('/login', request.url), 303)
 }

@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Bell, BriefcaseBusiness, FileText, LayoutDashboard, LogOut, Mail, Menu, Plus, Search, Settings, X, type LucideIcon } from 'lucide-react'
+import { BriefcaseBusiness, FileText, LayoutDashboard, LogOut, Mail, Menu, Plus, Search, Settings, X, type LucideIcon } from 'lucide-react'
 import { Logo } from '@/components/brand/logo'
 import { NavLink } from '@/components/layout/nav-link'
 import { LanguageSwitcher } from '@/components/i18n/language-switcher'
+import { ThemeSwitcher, ThemeToggleButton } from '@/components/theme/theme-toggle'
 import { ButtonLink } from '@/components/ui/button-link'
 import { initialsOf } from '@/components/ui/monogram'
 
@@ -35,7 +36,7 @@ function isActive(pathname: string, href: string) {
 function Avatar({ user }: { user: ShellUser }) {
   if (user.avatarUrl) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={user.avatarUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover ring-1 ring-stone-200" />
+    return <img src={user.avatarUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover ring-1 ring-slate-200" />
   }
   return (
     <span
@@ -109,10 +110,8 @@ function UserBlock({ user, pathname }: { user: ShellUser | null; pathname: strin
         <span className="flex-1">Settings</span>
       </NavLink>
       <div className="flex items-center justify-between border-t border-slate-200/70 pt-2 px-1">
-        <NavLink
-          href="/dashboard/account"
-          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-full p-1 transition-colors hover:bg-slate-100/70"
-        >
+        {/* The Settings link above already goes to the account page, so this is just identity. */}
+        <div className="flex min-w-0 flex-1 items-center gap-2.5 p-1">
           {user ? <Avatar user={user} /> : null}
           <span className="min-w-0 flex-1 text-left">
             <span className="block truncate text-xs font-semibold text-slate-900" data-no-translate>
@@ -122,7 +121,7 @@ function UserBlock({ user, pathname }: { user: ShellUser | null; pathname: strin
               {user?.email}
             </span>
           </span>
-        </NavLink>
+        </div>
         <form action="/dashboard/logout" method="POST">
           <button
             type="submit"
@@ -159,13 +158,13 @@ export default function DashboardShell({
     <div className="min-h-screen text-slate-900">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:shadow"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:shadow"
       >
         Skip to content
       </a>
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-3 left-3 z-40 hidden w-64 flex-col rounded-[28px] border border-slate-200/80 bg-white/90 shadow-xs backdrop-blur-md lg:flex print:hidden">
+      <aside className="fixed inset-y-3 left-3 z-40 hidden w-64 flex-col rounded-[28px] border border-slate-200/80 bg-surface/90 shadow-xs backdrop-blur-md lg:flex print:hidden">
         <div className="flex h-20 items-center px-6">
           <Logo href="/dashboard" />
         </div>
@@ -184,15 +183,20 @@ export default function DashboardShell({
             <span className="text-xs font-medium text-slate-500">Language</span>
             <LanguageSwitcher compact />
           </div>
+          <div className="flex items-center justify-between px-2">
+            <span className="text-xs font-medium text-slate-500">Theme</span>
+            <ThemeSwitcher compact />
+          </div>
           <UserBlock user={user} pathname={pathname} />
         </div>
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-md lg:hidden print:hidden">
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-surface/90 backdrop-blur-md lg:hidden print:hidden">
         <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
           <Logo href="/dashboard" className="mr-auto" />
           <LanguageSwitcher compact />
+          <ThemeToggleButton />
           <button
             type="button"
             className="flex h-10 w-10 items-center justify-center rounded-full text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
@@ -207,6 +211,10 @@ export default function DashboardShell({
         <div id="mobile-nav" data-open={isMobileMenuOpen} inert={!isMobileMenuOpen} className="collapse-panel">
           <div className={isMobileMenuOpen ? 'border-t border-slate-200/70' : ''}>
             <div className="space-y-3 px-3 py-3 sm:px-5">
+              <ButtonLink href="/dashboard/applications/new" className="w-full">
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                Add application
+              </ButtonLink>
               <SidebarNav pathname={pathname} counts={counts} />
               <div className="border-t border-slate-200/70 pt-3">
                 <UserBlock user={user} pathname={pathname} />
@@ -217,34 +225,27 @@ export default function DashboardShell({
       </header>
 
       <main id="main" className="lg:pl-[17.5rem]">
-        {/* Desktop Top Header Bar matching EduMate */}
-        <header className="sticky top-0 z-30 hidden h-16 items-center justify-between border-b border-slate-200/70 bg-white/70 px-8 backdrop-blur-md lg:flex print:hidden">
-          <form action="/dashboard/applications" method="GET" className="relative w-80">
+        {/* Desktop top bar */}
+        <header className="sticky top-0 z-30 hidden h-16 items-center justify-between border-b border-slate-200/70 bg-surface/70 px-8 backdrop-blur-md lg:flex print:hidden">
+          <form action="/dashboard/applications" method="GET" role="search" className="relative w-80">
+            <label htmlFor="shell-search" className="sr-only">
+              Search applications
+            </label>
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
             <input
+              id="shell-search"
               type="search"
               name="search"
-              placeholder="Search..."
-              className="h-10 w-full rounded-full border border-slate-200 bg-white pl-9 pr-4 text-xs font-medium text-slate-900 shadow-xs placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              placeholder="Search applications..."
+              className="h-10 w-full rounded-full border border-slate-200 bg-surface pl-9 pr-4 text-xs font-medium text-slate-900 shadow-xs placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             />
           </form>
           <div className="flex items-center gap-3">
-            <NavLink
-              href="/dashboard/applications"
-              className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-xs transition-colors hover:bg-slate-50 hover:text-slate-900"
-              title="Applications"
-            >
-              <Bell className="h-4 w-4" aria-hidden="true" />
-              {(counts.applications ?? 0) > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-600 px-1 text-[10px] font-semibold text-white">
-                  {counts.applications}
-                </span>
-              ) : null}
-            </NavLink>
+            <ThemeToggleButton className="border border-slate-200 bg-surface shadow-xs hover:bg-slate-50" />
             {user ? (
               <NavLink
                 href="/dashboard/account"
-                className="flex items-center gap-2.5 rounded-full border border-slate-200 bg-white py-1 pl-1.5 pr-4 shadow-xs transition-colors hover:bg-slate-50"
+                className="flex items-center gap-2.5 rounded-full border border-slate-200 bg-surface py-1 pl-1.5 pr-4 shadow-xs transition-colors hover:bg-slate-50"
               >
                 <Avatar user={user} />
                 <div className="text-left leading-tight">

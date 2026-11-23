@@ -783,6 +783,19 @@ const id: Record<string, string> = {
   'Credential link': 'Tautan kredensial',
   'Licences and courses with a certificate. Add a credential link so recruiters can verify it.': 'Lisensi dan kursus bersertifikat. Tambahkan tautan kredensial agar rekruter bisa memverifikasinya.',
   'The cover_letters table does not exist in your Supabase project yet. Copy the migration and run it in the Supabase SQL editor.': 'Tabel cover_letters belum ada di proyek Supabase Anda. Salin migrasinya lalu jalankan di SQL editor Supabase.',
+  // Theme
+  Theme: 'Tema',
+  Light: 'Terang',
+  Dark: 'Gelap',
+  System: 'Sistem',
+  'Choose theme': 'Pilih tema',
+  'Switch to dark mode': 'Beralih ke mode gelap',
+  'Switch to light mode': 'Beralih ke mode terang',
+  Appearance: 'Tampilan',
+  'Choose how CV Tracker looks on this device. System follows your operating system setting.': 'Pilih tampilan CV Tracker di perangkat ini. Sistem mengikuti pengaturan sistem operasi Anda.',
+  'CV and cover letter previews always stay white, matching the exported PDF.': 'Pratinjau CV dan surat lamaran selalu berlatar putih, sesuai PDF yang diekspor.',
+  'Search applications...': 'Cari lamaran...',
+  'Selected CV was not found or is not owned by your account.': 'CV yang dipilih tidak ditemukan atau bukan milik akun Anda.',
 }
 
 type LanguageContextValue = {

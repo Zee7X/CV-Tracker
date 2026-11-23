@@ -84,7 +84,7 @@ const LANGUAGE_OPTIONS: { id: LetterLanguage; label: string }[] = [
 ]
 
 const selectClass =
-  'h-10 w-full rounded-xl border border-stone-900/10 bg-white/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-white/85 focus-visible:border-brand-400 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 text-sm text-stone-900'
+  'h-10 w-full rounded-xl border border-slate-900/10 bg-surface/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-surface/85 focus-visible:border-brand-400 focus-visible:bg-surface focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 text-sm text-slate-900'
 
 function localToday() {
   const now = new Date()
@@ -343,22 +343,22 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-      <div className="flex flex-col gap-4 border-b border-stone-900/10 pb-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-900/10 pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <Link
             href="/dashboard/cover-letters"
-            className="inline-flex items-center gap-1 rounded text-sm font-medium text-stone-600 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
+            className="inline-flex items-center gap-1 rounded text-sm font-medium text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Cover letters
           </Link>
-          <h1 className="mt-1 truncate text-2xl font-semibold text-stone-900">
+          <h1 className="mt-1 truncate text-2xl font-semibold text-slate-900">
             {isEditing ? values.title || 'Untitled letter' : 'New cover letter'}
           </h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs text-stone-500" aria-live="polite">
+          <span className="mr-1 text-xs text-slate-500" aria-live="polite">
             {savedAt ? (
               <>
                 <span>Saved at</span> {savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -384,7 +384,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
         <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           <p className="font-medium">{serverError}</p>
           {missingTable ? (
-            <div className="mt-3 space-y-2 text-stone-700">
+            <div className="mt-3 space-y-2 text-slate-700">
               <p>
                 The cover_letters table does not exist in your Supabase project yet. Copy the migration and run it in the Supabase SQL editor.
               </p>
@@ -406,7 +406,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
         </div>
       ) : null}
 
-      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-full border border-white/70 bg-white/40 p-1 backdrop-blur-md lg:hidden">
+      <div role="tablist" aria-label="Editor view" className="grid grid-cols-2 rounded-full border border-surface/70 bg-surface/40 p-1 backdrop-blur-md lg:hidden">
         {(['form', 'preview'] as const).map((tab) => (
           <button
             key={tab}
@@ -414,7 +414,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
             role="tab"
             aria-selected={mobileTab === tab}
             onClick={() => setMobileTab(tab)}
-            className={`rounded-full py-2 text-sm font-semibold transition-colors ${mobileTab === tab ? 'bg-white/90 text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'}`}
+            className={`rounded-full py-2 text-sm font-semibold transition-colors ${mobileTab === tab ? 'bg-surface/90 text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
           >
             {tab === 'form' ? 'Edit' : 'Preview'}
           </button>
@@ -433,7 +433,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
                     <label
                       key={tmpl.id}
                       className={`cursor-pointer rounded-lg border px-3.5 py-3 text-left transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-700 ${
-                        selected ? 'border-brand-700 bg-brand-50/60 ring-1 ring-brand-700' : 'border-white/70 bg-white hover:border-stone-400'
+                        selected ? 'border-brand-700 bg-brand-50/60 ring-1 ring-brand-700' : 'border-surface/70 bg-surface hover:border-slate-400'
                       }`}
                     >
                       <input
@@ -445,10 +445,10 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
                         className="sr-only"
                       />
                       <span className="flex items-baseline justify-between gap-2">
-                        <span className="text-sm font-semibold text-stone-900">{tmpl.name}</span>
-                        <span className="text-xs text-stone-500">{tmpl.badge}</span>
+                        <span className="text-sm font-semibold text-slate-900">{tmpl.name}</span>
+                        <span className="text-xs text-slate-500">{tmpl.badge}</span>
                       </span>
-                      <span className="mt-1 block text-xs leading-5 text-stone-600">{tmpl.description}</span>
+                      <span className="mt-1 block text-xs leading-5 text-slate-600">{tmpl.description}</span>
                     </label>
                   )
                 })}
@@ -466,7 +466,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
                   value={docLang}
                   disabled={languageLocked}
                   onChange={(event) => handleSelectLanguage(event.target.value as LetterLanguage)}
-                  className={`${selectClass} disabled:cursor-not-allowed disabled:bg-stone-900/[0.05] disabled:text-stone-500`}
+                  className={`${selectClass} disabled:cursor-not-allowed disabled:bg-slate-900/[0.05] disabled:text-slate-500`}
                 >
                   {LANGUAGE_OPTIONS.map((option) => (
                     <option key={option.id} value={option.id}>
@@ -488,7 +488,7 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
             </div>
 
             {availableCVs.length > 0 ? (
-              <div className="flex flex-col gap-2 border-t border-white/70 pt-4 sm:flex-row sm:items-start">
+              <div className="flex flex-col gap-2 border-t border-surface/70 pt-4 sm:flex-row sm:items-start">
                 <Field id="import_cv" label="Fill your details from a CV" className="flex-1" hint="Copies name, email, phone, city and your top skills.">
                   <select id="import_cv" value={selectedCvId} onChange={(e) => setSelectedCvId(e.target.value)} className={selectClass}>
                     <option value="">Choose a CV</option>
@@ -569,15 +569,15 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
 
         <div className={mobileTab === 'form' ? 'hidden lg:block' : ''}>
           <div className="space-y-2 lg:sticky lg:top-8">
-            <p className="text-sm font-medium text-stone-700">Preview</p>
+            <p className="text-sm font-medium text-slate-700">Preview</p>
             <div
               data-no-translate
               lang={docLang}
-              className="space-y-4 rounded-md bg-white p-6 shadow-[0_8px_24px_-12px_rgba(28,25,23,0.25)] ring-1 ring-stone-200 font-serif text-[12.5px] leading-relaxed text-stone-900 sm:p-8 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto"
+              className="paper space-y-4 rounded-md bg-surface p-6 shadow-[0_8px_24px_-12px_rgba(28,25,23,0.25)] ring-1 ring-slate-200 font-serif text-[12.5px] leading-relaxed text-slate-900 sm:p-8 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto"
             >
-              <div className="border-b border-stone-800 pb-2">
+              <div className="border-b border-slate-800 pb-2">
                 <p className="text-lg font-bold leading-tight">{values.sender_name || (isEn ? 'Your name' : 'Nama lengkap')}</p>
-                <p className="mt-0.5 text-[11.5px] text-stone-600">
+                <p className="mt-0.5 text-[11.5px] text-slate-600">
                   {[values.sender_email, values.sender_phone, values.sender_location].filter(Boolean).join(' · ')}
                 </p>
               </div>

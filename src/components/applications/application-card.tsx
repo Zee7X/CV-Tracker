@@ -72,7 +72,7 @@ export function ApplicationCard({ application, onDeleteSuccess }: ApplicationCar
   return (
     <>
       <div
-        className={`rounded-2xl bg-white p-5 transition-all duration-200 ${
+        className={`rounded-2xl bg-surface p-5 transition-all duration-200 ${
           isExpanded
             ? 'border-2 border-brand-500 shadow-sm'
             : 'border border-slate-200/90 shadow-xs hover:border-slate-300'
@@ -207,7 +207,7 @@ export function ApplicationCard({ application, onDeleteSuccess }: ApplicationCar
                     value={application.status}
                     onChange={(event) => handleStatusChange(event.target.value as ApplicationStatus)}
                     disabled={isPending}
-                    className="h-8 appearance-none rounded-full border border-slate-200 bg-white pl-6 pr-7 text-xs font-medium text-slate-800 transition-colors hover:border-slate-300 focus-visible:border-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/20 disabled:opacity-50"
+                    className="h-8 appearance-none rounded-full border border-slate-200 bg-surface pl-6 pr-7 text-xs font-medium text-slate-800 transition-colors hover:border-slate-300 focus-visible:border-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/20 disabled:opacity-50"
                   >
                     {APPLICATION_STATUSES.map((status) => (
                       <option key={status.value} value={status.value}>

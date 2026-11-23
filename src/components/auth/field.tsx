@@ -15,7 +15,7 @@ export function Field({ label, htmlFor, error, children, className }: FieldProps
     <div className={cn('flex flex-col gap-1.5', className)}>
       <label
         htmlFor={htmlFor}
-        className="text-sm font-medium text-stone-800"
+        className="text-sm font-medium text-slate-800"
       >
         {label}
       </label>

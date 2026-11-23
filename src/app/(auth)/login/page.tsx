@@ -17,11 +17,21 @@ function CallbackError() {
   return <AuthAlert kind="error" message="Authentication failed. Please try again." />
 }
 
+// Where the proxy wanted to send the user before it asked them to sign in.
+// loginAction checks it with isSafeRedirect before redirecting.
+function NextField() {
+  const next = useSearchParams().get('next')
+  return next ? <input type="hidden" name="next" value={next} /> : null
+}
+
 function LoginForm() {
   const [state, action, pending] = useActionState(loginAction, undefined)
 
   return (
     <form action={action} className="mt-4 flex flex-col gap-4" noValidate>
+      <Suspense>
+        <NextField />
+      </Suspense>
       <Field label="Email address" htmlFor="email">
         <Input
           id="email"
@@ -64,8 +74,8 @@ export default function LoginPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-stone-900">Sign in</h1>
-        <p className="mt-2 text-sm leading-6 text-stone-600">Use the email and password you registered with.</p>
+        <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-slate-900">Sign in</h1>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Use the email and password you registered with.</p>
       </div>
 
       <Suspense>
@@ -74,7 +84,7 @@ export default function LoginPage() {
 
       <LoginForm />
 
-      <p className="mt-6 text-sm text-stone-600">
+      <p className="mt-6 text-sm text-slate-600">
         Don&apos;t have an account?{' '}
         <Link href="/register" className="font-medium text-brand-700 underline-offset-4 hover:underline">
           Create one

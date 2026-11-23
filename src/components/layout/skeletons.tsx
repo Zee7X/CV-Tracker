@@ -41,13 +41,13 @@ function Field({
 }) {
   return (
     <div className={`space-y-1.5 ${className}`}>
-      <span className="block text-sm font-medium text-stone-800">
+      <span className="block text-sm font-medium text-slate-800">
         {label}
         {required ? <span className="text-red-700"> *</span> : null}
-        {optional ? <span className="font-normal text-stone-500"> (optional)</span> : null}
+        {optional ? <span className="font-normal text-slate-500"> (optional)</span> : null}
       </span>
       {children}
-      {hint ? <p className="text-xs text-stone-500">{hint}</p> : null}
+      {hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
     </div>
   )
 }
@@ -81,10 +81,10 @@ const STAT_LABELS = ['Applications', 'Still open', 'Interviews', 'Response rate'
 /** Same header as Panel in layout/page-header.tsx. */
 function PanelHead({ title, description, action }: { title: string; description?: string; action?: string }) {
   return (
-    <header className="flex items-start justify-between gap-4 border-b border-stone-900/[0.06] px-5 py-4">
+    <header className="flex items-start justify-between gap-4 border-b border-slate-900/[0.06] px-5 py-4">
       <div className="min-w-0">
-        <h2 className="text-sm font-semibold text-stone-900">{title}</h2>
-        {description ? <p className="mt-0.5 text-xs leading-5 text-stone-500">{description}</p> : null}
+        <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
+        {description ? <p className="mt-0.5 text-xs leading-5 text-slate-500">{description}</p> : null}
       </div>
       {action ? (
         <div className="shrink-0">
@@ -129,7 +129,7 @@ export function OverviewSkeleton() {
         {STAT_LABELS.map((label) => (
           <div key={label} className={cn(PANEL, 'p-4 sm:p-5')}>
             <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-medium text-stone-600">{label}</span>
+              <span className="text-sm font-medium text-slate-600">{label}</span>
               <Bone className="h-8 w-8 rounded-lg" />
             </div>
             <span className="mt-2 flex h-9 items-center">
@@ -153,9 +153,9 @@ export function OverviewSkeleton() {
               <Bone className="h-3 rounded-full" />
               <ul className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {APPLICATION_STATUSES.map((status) => (
-                  <li key={status.value} className="flex items-center gap-2.5 rounded-lg border border-white/70 px-3 py-2.5">
+                  <li key={status.value} className="flex items-center gap-2.5 rounded-lg border border-surface/70 px-3 py-2.5">
                     <Bone className="h-2.5 w-2.5 rounded-full" />
-                    <span className="flex-1 text-sm text-stone-700">{status.label}</span>
+                    <span className="flex-1 text-sm text-slate-700">{status.label}</span>
                     <TextBone className="w-4" />
                   </li>
                 ))}
@@ -165,7 +165,7 @@ export function OverviewSkeleton() {
 
           <section className={PANEL}>
             <PanelHead title="Latest applications" action="All applications" />
-            <ul className="divide-y divide-stone-900/[0.06]">
+            <ul className="divide-y divide-slate-900/[0.06]">
               {Array.from({ length: 6 }, (_, i) => (
                 <li
                   key={i}
@@ -187,7 +187,7 @@ export function OverviewSkeleton() {
         <div className="min-w-0 space-y-6">
           <section className={PANEL}>
             <PanelHead title="Worth a follow-up" description="Applied or in screening for 7 days or more without a new stage." />
-            <ul className="divide-y divide-stone-900/[0.06]">
+            <ul className="divide-y divide-slate-900/[0.06]">
               {Array.from({ length: 3 }, (_, i) => (
                 <li key={i} className="flex items-center gap-3 px-5 py-3">
                   <MonogramBone size="sm" />
@@ -200,7 +200,7 @@ export function OverviewSkeleton() {
 
           <section className={PANEL}>
             <PanelHead title="Your CVs" action="All CVs" />
-            <ul className="divide-y divide-stone-900/[0.06]">
+            <ul className="divide-y divide-slate-900/[0.06]">
               {Array.from({ length: 3 }, (_, i) => (
                 <li key={i} className="flex items-center gap-3.5 px-5 py-3">
                   <Bone className="aspect-[210/297] w-11 rounded-[3px]" />
@@ -208,9 +208,9 @@ export function OverviewSkeleton() {
                 </li>
               ))}
             </ul>
-            <div className="flex items-center gap-3 border-t border-stone-900/[0.06] px-5 py-3.5 text-sm">
+            <div className="flex items-center gap-3 border-t border-slate-900/[0.06] px-5 py-3.5 text-sm">
               <Bone className="h-8 w-8 rounded-lg" />
-              <span className="flex-1 font-medium text-stone-800">Cover letters</span>
+              <span className="flex-1 font-medium text-slate-800">Cover letters</span>
               <TextBone className="w-4" />
             </div>
           </section>
@@ -226,9 +226,9 @@ export function OverviewSkeleton() {
 
 function CardFooterBone() {
   return (
-    <div className="flex items-center gap-1 border-t border-stone-900/[0.06] px-3 py-2">
+    <div className="flex items-center gap-1 border-t border-slate-900/[0.06] px-3 py-2">
       <span className="inline-flex h-8 items-center px-2.5 text-xs font-semibold text-brand-700">Edit</span>
-      <span className="inline-flex h-8 items-center px-3 text-xs font-semibold text-stone-700">Duplicate</span>
+      <span className="inline-flex h-8 items-center px-3 text-xs font-semibold text-slate-700">Duplicate</span>
     </div>
   )
 }
@@ -237,8 +237,8 @@ function DocumentCardBone({ kind }: { kind: 'cv' | 'letter' }) {
   if (kind === 'cv') {
     return (
       <div className={cn(PANEL, 'flex h-full flex-col overflow-hidden')}>
-        <div className="flex justify-center border-b border-stone-900/[0.06] bg-gradient-to-br from-brand-50 via-white/60 to-violet-50 px-6 pt-6">
-          <Bone className="aspect-[210/297] w-[46%] translate-y-1 rounded-b-none rounded-t-[3px] bg-white" />
+        <div className="flex justify-center border-b border-slate-900/[0.06] bg-gradient-to-br from-brand-50 via-surface/60 to-violet-50 px-6 pt-6">
+          <Bone className="aspect-[210/297] w-[46%] translate-y-1 rounded-b-none rounded-t-[3px] bg-surface" />
         </div>
         <div className="flex flex-1 flex-col px-5 py-4">
           <span className="flex items-start justify-between gap-3">
@@ -262,7 +262,7 @@ function DocumentCardBone({ kind }: { kind: 'cv' | 'letter' }) {
             <TextBone className="w-48" boxClassName="mt-0.5" />
           </span>
         </div>
-        <div className="mt-4 space-y-2 rounded-lg bg-white/50 px-3 py-2.5" style={{ height: 80 }}>
+        <div className="mt-4 space-y-2 rounded-lg bg-surface/50 px-3 py-2.5" style={{ height: 80 }}>
           <Bone className="h-2.5 w-11/12" />
           <Bone className="h-2.5 w-full" />
           <Bone className="h-2.5 w-3/5" />
@@ -305,15 +305,15 @@ export function DocumentListSkeleton({ kind }: { kind: 'cv' | 'letter' }) {
         <li>
           <div
             className={cn(
-              'flex h-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-stone-900/10 px-6 py-8 text-center',
+              'flex h-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-900/10 px-6 py-8 text-center',
               isCV ? 'min-h-[200px]' : 'min-h-[180px]'
             )}
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-brand-700 ring-1 ring-stone-200">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-brand-700 ring-1 ring-slate-200">
               <Plus className="h-5 w-5" aria-hidden="true" />
             </span>
-            <span className="text-sm font-semibold text-stone-900">{isCV ? 'New CV' : 'New cover letter'}</span>
-            <span className="max-w-[220px] text-xs leading-5 text-stone-500">
+            <span className="text-sm font-semibold text-slate-900">{isCV ? 'New CV' : 'New cover letter'}</span>
+            <span className="max-w-[220px] text-xs leading-5 text-slate-500">
               {isCV ? 'Start blank, or duplicate an existing CV to tailor it for one role.' : 'Pick a format, then fill it from one of your CVs.'}
             </span>
           </div>
@@ -343,9 +343,9 @@ export function ApplicationsSkeleton() {
         }
       />
       <div className={cn(PANEL, 'overflow-hidden')}>
-        <div className="flex flex-col gap-3 border-b border-stone-900/[0.06] px-4 pt-4 sm:px-5">
+        <div className="flex flex-col gap-3 border-b border-slate-900/[0.06] px-4 pt-4 sm:px-5">
           <span className="relative block w-full max-w-md">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" aria-hidden="true" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
             <InputBone empty />
           </span>
           <div className="scrollbar-none -mx-1 overflow-x-auto px-1">
@@ -355,7 +355,7 @@ export function ApplicationsSkeleton() {
                   key={label}
                   className={cn(
                     '-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium',
-                    i === 0 ? 'border-brand-700 text-stone-900' : 'border-transparent text-stone-500'
+                    i === 0 ? 'border-brand-700 text-slate-900' : 'border-transparent text-slate-500'
                   )}
                 >
                   {label}
@@ -365,13 +365,13 @@ export function ApplicationsSkeleton() {
             </div>
           </div>
         </div>
-        <div className={cn('hidden gap-4 border-b border-stone-900/[0.06] bg-white/50/70 px-5 py-2.5 text-xs font-medium text-stone-500 lg:grid', APP_GRID)}>
+        <div className={cn('hidden gap-4 border-b border-slate-900/[0.06] bg-surface/50/70 px-5 py-2.5 text-xs font-medium text-slate-500 lg:grid', APP_GRID)}>
           <span>Position and company</span>
           <span>CV sent</span>
           <span>Date applied</span>
           <span>Stage</span>
         </div>
-        <ul className="divide-y divide-stone-900/[0.06]">
+        <ul className="divide-y divide-slate-900/[0.06]">
           {Array.from({ length: 5 }, (_, i) => (
             <li key={i} className={cn('grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-3 px-4 py-4 sm:px-5 lg:items-center lg:gap-4', APP_GRID)}>
               <div className="col-span-2 flex min-w-0 items-start gap-3 lg:col-span-1 lg:items-center">
@@ -407,7 +407,7 @@ const STAGES = APPLICATION_STATUSES.filter((status) => status.value !== 'rejecte
 export function ApplicationFormSkeleton({ editing }: { editing: boolean }) {
   return (
     <SkeletonRegion className="space-y-5">
-      <span className="inline-flex items-center gap-1 text-sm font-medium text-stone-600">
+      <span className="inline-flex items-center gap-1 text-sm font-medium text-slate-600">
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         Applications
       </span>
@@ -418,9 +418,9 @@ export function ApplicationFormSkeleton({ editing }: { editing: boolean }) {
             <TextBone size="2xl" className="w-40" boxClassName="h-[32.5px] sm:hidden" />
           </>
         ) : (
-          <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.02em] text-stone-900">Add application</h1>
+          <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.02em] text-slate-900">Add application</h1>
         )}
-        <p className="mt-1.5 text-sm text-stone-600">
+        <p className="mt-1.5 text-sm text-slate-600">
           {editing ? 'Update the stage, the CV you sent, or your notes.' : 'Record the job, the date you applied and the CV you sent.'}
         </p>
       </div>
@@ -438,7 +438,7 @@ export function ApplicationFormSkeleton({ editing }: { editing: boolean }) {
               <InputBone empty />
             </Field>
           </div>
-          <div className="grid grid-cols-1 gap-4 border-t border-stone-900/[0.06] px-5 py-5 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 border-t border-slate-900/[0.06] px-5 py-5 sm:grid-cols-3">
             <Field label="Date applied" required>
               <InputBone />
             </Field>
@@ -449,12 +449,12 @@ export function ApplicationFormSkeleton({ editing }: { editing: boolean }) {
               <InputBone />
             </Field>
           </div>
-          <div className="border-t border-stone-900/[0.06] px-5 py-5">
+          <div className="border-t border-slate-900/[0.06] px-5 py-5">
             <Field label="Notes" optional hint="Recruiter contact, interview dates, salary range, what to follow up on.">
               <TextareaBone rows={5} empty={!editing} />
             </Field>
           </div>
-          <div className="flex items-center justify-end gap-2 border-t border-stone-900/[0.06] px-5 py-4">
+          <div className="flex items-center justify-end gap-2 border-t border-slate-900/[0.06] px-5 py-4">
             <GhostButton variant="outline">Cancel</GhostButton>
             <GhostButton>{editing ? 'Save changes' : 'Add application'}</GhostButton>
           </div>
@@ -462,19 +462,19 @@ export function ApplicationFormSkeleton({ editing }: { editing: boolean }) {
 
         <aside className="space-y-4">
           <section className={cn(PANEL, 'p-5')}>
-            <h2 className="text-sm font-semibold text-stone-900">Progress</h2>
+            <h2 className="text-sm font-semibold text-slate-900">Progress</h2>
             <ol className="mt-4">
               {STAGES.map((stage) => (
                 <li key={stage.value} className="flex gap-3 pb-4 last:pb-0">
                   <Bone className="mt-0.5 h-5 w-5 rounded-full" />
-                  <span className="text-sm text-stone-400">{stage.label}</span>
+                  <span className="text-sm text-slate-400">{stage.label}</span>
                 </li>
               ))}
             </ol>
           </section>
           <section className={cn(PANEL, 'p-5')}>
-            <h2 className="text-sm font-semibold text-stone-900">CV sent</h2>
-            <div className="mt-3 flex items-center gap-3 rounded-lg border border-white/70 p-3">
+            <h2 className="text-sm font-semibold text-slate-900">CV sent</h2>
+            <div className="mt-3 flex items-center gap-3 rounded-lg border border-surface/70 p-3">
               <Bone className="aspect-[210/297] w-12 rounded-[3px]" />
               <TwoLines first="w-40" second="w-16" />
             </div>
@@ -493,7 +493,7 @@ const CV_SECTIONS = ['Settings', 'Personal', 'Summary', 'Skills', 'Experience', 
 
 function PreviewSheetBone() {
   return (
-    <div className="mx-auto aspect-[210/297] w-full max-w-[794px] bg-white p-[7%] shadow-[0_1px_3px_rgba(0,0,0,0.12)] ring-1 ring-stone-300">
+    <div className="paper mx-auto aspect-[210/297] w-full max-w-[794px] bg-surface p-[7%] shadow-[0_1px_3px_rgba(0,0,0,0.12)] ring-1 ring-slate-300">
       <Bone className="h-[3.2%] w-2/5" />
       <Bone className="mt-[2%] h-[1.6%] w-1/3" />
       <Bone className="mt-[2%] h-[1.2%] w-3/4" />
@@ -514,16 +514,16 @@ export function CVEditorSkeleton({ editing }: { editing: boolean }) {
     <SkeletonRegion className="space-y-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/70 bg-white/60 text-stone-700 shadow-[0_1px_1px_rgba(28,25,23,0.04)]">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-surface/70 bg-surface/60 text-slate-700 shadow-[0_1px_1px_rgba(28,25,23,0.04)]">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            {editing ? <TextBone size="xl" className="w-56" /> : <h1 className="text-xl font-semibold text-stone-900">New CV</h1>}
+            {editing ? <TextBone size="xl" className="w-56" /> : <h1 className="text-xl font-semibold text-slate-900">New CV</h1>}
             <TextBone className="w-28" />
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="hidden h-9 items-center gap-1.5 rounded-md px-2.5 text-xs font-semibold text-stone-700 lg:inline-flex">
+          <span className="hidden h-9 items-center gap-1.5 rounded-md px-2.5 text-xs font-semibold text-slate-700 lg:inline-flex">
             <PanelRightClose className="h-4 w-4" aria-hidden="true" />
             Hide preview
           </span>
@@ -542,20 +542,20 @@ export function CVEditorSkeleton({ editing }: { editing: boolean }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 rounded-full border border-white/70 bg-white/40 p-1 backdrop-blur-md lg:hidden">
-        <span className="rounded-full bg-white/90 py-2 text-center text-sm font-semibold text-stone-900 shadow-sm">Edit</span>
-        <span className="py-2 text-center text-sm font-semibold text-stone-600">Preview</span>
+      <div className="grid grid-cols-2 rounded-full border border-surface/70 bg-surface/40 p-1 backdrop-blur-md lg:hidden">
+        <span className="rounded-full bg-surface/90 py-2 text-center text-sm font-semibold text-slate-900 shadow-sm">Edit</span>
+        <span className="py-2 text-center text-sm font-semibold text-slate-600">Preview</span>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-5">
           <div className="scrollbar-none -mx-1 overflow-x-auto px-1">
-            <ul className="flex min-w-max gap-1 border-b border-stone-900/10">
+            <ul className="flex min-w-max gap-1 border-b border-slate-900/10">
               {CV_SECTIONS.map((label) => (
                 <li
                   key={label}
                   className={`-mb-px border-b-2 px-3 py-2.5 text-sm font-medium ${
-                    label === 'Personal' ? 'border-brand-800 text-stone-900' : 'border-transparent text-stone-600'
+                    label === 'Personal' ? 'border-brand-800 text-slate-900' : 'border-transparent text-slate-600'
                   }`}
                 >
                   {label}
@@ -591,16 +591,16 @@ export function CVEditorSkeleton({ editing }: { editing: boolean }) {
                 <InputBone empty={!editing} />
               </Field>
             </div>
-            <div className="border-t border-white/70 pt-4">
+            <div className="border-t border-surface/70 pt-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                <span className="h-20 w-20 shrink-0 rounded-full border border-white/70 bg-stone-900/[0.05]" />
+                <span className="h-20 w-20 shrink-0 rounded-full border border-surface/70 bg-slate-900/[0.05]" />
                 <div className="min-w-0 flex-1 space-y-2">
                   <div>
-                    <p className="text-sm font-medium text-stone-800">
-                      Photo <span className="font-normal text-stone-500">(optional)</span>
+                    <p className="text-sm font-medium text-slate-800">
+                      Photo <span className="font-normal text-slate-500">(optional)</span>
                     </p>
                     {/* Same hint the form shows for the default (non-Modern) templates. */}
-                    <p className="text-xs text-stone-500">
+                    <p className="text-xs text-slate-500">
                       Only the Modern template shows a photo. Many international employers prefer CVs without one.
                     </p>
                   </div>
@@ -627,15 +627,15 @@ export function CVEditorSkeleton({ editing }: { editing: boolean }) {
 
         <div className="hidden min-w-0 lg:sticky lg:top-8 lg:block lg:self-start">
           <section className="flex flex-col overflow-hidden rounded-3xl glass/35 lg:h-[calc(100vh-4rem)]">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/60 bg-white/50 px-3 py-2 backdrop-blur-md">
-              <div className="flex rounded-lg border border-white/70 bg-stone-900/[0.05] p-0.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-surface/60 bg-surface/50 px-3 py-2 backdrop-blur-md">
+              <div className="flex rounded-lg border border-surface/70 bg-slate-900/[0.05] p-0.5">
                 {TEMPLATES_METADATA.map((tmpl) => (
-                  <span key={tmpl.id} className="rounded px-2.5 py-1 text-xs font-semibold text-stone-600" data-no-translate>
+                  <span key={tmpl.id} className="rounded px-2.5 py-1 text-xs font-semibold text-slate-600" data-no-translate>
                     {tmpl.name}
                   </span>
                 ))}
               </div>
-              <span className="h-8 w-28 rounded-xl border border-white/70 bg-white/60" />
+              <span className="h-8 w-28 rounded-xl border border-surface/70 bg-surface/60" />
             </div>
             <div className="flex-1 overflow-hidden p-4 sm:p-6">
               <PreviewSheetBone />
@@ -654,16 +654,16 @@ export function CVEditorSkeleton({ editing }: { editing: boolean }) {
 export function CoverLetterEditorSkeleton({ editing }: { editing: boolean }) {
   return (
     <SkeletonRegion className="space-y-5">
-      <div className="flex flex-col gap-4 border-b border-stone-900/10 pb-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-900/10 pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1 text-sm font-medium text-stone-600">
+          <span className="inline-flex items-center gap-1 text-sm font-medium text-slate-600">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Cover letters
           </span>
           {editing ? (
             <TextBone size="2xl" className="w-56" boxClassName="mt-1" />
           ) : (
-            <h1 className="mt-1 text-2xl font-semibold text-stone-900">New cover letter</h1>
+            <h1 className="mt-1 text-2xl font-semibold text-slate-900">New cover letter</h1>
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -676,9 +676,9 @@ export function CoverLetterEditorSkeleton({ editing }: { editing: boolean }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 rounded-full border border-white/70 bg-white/40 p-1 backdrop-blur-md lg:hidden">
-        <span className="rounded-full bg-white/90 py-2 text-center text-sm font-semibold text-stone-900 shadow-sm">Edit</span>
-        <span className="py-2 text-center text-sm font-semibold text-stone-600">Preview</span>
+      <div className="grid grid-cols-2 rounded-full border border-surface/70 bg-surface/40 p-1 backdrop-blur-md lg:hidden">
+        <span className="rounded-full bg-surface/90 py-2 text-center text-sm font-semibold text-slate-900 shadow-sm">Edit</span>
+        <span className="py-2 text-center text-sm font-semibold text-slate-600">Preview</span>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)]">
@@ -686,12 +686,12 @@ export function CoverLetterEditorSkeleton({ editing }: { editing: boolean }) {
           <EditorSection title="Format">
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {COVER_LETTER_TEMPLATES.map((tmpl) => (
-                <div key={tmpl.id} className="rounded-xl border border-white/70 bg-white/60 px-3.5 py-3">
+                <div key={tmpl.id} className="rounded-xl border border-surface/70 bg-surface/60 px-3.5 py-3">
                   <span className="flex items-baseline justify-between gap-2">
-                    <span className="text-sm font-semibold text-stone-900">{tmpl.name}</span>
-                    <span className="text-xs text-stone-500">{tmpl.badge}</span>
+                    <span className="text-sm font-semibold text-slate-900">{tmpl.name}</span>
+                    <span className="text-xs text-slate-500">{tmpl.badge}</span>
                   </span>
-                  <span className="mt-1 block text-xs leading-5 text-stone-600">{tmpl.description}</span>
+                  <span className="mt-1 block text-xs leading-5 text-slate-600">{tmpl.description}</span>
                 </div>
               ))}
             </div>
@@ -703,7 +703,7 @@ export function CoverLetterEditorSkeleton({ editing }: { editing: boolean }) {
                 <InputBone empty={!editing} />
               </Field>
             </div>
-            <div className="flex flex-col gap-2 border-t border-white/70 pt-4 sm:flex-row sm:items-start">
+            <div className="flex flex-col gap-2 border-t border-surface/70 pt-4 sm:flex-row sm:items-start">
               <Field label="Fill your details from a CV" className="flex-1" hint="Copies name, email, phone, city and your top skills.">
                 <InputBone />
               </Field>
@@ -776,9 +776,9 @@ export function CoverLetterEditorSkeleton({ editing }: { editing: boolean }) {
 
         <div className="hidden lg:block">
           <div className="space-y-2 lg:sticky lg:top-8">
-            <p className="text-sm font-medium text-stone-700">Preview</p>
-            <div className="space-y-4 rounded-md bg-white p-6 shadow-[0_8px_24px_-12px_rgba(28,25,23,0.25)] ring-1 ring-stone-200 sm:p-8">
-              <div className="border-b border-stone-800 pb-2">
+            <p className="text-sm font-medium text-slate-700">Preview</p>
+            <div className="paper space-y-4 rounded-md bg-surface p-6 shadow-[0_8px_24px_-12px_rgba(28,25,23,0.25)] ring-1 ring-slate-200 sm:p-8">
+              <div className="border-b border-slate-800 pb-2">
                 <TextBone size="lg" className="w-1/2" />
                 <TextBone size="xs" className="w-3/4" />
               </div>
@@ -815,10 +815,10 @@ export function AccountSkeleton() {
         <EditorSection title="Profile" description="Your name is used as the default sender on new cover letters.">
           <div className="space-y-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-              <span className="h-20 w-20 shrink-0 rounded-full border border-white/70 bg-stone-900/[0.05]" />
+              <span className="h-20 w-20 shrink-0 rounded-full border border-surface/70 bg-slate-900/[0.05]" />
               <div className="min-w-0 flex-1 space-y-2">
-                <p className="text-sm font-medium text-stone-800">Photo</p>
-                <p className="text-xs text-stone-500">
+                <p className="text-sm font-medium text-slate-800">Photo</p>
+                <p className="text-xs text-slate-500">
                   {'JPG, PNG or WebP. Resized to 320 px. Only the Modern CV template prints a photo; in the CV editor choose “Use account photo”.'}
                 </p>
                 <GhostButton variant="outline" size="sm">
@@ -834,7 +834,7 @@ export function AccountSkeleton() {
                 <InputBone />
               </Field>
             </div>
-            <div className="flex items-center justify-between gap-4 border-t border-white/70 pt-4">
+            <div className="flex items-center justify-between gap-4 border-t border-surface/70 pt-4">
               <TextBone size="xs" className="w-40" />
               <GhostButton>Save profile</GhostButton>
             </div>
@@ -851,7 +851,7 @@ export function AccountSkeleton() {
                 <InputBone empty />
               </Field>
             </div>
-            <div className="flex justify-end border-t border-white/70 pt-4">
+            <div className="flex justify-end border-t border-surface/70 pt-4">
               <GhostButton variant="outline">Change password</GhostButton>
             </div>
           </div>
@@ -861,10 +861,10 @@ export function AccountSkeleton() {
       <aside className="space-y-4">
         <section className={PANEL}>
           <PanelHead title="In your account" />
-          <div className="divide-y divide-stone-900/[0.06]">
+          <div className="divide-y divide-slate-900/[0.06]">
             {['CVs', 'Applications', 'Cover letters'].map((label) => (
               <div key={label} className="flex items-center justify-between px-5 py-3 text-sm">
-                <span className="text-stone-700">{label}</span>
+                <span className="text-slate-700">{label}</span>
                 <TextBone className="w-4" />
               </div>
             ))}

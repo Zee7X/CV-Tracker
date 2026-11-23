@@ -61,13 +61,13 @@ export default async function CoverLettersPage() {
             <li>
               <Link
                 href="/dashboard/cover-letters/new"
-                className="flex h-full min-h-[180px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-stone-900/10 px-6 py-8 text-center transition-colors hover:border-brand-400 hover:bg-brand-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
+                className="flex h-full min-h-[180px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-900/10 px-6 py-8 text-center transition-colors hover:border-brand-400 hover:bg-brand-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-brand-700 ring-1 ring-stone-200">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-brand-700 ring-1 ring-slate-200">
                   <Plus className="h-5 w-5" aria-hidden="true" />
                 </span>
-                <span className="text-sm font-semibold text-stone-900">New cover letter</span>
-                <span className="max-w-[220px] text-xs leading-5 text-stone-500">Pick a format, then fill it from one of your CVs.</span>
+                <span className="text-sm font-semibold text-slate-900">New cover letter</span>
+                <span className="max-w-[220px] text-xs leading-5 text-slate-500">Pick a format, then fill it from one of your CVs.</span>
               </Link>
             </li>
           </ul>

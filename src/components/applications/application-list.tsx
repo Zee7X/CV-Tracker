@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { ButtonLink } from '@/components/ui/button-link'
 import { EmptyState } from '@/components/layout/page-header'
 import { LocalDate } from '@/components/i18n/local-date'
-import { BriefcaseBusiness, Filter, Plus, Search, X } from 'lucide-react'
+import { BriefcaseBusiness, Plus, Search, X } from 'lucide-react'
 
 interface ApplicationListProps {
   initialApplications: JobApplicationWithCV[]
@@ -95,7 +95,7 @@ export function ApplicationList({ initialApplications, initialStatus = 'all', in
                   className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 ${
                     selected
                       ? 'bg-brand-600 text-white shadow-xs'
-                      : 'border border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                      : 'border border-slate-200/90 bg-surface text-slate-600 hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
                   {filter.label}
@@ -121,7 +121,7 @@ export function ApplicationList({ initialApplications, initialStatus = 'all', in
               placeholder="Filter company or role..."
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              className="h-9 w-full rounded-full border border-slate-200 bg-white pl-9 pr-3.5 text-xs text-slate-900 shadow-xs placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              className="h-9 w-full rounded-full border border-slate-200 bg-surface pl-9 pr-3.5 text-xs text-slate-900 shadow-xs placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               aria-label="Search applications"
             />
           </div>
@@ -145,7 +145,7 @@ export function ApplicationList({ initialApplications, initialStatus = 'all', in
 
       {/* List of Applications grouped by Date/Timeline */}
       {filteredApplications.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center shadow-xs">
+        <div className="rounded-2xl border border-slate-200 bg-surface px-6 py-14 text-center shadow-xs">
           <p className="text-sm font-semibold text-slate-800">No applications match these filters.</p>
           <p className="mt-1 text-xs text-slate-500">Try selecting another status tab or clearing your search term.</p>
           <Button

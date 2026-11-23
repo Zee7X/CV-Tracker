@@ -48,12 +48,12 @@ export function CVCard({ cv }: CVCardProps) {
 
   return (
     <>
-      <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs transition-all hover:border-slate-300 hover:shadow-sm">
+      <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-surface shadow-xs transition-all hover:border-slate-300 hover:shadow-sm">
         <Link
           href={`/dashboard/cv/${cv.id}`}
           className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-600"
         >
-          <div className="flex justify-center border-b border-slate-100 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 px-6 pt-6">
+          <div className="flex justify-center border-b border-slate-100 bg-gradient-to-br from-slate-50 via-surface to-blue-50/40 px-6 pt-6">
             <CVThumbnail cv={cv} className="w-[46%] translate-y-1 rounded-b-none transition-transform duration-200 group-hover:-translate-y-0.5" />
           </div>
           <div className="flex flex-1 flex-col px-5 py-4">

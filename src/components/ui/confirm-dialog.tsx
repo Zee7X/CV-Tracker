@@ -42,7 +42,7 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, subject, childr
     <dialog
       ref={ref}
       aria-labelledby={titleId}
-      className="app-dialog glass w-[calc(100%-2rem)] max-w-md rounded-[28px] bg-white/80 p-0 text-stone-900"
+      className="app-dialog glass w-[calc(100%-2rem)] max-w-md rounded-[28px] bg-surface/80 p-0 text-slate-900"
       onCancel={(event) => {
         event.preventDefault()
         if (!pending) onClose()
@@ -57,11 +57,11 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, subject, childr
           {title}
         </h2>
         {subject ? (
-          <p className="mt-2 break-words text-sm font-medium text-stone-800" data-no-translate>
+          <p className="mt-2 break-words text-sm font-medium text-slate-800" data-no-translate>
             {subject}
           </p>
         ) : null}
-        {children ? <div className={`${subject ? 'mt-1' : 'mt-2'} text-sm text-stone-600`}>{children}</div> : null}
+        {children ? <div className={`${subject ? 'mt-1' : 'mt-2'} text-sm text-slate-600`}>{children}</div> : null}
         <div className="mt-6 flex justify-end gap-2">
           <Button ref={cancelRef} type="button" variant="outline" onClick={onClose} disabled={pending}>
             Cancel

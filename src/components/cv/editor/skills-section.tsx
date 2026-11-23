@@ -50,7 +50,7 @@ export function SkillsSection({ watch, setValue, errors }: SkillsSectionProps) {
       description="List the tools, languages and methods a recruiter would search for. Soft skills read better as results in your experience bullets."
     >
       <div className="space-y-1.5">
-        <label htmlFor="skill-input" className="block text-sm font-medium text-stone-800">
+        <label htmlFor="skill-input" className="block text-sm font-medium text-slate-800">
           Add skills
         </label>
         <div className="flex gap-2">
@@ -71,7 +71,7 @@ export function SkillsSection({ watch, setValue, errors }: SkillsSectionProps) {
             Add
           </Button>
         </div>
-        <p className="text-xs text-stone-500">Press Enter to add. Separate several with commas.</p>
+        <p className="text-xs text-slate-500">Press Enter to add. Separate several with commas.</p>
       </div>
 
       {skills.length > 0 ? (
@@ -79,13 +79,13 @@ export function SkillsSection({ watch, setValue, errors }: SkillsSectionProps) {
           {skills.map((skill, index) => (
             <li
               key={`${skill}-${index}`}
-              className="inline-flex items-center gap-1 rounded-md border border-stone-900/10 bg-white/50 py-1 pl-2.5 pr-1 text-sm text-stone-900"
+              className="inline-flex items-center gap-1 rounded-md border border-slate-900/10 bg-surface/50 py-1 pl-2.5 pr-1 text-sm text-slate-900"
             >
               {skill}
               <button
                 type="button"
                 onClick={() => removeSkill(index)}
-                className="flex h-6 w-6 items-center justify-center rounded text-stone-500 hover:bg-stone-200 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
+                className="flex h-6 w-6 items-center justify-center rounded text-slate-500 hover:bg-slate-200 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
                 aria-label={`Remove ${skill}`}
               >
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
@@ -94,7 +94,7 @@ export function SkillsSection({ watch, setValue, errors }: SkillsSectionProps) {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-stone-500">No skills added yet.</p>
+        <p className="text-sm text-slate-500">No skills added yet.</p>
       )}
       <FieldError message={skillError} />
     </EditorSection>

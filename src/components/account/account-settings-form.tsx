@@ -77,7 +77,7 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
           <input type="hidden" name="avatar_url" value={avatarUrl} />
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/70 bg-stone-900/[0.05] text-xl font-semibold text-stone-500">
+            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-surface/70 bg-slate-900/[0.05] text-xl font-semibold text-slate-500">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -85,15 +85,15 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
                 <span aria-hidden="true">{initials}</span>
               )}
               {isCompressing ? (
-                <span className="absolute inset-0 flex items-center justify-center bg-white/80">
-                  <Loader2 className="h-5 w-5 animate-spin text-stone-600" aria-label="Processing image" />
+                <span className="absolute inset-0 flex items-center justify-center bg-surface/80">
+                  <Loader2 className="h-5 w-5 animate-spin text-slate-600" aria-label="Processing image" />
                 </span>
               ) : null}
             </div>
 
             <div className="min-w-0 flex-1 space-y-2">
-              <p className="text-sm font-medium text-stone-800">Photo</p>
-              <p className="text-xs text-stone-500">
+              <p className="text-sm font-medium text-slate-800">Photo</p>
+              <p className="text-xs text-slate-500">
                 {'JPG, PNG or WebP. Resized to 320 px. Only the Modern CV template prints a photo; in the CV editor choose “Use account photo”.'}
               </p>
               <div className="flex flex-wrap items-center gap-2">
@@ -167,13 +167,13 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
                 type="email"
                 value={initialProfile.email}
                 readOnly
-                className="cursor-not-allowed bg-stone-900/[0.05] text-stone-600"
+                className="cursor-not-allowed bg-slate-900/[0.05] text-slate-600"
               />
             </Field>
           </div>
 
-          <div className="flex items-center justify-between gap-4 border-t border-white/70 pt-4">
-            <p className="text-xs text-stone-500">
+          <div className="flex items-center justify-between gap-4 border-t border-surface/70 pt-4">
+            <p className="text-xs text-slate-500">
               {initialProfile.created_at ? (
                 <>
                   <span>Account created</span> <LocalDate value={initialProfile.created_at} />
@@ -201,7 +201,7 @@ export function AccountSettingsForm({ initialProfile }: AccountSettingsFormProps
               <PasswordInput id="confirm_password" name="confirm_password" autoComplete="new-password" required minLength={8} />
             </Field>
           </div>
-          <div className="flex justify-end border-t border-white/70 pt-4">
+          <div className="flex justify-end border-t border-surface/70 pt-4">
             <Button type="submit" variant="outline" disabled={passwordPending}>
               {passwordPending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
               {passwordPending ? 'Updating' : 'Change password'}

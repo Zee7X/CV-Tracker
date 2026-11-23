@@ -117,6 +117,18 @@ src/
 
 ---
 
+## Light and Dark Mode
+
+Users pick Light, Dark or System from the sidebar, the header button, or **Account → Appearance**. The choice is saved per device in `localStorage` (`cv-tracker-theme`), and an inline script in `src/app/layout.tsx` applies it before the first paint so pages never flash.
+
+Dark mode is driven by CSS variables in `src/app/globals.css`, not by a `dark:` twin on every class:
+
+- Use `bg-surface` / `border-surface` for panels instead of `bg-white`. `surface` is white in light mode and dark slate in dark mode.
+- The `slate` scale flips in dark mode, so `text-slate-900` stays the strongest text and `bg-slate-100` a raised fill.
+- Light tints (`*-50` to `*-200`) become translucent washes and tinted text (`text-red-700` etc.) lightens automatically.
+- Wrap anything that previews a printed document in `.paper`. It keeps the CV/cover letter preview dark-on-white, matching the PDF.
+- `dark:` variants still work (class strategy) for one-off adjustments.
+
 ## MVP Scope Summary
 
 - **CV Builder**:

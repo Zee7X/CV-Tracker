@@ -23,7 +23,7 @@ export function Logo({ href = '/', className, tone = 'dark' }: { href?: string; 
     >
       <LogoMark />
       <span
-        className={cn('font-display text-[17px] font-semibold tracking-[-0.02em]', tone === 'light' ? 'text-white' : 'text-stone-900')}
+        className={cn('font-display text-[17px] font-semibold tracking-[-0.02em]', tone === 'light' ? 'text-white' : 'text-slate-900')}
         data-no-translate
       >
         CV Tracker
