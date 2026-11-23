@@ -375,7 +375,7 @@ export function CVForm({ initialData }: CVFormProps) {
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </Link>
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-semibold tracking-[-0.01em] text-slate-900">{isEditing ? <span data-no-translate>{cvName}</span> : 'New CV'}</h1>
+            <h1 className="font-heading truncate text-2xl font-black text-slate-900">{isEditing ? <span data-no-translate>{cvName}</span> : 'New CV'}</h1>
             <p className="text-sm text-slate-600" aria-live="polite">
               {saveStatus}
             </p>

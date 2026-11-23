@@ -84,7 +84,7 @@ const LANGUAGE_OPTIONS: { id: LetterLanguage; label: string }[] = [
 ]
 
 const selectClass =
-  'h-10 w-full rounded-xl border border-slate-900/10 bg-surface/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-surface/85 focus-visible:border-brand-400 focus-visible:bg-surface focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 text-sm text-slate-900'
+  'select-field h-10 w-full rounded-xl border border-slate-900/10 bg-surface/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-surface/85 focus-visible:border-brand-400 focus-visible:bg-surface focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 text-sm text-slate-900'
 
 function localToday() {
   const now = new Date()
@@ -352,12 +352,12 @@ export function CoverLetterForm({ initialData, availableCVs = [], userProfile }:
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Cover letters
           </Link>
-          <h1 className="mt-1 truncate text-2xl font-semibold text-slate-900">
+          <h1 className="font-heading mt-1 line-clamp-2 text-[28px] font-black leading-tight text-slate-900">
             {isEditing ? values.title || 'Untitled letter' : 'New cover letter'}
           </h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 lg:shrink-0 lg:flex-nowrap">
           <span className="mr-1 text-xs text-slate-500" aria-live="polite">
             {savedAt ? (
               <>

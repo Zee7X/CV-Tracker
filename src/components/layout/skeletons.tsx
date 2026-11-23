@@ -418,7 +418,7 @@ export function ApplicationFormSkeleton({ editing }: { editing: boolean }) {
             <TextBone size="2xl" className="w-40" boxClassName="h-[32.5px] sm:hidden" />
           </>
         ) : (
-          <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.02em] text-slate-900">Add application</h1>
+          <h1 className="font-heading text-[32px] font-black leading-tight text-slate-900">Add application</h1>
         )}
         <p className="mt-1.5 text-sm text-slate-600">
           {editing ? 'Update the stage, the CV you sent, or your notes.' : 'Record the job, the date you applied and the CV you sent.'}
@@ -518,7 +518,7 @@ export function CVEditorSkeleton({ editing }: { editing: boolean }) {
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            {editing ? <TextBone size="xl" className="w-56" /> : <h1 className="text-xl font-semibold text-slate-900">New CV</h1>}
+            {editing ? <TextBone size="xl" className="w-56" /> : <h1 className="font-heading text-2xl font-black text-slate-900">New CV</h1>}
             <TextBone className="w-28" />
           </div>
         </div>
@@ -663,7 +663,7 @@ export function CoverLetterEditorSkeleton({ editing }: { editing: boolean }) {
           {editing ? (
             <TextBone size="2xl" className="w-56" boxClassName="mt-1" />
           ) : (
-            <h1 className="mt-1 text-2xl font-semibold text-slate-900">New cover letter</h1>
+            <h1 className="font-heading mt-1 text-[28px] font-black leading-tight text-slate-900">New cover letter</h1>
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">

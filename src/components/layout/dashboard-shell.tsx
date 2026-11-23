@@ -226,7 +226,7 @@ export default function DashboardShell({
 
       <main id="main" className="lg:pl-[17.5rem]">
         {/* Desktop top bar */}
-        <header className="sticky top-0 z-30 hidden h-16 items-center justify-between border-b border-slate-200/70 bg-surface/70 px-8 backdrop-blur-md lg:flex print:hidden">
+        <header className="sticky top-0 z-30 hidden h-16 items-center justify-between bg-background/80 px-8 backdrop-blur-md lg:flex print:hidden">
           <form action="/dashboard/applications" method="GET" role="search" className="relative w-80">
             <label htmlFor="shell-search" className="sr-only">
               Search applications

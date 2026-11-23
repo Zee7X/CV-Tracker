@@ -24,7 +24,7 @@ interface ApplicationFormProps {
 }
 
 const selectClass =
-  'flex h-10 w-full rounded-xl border border-slate-900/10 bg-surface/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-surface/85 focus-visible:border-brand-400 focus-visible:bg-surface focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 py-2 text-sm text-slate-900 disabled:opacity-50'
+  'select-field flex h-10 w-full rounded-xl border border-slate-900/10 bg-surface/80 shadow-[inset_0_1px_2px_rgba(120,60,80,0.06)] hover:bg-surface/85 focus-visible:border-brand-400 focus-visible:bg-surface focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20 transition-colors px-3 py-2 text-sm text-slate-900 disabled:opacity-50'
 
 // The usual path of an application; Rejected can happen at any step and is shown apart.
 const STAGES = APPLICATION_STATUSES.filter((status) => status.value !== 'rejected')
@@ -94,7 +94,7 @@ export function ApplicationForm({ initialData, userCVs = [] }: ApplicationFormPr
       </Link>
 
       <div>
-        <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.02em] text-slate-900">
+        <h1 className="font-heading text-[32px] font-black leading-tight text-slate-900">
           {isEditing ? (
             <>
               <span data-no-translate>{initialData?.position}</span>
