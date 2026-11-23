@@ -119,9 +119,3 @@ export async function resetPasswordAction(
 
   redirect('/dashboard')
 }
-
-export async function signOutAction(): Promise<void> {
-  const supabase = await createClient()
-  await supabase.auth.signOut()
-  redirect('/login')
-}

@@ -5,6 +5,24 @@ import { createClient } from '@/lib/supabase/server'
 import { coverLetterSchema } from '@/lib/validations/cover-letter'
 import type { CoverLetter, CoverLetterInput } from '@/types/cover-letter'
 
+type SupabaseClient = Awaited<ReturnType<typeof createClient>>
+
+// Only "relation does not exist" errors, not every error that names the table
+// (RLS and constraint errors mention cover_letters too).
+function isMissingTableError(error: { code?: string; message?: string }) {
+  return error.code === '42P01' || error.code === 'PGRST205' || Boolean(error.message?.includes('schema cache'))
+}
+
+const MISSING_TABLE_MESSAGE =
+  'The cover_letters table is missing in Supabase. Run supabase/migrations/20260921000002_cover_letters.sql in the Supabase SQL editor.'
+
+// The foreign key only proves the CV exists; this makes sure it is the user's own.
+async function verifyCvOwnership(supabase: SupabaseClient, userId: string, cvId: string | null) {
+  if (!cvId) return null
+  const { data, error } = await supabase.from('cvs').select('id').eq('id', cvId).eq('user_id', userId).maybeSingle()
+  return error || !data ? 'Selected CV was not found or is not owned by your account.' : null
+}
+
 export async function createCoverLetter(
   input: CoverLetterInput
 ): Promise<{ success: boolean; id?: string; error?: string }> {
@@ -22,6 +40,9 @@ export async function createCoverLetter(
   if (authError || !user) {
     return { success: false, error: 'You must be signed in to create a cover letter.' }
   }
+
+  const cvError = await verifyCvOwnership(supabase, user.id, parsed.data.cv_id || null)
+  if (cvError) return { success: false, error: cvError }
 
   const payload = {
     user_id: user.id,
@@ -50,22 +71,11 @@ export async function createCoverLetter(
     .single()
 
   if (error) {
-    if (
-      error.code === '42P01' ||
-      error.code === 'PGRST205' ||
-      error.message?.includes('schema cache') ||
-      error.message?.includes('cover_letters')
-    ) {
-      return {
-        success: false,
-        error:
-          'The cover_letters table is missing in Supabase. Run supabase/migrations/20260921000002_cover_letters.sql in the Supabase SQL editor.',
-      }
-    }
-    return { success: false, error: error.message }
+    return { success: false, error: isMissingTableError(error) ? MISSING_TABLE_MESSAGE : error.message }
   }
 
-  revalidatePath('/dashboard/cover-letters')
+  // The dashboard layout shows a cover letter count.
+  revalidatePath('/dashboard', 'layout')
   return { success: true, id: data?.id }
 }
 
@@ -87,6 +97,9 @@ export async function updateCoverLetter(
   if (authError || !user) {
     return { success: false, error: 'You must be signed in to update a cover letter.' }
   }
+
+  const cvError = await verifyCvOwnership(supabase, user.id, parsed.data.cv_id || null)
+  if (cvError) return { success: false, error: cvError }
 
   const payload = {
     title: parsed.data.title,
@@ -115,7 +128,7 @@ export async function updateCoverLetter(
     .eq('user_id', user.id)
 
   if (error) {
-    return { success: false, error: error.message }
+    return { success: false, error: isMissingTableError(error) ? MISSING_TABLE_MESSAGE : error.message }
   }
 
   revalidatePath('/dashboard/cover-letters')
@@ -143,10 +156,10 @@ export async function deleteCoverLetter(
     .eq('user_id', user.id)
 
   if (error) {
-    return { success: false, error: error.message }
+    return { success: false, error: isMissingTableError(error) ? MISSING_TABLE_MESSAGE : error.message }
   }
 
-  revalidatePath('/dashboard/cover-letters')
+  revalidatePath('/dashboard', 'layout')
   return { success: true }
 }
 
@@ -205,7 +218,7 @@ export async function duplicateCoverLetter(
     return { success: false, error: insertError.message }
   }
 
-  revalidatePath('/dashboard/cover-letters')
+  revalidatePath('/dashboard', 'layout')
   return { success: true, id: data?.id }
 }
 

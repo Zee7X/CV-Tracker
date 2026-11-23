@@ -60,6 +60,9 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   if (!user && isDashboardRoute) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'
+    // Bring the user back to the page they asked for after signing in.
+    redirectUrl.search = ''
+    redirectUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`)
     return NextResponse.redirect(redirectUrl)
   }
 
