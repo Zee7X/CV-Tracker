@@ -5,20 +5,20 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Visual language: soft warm aurora behind frosted glass panels, coral accent,
- * Poppins for headings and UI. CV documents (templates, PDF) stay plain white:
- * they are what recruiters read, so none of this reaches them.
+ * Visual language: a warm grey, lightly grained page with white rounded panels,
+ * a violet brand colour, a blush pink call to action and near-black "ink"
+ * pills. Big headings use Fraunces (a heavy soft serif, `font-heading`);
+ * Poppins stays for UI and Inter for body text. CV documents (templates, PDF)
+ * stay plain white: they are what recruiters read, so none of this reaches them.
  */
 :root {
-  --paper: #f8fafc;
-  --ink: #0f172a;
-  --line: rgb(226 232 240 / 0.85);
-  --highlight: #dbeafe;
+  --paper: #ececef;
+  --ink: #18181b;
+  --line: rgb(212 212 216 / 0.9);
+  --highlight: #ece6ff;
   --surface: #ffffff;
-  --glow-1: rgb(219 234 254 / 0.75);
-  --glow-2: rgb(237 233 254 / 0.75);
-  --glow-3: rgb(224 242 254 / 0.5);
-  --shadow-ink: 15 23 42;
+  --grain-opacity: 0.35;
+  --shadow-ink: 24 24 27;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 }
@@ -31,26 +31,24 @@
  * Prefer `bg-surface` over `bg-white` for panels so they follow the theme.
  */
 .dark {
-  --paper: #020617;
-  --ink: #f1f5f9;
-  --line: rgb(51 65 85 / 0.7);
-  --highlight: rgb(59 130 246 / 0.35);
-  --surface: #0f172a;
-  --glow-1: rgb(37 99 235 / 0.16);
-  --glow-2: rgb(124 58 237 / 0.12);
-  --glow-3: rgb(14 165 233 / 0.08);
+  --paper: #0c0c10;
+  --ink: #f4f4f5;
+  --line: rgb(63 63 70 / 0.7);
+  --highlight: rgb(141 107 245 / 0.4);
+  --surface: #17171c;
+  --grain-opacity: 0.12;
   --shadow-ink: 0 0 0;
   color-scheme: dark;
-  --color-slate-50: oklch(17.5% 0.035 265);
-  --color-slate-100: oklch(27.9% 0.041 260.031);
-  --color-slate-200: oklch(37.2% 0.044 257.287);
-  --color-slate-300: oklch(44.6% 0.043 257.281);
-  --color-slate-400: oklch(55.4% 0.046 257.417);
-  --color-slate-500: oklch(70.4% 0.04 256.788);
-  --color-slate-600: oklch(86.9% 0.022 252.894);
-  --color-slate-700: oklch(92.9% 0.013 255.508);
-  --color-slate-800: oklch(96.8% 0.007 247.896);
-  --color-slate-900: oklch(98.4% 0.003 247.858);
+  --color-slate-50: oklch(17% 0.006 286);
+  --color-slate-100: oklch(27.4% 0.006 286.033);
+  --color-slate-200: oklch(37% 0.013 285.805);
+  --color-slate-300: oklch(44.2% 0.017 285.786);
+  --color-slate-400: oklch(55.2% 0.016 285.938);
+  --color-slate-500: oklch(70.5% 0.015 286.067);
+  --color-slate-600: oklch(87.1% 0.006 286.286);
+  --color-slate-700: oklch(92% 0.004 286.32);
+  --color-slate-800: oklch(96.7% 0.001 286.375);
+  --color-slate-900: oklch(98.5% 0 none);
   --color-slate-950: #fff;
   --color-red-50: color-mix(in oklab, oklch(63.7% 0.237 25.331) 14%, transparent);
   --color-red-100: color-mix(in oklab, oklch(63.7% 0.237 25.331) 22%, transparent);
@@ -85,9 +83,16 @@
   --color-violet-50: color-mix(in oklab, oklch(60.6% 0.25 292.717) 14%, transparent);
   --color-violet-100: color-mix(in oklab, oklch(60.6% 0.25 292.717) 22%, transparent);
   --color-violet-200: color-mix(in oklab, oklch(60.6% 0.25 292.717) 34%, transparent);
-  --color-brand-50: color-mix(in oklab, #3b82f6 14%, transparent);
-  --color-brand-100: color-mix(in oklab, #3b82f6 22%, transparent);
-  --color-brand-200: color-mix(in oklab, #3b82f6 34%, transparent);
+  --color-brand-50: color-mix(in oklab, #8d6bf5 14%, transparent);
+  --color-brand-100: color-mix(in oklab, #8d6bf5 22%, transparent);
+  --color-brand-200: color-mix(in oklab, #8d6bf5 34%, transparent);
+}
+
+/* On a dark page, ink panels (nav pill, sidebar, labels, CTA band) are lifted a
+   step so they still stand out from the background. Only <html> sets this, so
+   a local `.dark` scope in light mode keeps the true ink. */
+html.dark {
+  --color-ink: #2a2a32;
 }
 
 /*
@@ -142,15 +147,16 @@
   --color-violet-50: oklch(96.9% 0.016 293.756);
   --color-violet-100: oklch(94.3% 0.029 294.588);
   --color-violet-200: oklch(89.4% 0.057 293.283);
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-200: #bfdbfe;
+  --color-brand-50: #f5f2ff;
+  --color-brand-100: #ece6ff;
+  --color-brand-200: #dacfff;
 }
 
 @theme inline {
   --color-background: var(--paper);
   --color-foreground: var(--ink);
   --color-surface: var(--surface);
+  --font-heading: var(--font-fraunces), Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-poppins), var(--font-inter), ui-sans-serif, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -159,18 +165,24 @@
 /* Not inline, so the dark theme can override the light brand tints. */
 @theme {
 
-  /* Royal blue primary accent matching modern clean dashboard standards */
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-200: #bfdbfe;
-  --color-brand-300: #93c5fd;
-  --color-brand-400: #60a5fa;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-700: #1d4ed8;
-  --color-brand-800: #1e40af;
-  --color-brand-900: #1e3a8a;
-  --color-brand-950: #172554;
+  /* Near-black pills and labels; stays dark in both themes. */
+  --color-ink: #18181b;
+  --color-ink-soft: #27272a;
+  /* Call-to-action pink, always with ink text. */
+  --color-blush: #f6b8ec;
+  --color-blush-strong: #f09ae3;
+  /* Violet brand: buttons, active navigation, highlights. */
+  --color-brand-50: #f5f2ff;
+  --color-brand-100: #ece6ff;
+  --color-brand-200: #dacfff;
+  --color-brand-300: #bfacff;
+  --color-brand-400: #a184fb;
+  --color-brand-500: #8d6bf5;
+  --color-brand-600: #7651ea;
+  --color-brand-700: #6340cf;
+  --color-brand-800: #5235a8;
+  --color-brand-900: #432d86;
+  --color-brand-950: #2a1a5c;
 }
 
 @layer base {
@@ -185,13 +197,24 @@
   body {
     color: var(--ink);
     background-color: var(--paper);
-    /* Soft ambient sky and lavender glow pinned to top, matching EduMate aesthetic */
-    background-image:
-      radial-gradient(55rem 35rem at 15% -8%, var(--glow-1), transparent 65%),
-      radial-gradient(50rem 35rem at 85% -8%, var(--glow-2), transparent 65%),
-      radial-gradient(40rem 25rem at 50% -12%, var(--glow-3), transparent 60%);
-    background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fine paper grain over the whole page, behind all content. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @media print {
+    body::before {
+      display: none;
+    }
   }
 
   h1,
@@ -227,10 +250,72 @@
     -webkit-backdrop-filter: blur(16px);
   }
 
-  /* Sleek modern brand orb */
+  /* Violet disc used for numbered steps and icon badges. */
   .orb {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-    box-shadow: 0 4px 14px -2px rgb(37 99 235 / 0.45);
+    background: linear-gradient(135deg, #a184fb 0%, #7651ea 55%, #6340cf 100%);
+    box-shadow: 0 4px 14px -2px rgb(118 81 234 / 0.45);
+  }
+
+  /* Heavy soft serif for display headings. */
+  .font-heading {
+    font-family: var(--font-heading);
+    font-variation-settings: 'SOFT' 100;
+    letter-spacing: -0.02em;
+  }
+
+  /* Ink label behind a heading phrase, as in "a black pill with white words". */
+  .ink-label {
+    display: inline-block;
+    border-radius: 0.3em;
+    background: var(--color-ink);
+    color: #fff;
+    padding: 0 0.22em 0.06em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  /* Violet sticker behind a phrase: dashed inner border, slightly tilted. */
+  .tag-label {
+    display: inline-block;
+    rotate: -2deg;
+    border-radius: 0.12em;
+    background: var(--color-brand-500);
+    color: #fff;
+    padding: 0.02em 0.28em 0.1em;
+    outline: 2px dashed rgb(255 255 255 / 0.75);
+    outline-offset: -0.16em;
+  }
+
+  /* Hollow letters: the outline only. */
+  .text-hollow {
+    color: transparent;
+    -webkit-text-stroke: 0.035em var(--hollow-color, #fff);
+  }
+
+  /* Letters with a white rim and a hard drop shadow, like a sticker. */
+  .text-sticker {
+    -webkit-text-stroke: 0.06em #fff;
+    paint-order: stroke fill;
+    text-shadow: 0 0.05em 0 rgb(24 24 27 / 0.18);
+  }
+
+  .dark .text-sticker {
+    -webkit-text-stroke-color: var(--paper);
+  }
+
+  /* Floating decorative cards on the landing page drift a little. */
+  .float-slow {
+    animation: float 7s ease-in-out infinite;
+  }
+
+  .float-slower {
+    animation: float 9s ease-in-out -3s infinite;
+  }
+}
+
+@keyframes float {
+  50% {
+    translate: 0 -8px;
   }
 }
 
@@ -450,10 +535,10 @@ html[data-i18n-pending] body {
 .dark .text-violet-700:not(.paper *) { color: oklch(81.1% 0.111 293.571); }
 .dark .text-violet-800:not(.paper *) { color: oklch(89.4% 0.057 293.283); }
 .dark .text-violet-900:not(.paper *) { color: oklch(94.3% 0.029 294.588); }
-.dark .text-brand-600:not(.paper *) { color: #60a5fa; }
-.dark .text-brand-700:not(.paper *) { color: #93c5fd; }
-.dark .text-brand-800:not(.paper *) { color: #bfdbfe; }
-.dark .text-brand-900:not(.paper *) { color: #dbeafe; }
+.dark .text-brand-600:not(.paper *) { color: #a184fb; }
+.dark .text-brand-700:not(.paper *) { color: #bfacff; }
+.dark .text-brand-800:not(.paper *) { color: #dacfff; }
+.dark .text-brand-900:not(.paper *) { color: #ece6ff; }
 
 /* While ThemeProvider switches theme, everything recolours at once instead of
    each transition-colors element fading on its own. */

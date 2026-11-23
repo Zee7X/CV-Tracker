@@ -15,7 +15,7 @@ export default function ForgotPasswordPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-slate-900">Reset your password</h1>
+        <h1 className="font-heading text-[34px] font-black leading-tight text-slate-900">Reset your password</h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
           Enter the email you registered with. We will send a link to set a new password.
         </p>

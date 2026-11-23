@@ -795,6 +795,44 @@ const id: Record<string, string> = {
   'Choose how CV Tracker looks on this device. System follows your operating system setting.': 'Pilih tampilan CV Tracker di perangkat ini. Sistem mengikuti pengaturan sistem operasi Anda.',
   'CV and cover letter previews always stay white, matching the exported PDF.': 'Pratinjau CV dan surat lamaran selalu berlatar putih, sesuai PDF yang diekspor.',
   'Search applications...': 'Cari lamaran...',
+  // Landing and auth redesign
+  'How it works': 'Cara kerja',
+  'Get started': 'Mulai',
+  'Your Personal CV': 'CV & Pelacak',
+  '& Job Tracker –': 'Lamaran Pribadimu –',
+  'Land the': 'Raih',
+  'See how it works': 'Lihat cara kerjanya',
+  'Everything your job search needs, in': 'Semua kebutuhan cari kerja Anda, dalam',
+  'one tracker': 'satu pelacak',
+  'Three CV templates, six application stages and two languages, from blank page to follow-up. No spreadsheets required.':
+    'Tiga template CV, enam tahap lamaran, dan dua bahasa, dari halaman kosong hingga tindak lanjut. Tanpa perlu spreadsheet.',
+  'Live A4 preview': 'Pratinjau A4 langsung',
+  'A4 layout with selectable text, so applicant tracking systems can read every line.':
+    'Tata letak A4 dengan teks yang dapat dipilih, sehingga sistem ATS bisa membaca setiap baris.',
+  'Application pipeline': 'Alur lamaran',
+  'Move each job through applied, screening, interview, offer, accepted or rejected.':
+    'Pindahkan setiap lamaran melalui tahap dikirim, screening, wawancara, penawaran, diterima, atau ditolak.',
+  'Write a letter for each job from a formal, professional, short email or creative starting point.':
+    'Tulis surat untuk setiap lowongan dari template formal, profesional, email singkat, atau kreatif.',
+  'English or Indonesian': 'Inggris atau Indonesia',
+  'Each CV is written in English or Indonesian, and headings, months and "Present" follow that choice.':
+    'Setiap CV ditulis dalam bahasa Inggris atau Indonesia, dan judul, bulan, serta "Sekarang" mengikuti pilihan itu.',
+  'Light and dark, on any screen': 'Terang dan gelap, di layar apa pun',
+  'Works on your phone and laptop, in light or dark mode. Your CV preview always stays white like the PDF.':
+    'Bisa dipakai di ponsel dan laptop, dalam mode terang atau gelap. Pratinjau CV selalu putih seperti PDF-nya.',
+  'From blank page': 'Dari halaman kosong',
+  'to follow-up': 'hingga tindak lanjut',
+  'Switch between ATS Clean, Professional and Modern without retyping anything.':
+    'Beralih antara ATS Clean, Professional, dan Modern tanpa mengetik ulang.',
+  'Three templates,': 'Tiga template,',
+  'one set of content': 'satu isi',
+  'Start with your most recent job.': 'Mulai dari pekerjaan terakhir Anda.',
+  'The rest can wait.': 'Sisanya bisa menyusul.',
+  'Write the CV once.': 'Tulis CV sekali.',
+  'Know which version': 'Ketahui versi mana',
+  'went where.': 'dikirim ke mana.',
+  'CV Tracker home': 'Beranda CV Tracker',
+  'templates · stages · languages': 'template · tahap · bahasa',
   'Selected CV was not found or is not owned by your account.': 'CV yang dipilih tidak ditemukan atau bukan milik akun Anda.',
 }
 

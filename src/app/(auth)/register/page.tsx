@@ -16,7 +16,7 @@ export default function RegisterPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-slate-900">Create an account</h1>
+        <h1 className="font-heading text-[34px] font-black leading-tight text-slate-900">Create an account</h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">Free. You can write your first CV right after signing up.</p>
       </div>
 
