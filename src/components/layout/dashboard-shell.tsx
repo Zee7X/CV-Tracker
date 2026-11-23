@@ -163,13 +163,13 @@ export default function DashboardShell({
         Skip to content
       </a>
 
-      {/* Desktop sidebar */}
-      <aside className="fixed inset-y-3 left-3 z-40 hidden w-64 flex-col rounded-[28px] border border-slate-200/80 bg-surface/90 shadow-xs backdrop-blur-md lg:flex print:hidden">
+      {/* Desktop sidebar: an ink panel in both themes. `dark` flips the slate classes inside to light-on-dark. */}
+      <aside className="dark fixed inset-y-3 left-3 z-40 hidden w-64 flex-col rounded-[30px] bg-ink shadow-[0_20px_40px_-20px_rgba(24,24,27,0.6)] lg:flex print:hidden">
         <div className="flex h-20 items-center px-6">
           <Logo href="/dashboard" />
         </div>
         <div className="px-4 pb-4">
-          <ButtonLink href="/dashboard/applications/new" className="w-full">
+          <ButtonLink href="/dashboard/applications/new" className="w-full bg-blush font-semibold text-ink hover:bg-blush-strong active:bg-blush-strong">
             <Plus className="h-4 w-4" aria-hidden="true" />
             Add application
           </ButtonLink>
@@ -178,7 +178,7 @@ export default function DashboardShell({
           <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Workspace</p>
           <SidebarNav pathname={pathname} counts={counts} />
         </div>
-        <div className="space-y-3 border-t border-slate-200/70 p-4">
+        <div className="space-y-3 border-t border-white/10 p-4">
           <div className="flex items-center justify-between px-2">
             <span className="text-xs font-medium text-slate-500">Language</span>
             <LanguageSwitcher compact />

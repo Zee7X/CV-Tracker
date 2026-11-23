@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Poppins } from 'next/font/google'
+import { Fraunces, Inter, Poppins } from 'next/font/google'
 import { LanguageProvider } from '@/components/i18n/language-provider'
 import { THEME_BOOT_SCRIPT, ThemeProvider } from '@/components/theme/theme-provider'
 import './globals.css'
@@ -14,6 +14,13 @@ const poppins = Poppins({
   variable: '--font-poppins',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
+})
+
+// Big page and section headings: a soft, heavy serif (variable, with the SOFT axis).
+const fraunces = Fraunces({
+  variable: '--font-fraunces',
+  subsets: ['latin'],
+  axes: ['SOFT', 'opsz'],
 })
 
 const siteName = 'CV Tracker'
@@ -34,8 +41,8 @@ export const metadata: Metadata = {
 // Colours the mobile browser bar to match the page in light and dark.
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
-    { media: '(prefers-color-scheme: dark)', color: '#020617' },
+    { media: '(prefers-color-scheme: light)', color: '#ececef' },
+    { media: '(prefers-color-scheme: dark)', color: '#0c0c10' },
   ],
 }
 
@@ -50,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       // Lets Next turn smooth scrolling off during route changes so a new page starts at the top instantly.
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${inter.variable} ${poppins.variable} h-full scroll-smooth antialiased`}
+      className={`${inter.variable} ${poppins.variable} ${fraunces.variable} h-full scroll-smooth antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
