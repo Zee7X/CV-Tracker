@@ -64,12 +64,12 @@ function SidebarNav({ pathname, counts }: { pathname: string; counts: ShellCount
             aria-current={active ? 'page' : undefined}
             className={`font-display group flex h-11 items-center gap-3 rounded-full px-4 text-sm transition-[background-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 ${
               active
-                ? 'bg-brand-600 font-semibold text-white shadow-xs'
-                : 'font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
+                ? 'bg-white/10 font-semibold text-white'
+                : 'font-medium text-slate-600 hover:bg-white/5 hover:text-slate-900'
             }`}
           >
             <Icon
-              className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`}
+              className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-brand-400' : 'text-slate-500 group-hover:text-slate-700'}`}
               strokeWidth={active ? 2.2 : 1.8}
               aria-hidden="true"
             />
@@ -77,7 +77,7 @@ function SidebarNav({ pathname, counts }: { pathname: string; counts: ShellCount
             {value !== null && value !== undefined ? (
               <span
                 className={`min-w-6 rounded-full px-2 py-0.5 text-center text-xs tabular-nums ${
-                  active ? 'bg-white/20 text-white font-medium' : 'bg-slate-100 text-slate-600'
+                  active ? 'bg-brand-500 font-semibold text-white' : 'bg-white/5 text-slate-500'
                 }`}
               >
                 {value}
@@ -99,11 +99,11 @@ function UserBlock({ user, pathname }: { user: ShellUser | null; pathname: strin
         aria-current={accountActive ? 'page' : undefined}
         pendingVariant="spinner"
         className={`font-display group flex h-10 items-center gap-3 rounded-full px-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 ${
-          accountActive ? 'bg-brand-600 font-semibold text-white shadow-xs' : 'font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
+          accountActive ? 'bg-white/10 font-semibold text-white' : 'font-medium text-slate-600 hover:bg-white/5 hover:text-slate-900'
         }`}
       >
         <Settings
-          className={`h-4 w-4 shrink-0 ${accountActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`}
+          className={`h-4 w-4 shrink-0 ${accountActive ? 'text-brand-400' : 'text-slate-500 group-hover:text-slate-700'}`}
           strokeWidth={accountActive ? 2.2 : 1.8}
           aria-hidden="true"
         />
@@ -164,7 +164,7 @@ export default function DashboardShell({
       </a>
 
       {/* Desktop sidebar: an ink panel in both themes. `dark` flips the slate classes inside to light-on-dark. */}
-      <aside className="dark fixed inset-y-3 left-3 z-40 hidden w-64 flex-col rounded-[30px] bg-ink shadow-[0_20px_40px_-20px_rgba(24,24,27,0.6)] lg:flex print:hidden">
+      <aside className="dark fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-ink lg:flex print:hidden">
         <div className="flex h-20 items-center px-6">
           <Logo href="/dashboard" />
         </div>
@@ -209,14 +209,15 @@ export default function DashboardShell({
           </button>
         </div>
         <div id="mobile-nav" data-open={isMobileMenuOpen} inert={!isMobileMenuOpen} className="collapse-panel">
-          <div className={isMobileMenuOpen ? 'border-t border-slate-200/70' : ''}>
+          {/* Same ink panel as the desktop sidebar, so the nav items look identical. */}
+          <div className="dark bg-ink">
             <div className="space-y-3 px-3 py-3 sm:px-5">
-              <ButtonLink href="/dashboard/applications/new" className="w-full">
+              <ButtonLink href="/dashboard/applications/new" className="w-full bg-blush font-semibold text-ink hover:bg-blush-strong active:bg-blush-strong">
                 <Plus className="h-4 w-4" aria-hidden="true" />
                 Add application
               </ButtonLink>
               <SidebarNav pathname={pathname} counts={counts} />
-              <div className="border-t border-slate-200/70 pt-3">
+              <div className="border-t border-white/10 pt-3">
                 <UserBlock user={user} pathname={pathname} />
               </div>
             </div>
@@ -224,7 +225,7 @@ export default function DashboardShell({
         </div>
       </header>
 
-      <main id="main" className="lg:pl-[17.5rem]">
+      <main id="main" className="lg:pl-64">
         {/* Desktop top bar */}
         <header className="sticky top-0 z-30 hidden h-16 items-center justify-between bg-background/80 px-8 backdrop-blur-md lg:flex print:hidden">
           <form action="/dashboard/applications" method="GET" role="search" className="relative w-80">

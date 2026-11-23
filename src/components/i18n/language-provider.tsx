@@ -833,6 +833,16 @@ const id: Record<string, string> = {
   'went where.': 'dikirim ke mana.',
   'CV Tracker home': 'Beranda CV Tracker',
   'templates · stages · languages': 'template · tahap · bahasa',
+  'CV in English or Indonesian, with dates and headings in the right language':
+    'CV dalam bahasa Inggris atau Indonesia, dengan tanggal dan judul sesuai bahasanya',
+  'Three templates and a PDF that matches the preview': 'Tiga template dan PDF yang sama dengan pratinjaunya',
+  'Every application logged with the CV you sent and its stage': 'Setiap lamaran tercatat bersama CV yang dikirim dan tahapnya',
+  'Contact details, experience and skills, with a live A4 preview and PDF download.':
+    'Kontak, pengalaman, dan keahlian, dengan pratinjau A4 langsung dan unduhan PDF.',
+  'Company, role, posting link and the CV you sent, so you know what went where.':
+    'Perusahaan, posisi, tautan lowongan, dan CV yang dikirim, agar Anda tahu apa dikirim ke mana.',
+  'Formal Indonesian, professional English or a short email body, filled from your CV.':
+    'Surat resmi berbahasa Indonesia, surat profesional berbahasa Inggris, atau badan email singkat, terisi dari CV Anda.',
   'Page not found': 'Halaman tidak ditemukan',
   'Home page': 'Beranda',
   'The link may be mistyped, or the page was moved or deleted. Your CVs, letters and applications are unaffected.': 'Tautannya mungkin salah ketik, atau halamannya sudah dipindah atau dihapus. CV, surat, dan lamaran Anda tetap aman.',
