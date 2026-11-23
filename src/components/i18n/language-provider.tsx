@@ -833,6 +833,9 @@ const id: Record<string, string> = {
   'went where.': 'dikirim ke mana.',
   'CV Tracker home': 'Beranda CV Tracker',
   'templates · stages · languages': 'template · tahap · bahasa',
+  'Page not found': 'Halaman tidak ditemukan',
+  'Home page': 'Beranda',
+  'The link may be mistyped, or the page was moved or deleted. Your CVs, letters and applications are unaffected.': 'Tautannya mungkin salah ketik, atau halamannya sudah dipindah atau dihapus. CV, surat, dan lamaran Anda tetap aman.',
   'Selected CV was not found or is not owned by your account.': 'CV yang dipilih tidak ditemukan atau bukan milik akun Anda.',
 }
 

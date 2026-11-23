@@ -57,16 +57,29 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
     pathname.startsWith('/register') ||
     pathname.startsWith('/forgot-password')
 
-  if (!user && isDashboardRoute) {
+  // The logout route works with or without a session (it always ends on /login),
+  // so it is never bounced here.
+  const isLogoutRoute = pathname === '/dashboard/logout'
+  const isPageRequest = request.method === 'GET' || request.method === 'HEAD'
+  // Server action calls are fetches, not navigations. Each action checks the
+  // session itself and returns a "please sign in" error the form can show.
+  const isServerAction = request.headers.has('next-action')
+
+  if (!user && isDashboardRoute && !isLogoutRoute && !isServerAction) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'
-    // Bring the user back to the page they asked for after signing in.
     redirectUrl.search = ''
-    redirectUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`)
-    return NextResponse.redirect(redirectUrl)
+    // Bring the user back to the page they asked for after signing in. Only
+    // for page views: a form POST cannot be replayed from the login page.
+    if (isPageRequest) redirectUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`)
+    // 303 makes the browser follow with GET. The default 307 would repeat a
+    // POST against /login, which only serves GET (HTTP 405).
+    return NextResponse.redirect(redirectUrl, isPageRequest ? 307 : 303)
   }
 
-  if (user && isAuthRoute) {
+  // Signed-in users skip the sign-in pages. Page views only: a login form
+  // submitted from a stale tab still reaches its server action.
+  if (user && isAuthRoute && isPageRequest) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/dashboard'
     return NextResponse.redirect(redirectUrl)

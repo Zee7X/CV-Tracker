@@ -69,9 +69,11 @@ export function CoverLetterCard({ letter }: CoverLetterCardProps) {
             </div>
           </div>
           {letter.opening ? (
-            <p className="mt-4 line-clamp-3 rounded-xl border border-slate-100 bg-slate-50/70 px-3.5 py-2.5 font-serif text-[13px] leading-5 text-slate-600" data-no-translate>
+            <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/70 px-3.5 py-2.5" data-no-translate>
+              <p className="line-clamp-3 font-serif text-[13px] leading-5 text-slate-600">
               {letter.opening}
             </p>
+            </div>
           ) : null}
           <div className="mt-auto flex flex-wrap items-center gap-2 pt-4 text-xs text-slate-400">
             <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">{FORMAT_LABELS[letter.template] ?? letter.template}</span>
