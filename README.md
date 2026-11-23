@@ -122,7 +122,7 @@ src/
 - `brand-*` is violet (primary buttons, active navigation). `blush` is the pink call-to-action colour, always with `text-ink`. `ink` is the near-black used for the nav pill, the sidebar and labels.
 - `font-heading` (Fraunces) is for big page and section headings; Poppins (`font-display`) stays for UI, Inter for body text.
 - Helper classes in `globals.css`: `ink-label` (white words on an ink pill), `tag-label` (tilted violet sticker), `text-hollow`, `text-sticker`.
-- The logo mark lives in `src/components/brand/logo.tsx` and matches `src/app/icon.svg` (favicon). `favicon.ico` and `apple-icon.png` are rendered from that SVG.
+- The logo mark ("CV" on a violet tile with a progress bar) lives in `src/components/brand/logo.tsx` and matches `src/app/icon.svg` (favicon). `favicon.ico` and `apple-icon.png` are rendered from that SVG.
 
 ## Light and Dark Mode
 

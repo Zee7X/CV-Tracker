@@ -12,7 +12,7 @@ import {
   Play,
   Send,
 } from 'lucide-react'
-import { LogoMark } from '@/components/brand/logo'
+import { LogoGlyph, LogoMark } from '@/components/brand/logo'
 import { LanguageSwitcher } from '@/components/i18n/language-switcher'
 import { ThemeToggleButton } from '@/components/theme/theme-toggle'
 import { CVThumbnail } from '@/components/cv/cv-thumbnail'
@@ -96,13 +96,7 @@ const weeklyBars = [38, 62, 30, 80, 54, 92, 46, 70, 34, 88, 58, 76, 40, 66, 28, 
 
 function Watermark() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 32 32" className="pointer-events-none absolute left-1/2 top-[-14rem] -z-10 h-[78rem] w-[78rem] -translate-x-1/2 text-slate-900 opacity-[0.035]">
-      <g fill="currentColor">
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-          <ellipse key={angle} cx="16" cy="7.6" rx="4.3" ry="7.1" transform={`rotate(${angle} 16 16)`} />
-        ))}
-      </g>
-    </svg>
+    <LogoGlyph className="pointer-events-none absolute left-1/2 top-[-6rem] -z-10 h-[52rem] w-[52rem] -translate-x-1/2 text-slate-900 opacity-[0.035]" />
   )
 }
 
@@ -341,7 +335,7 @@ export default function LandingPage() {
 
           <section className="px-4 pb-10 pt-20 sm:px-8 sm:pt-28">
             <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-8 overflow-hidden rounded-[36px] bg-ink px-8 py-12 sm:px-14 md:flex-row md:items-center md:justify-between">
-              <LogoMark className="pointer-events-none absolute -bottom-28 right-[30%] h-72 w-72 rotate-12 opacity-15" />
+              <LogoGlyph className="pointer-events-none absolute -bottom-20 right-[28%] h-72 w-72 -rotate-12 text-brand-400 opacity-20" />
               <h2 className="relative max-w-xl font-heading text-[clamp(1.9rem,4vw,3rem)] font-black leading-[1.08] text-white">
                 <span>Start with your most recent job. </span>
                 <span className="text-blush">The rest can wait.</span>

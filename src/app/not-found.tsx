@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { Logo, LogoMark } from '@/components/brand/logo'
+import { Logo, LogoGlyph } from '@/components/brand/logo'
 
 export const metadata = {
   title: 'Page not found - CV Tracker',
@@ -13,7 +13,7 @@ export default function NotFound() {
       <Logo />
       <main className="flex flex-1 flex-col items-center justify-center py-16 text-center">
         <div className="relative">
-          <LogoMark className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-64 w-64 -translate-x-1/2 -translate-y-1/2 opacity-15" />
+          <LogoGlyph className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-64 w-64 -translate-x-1/2 -translate-y-1/2 text-brand-500 opacity-15" />
           <p className="font-heading text-[clamp(5rem,18vw,9rem)] font-black leading-none text-slate-900" data-no-translate>
             <span className="text-sticker">4</span>
             <span className="text-hollow [--hollow-color:var(--color-brand-500)]">0</span>
