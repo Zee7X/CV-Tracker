@@ -146,3 +146,8 @@ Dark mode is driven by CSS variables in `src/app/globals.css`, not by a `dark:` 
   - Track Company, Position, Applied Date, Status (`applied`, `screening`, `interview`, `offering`, `accepted`, `rejected`), Linked CV, Job URL, Notes.
 - **Out of Scope for MVP**:
   - No AI assistant, no ATS score estimation, no automated job scraping, no social feeds.
+
+## Contributors
+
+- [@Zee7X](https://github.com/Zee7X)
+- [@clumsyx](https://github.com/clumsyx)
